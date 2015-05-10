@@ -1,0 +1,38 @@
+<div class="ui large inverted vertical sidebar menu">
+  {{#if user}}
+    <div class="item profil">
+      <img class="ui avatar rounded image" src="{{user.avatar_url}}">
+      <span class="name">{{user.name}}</span>
+    </div>
+    {{#if user.public_repos}}
+      <a class="item">
+        Public project <span class="ui label">{{user.public_repos}}</span>
+      </a>
+    {{/if}}
+  {{/if}}
+  <a class="active item">
+    Dogs Weekly <span class="ui label">213</span>
+  </a>
+  <div class="item">
+    <b>Archived Feeds</b>
+    <div class="menu">
+      <a class="item">
+        Engadget <span class="ui label">11</span>
+      </a>
+      <a class="item">
+        NY Times Tech Blog <span class="ui label">21</span>
+      </a>
+    </div>
+  </div>
+  <a class="item">
+    <i class="bookmark icon"></i> Favorites
+  </a>
+  <div class="ui dropdown item">
+    <i class="add icon"></i> New
+    <div class="menu">
+      <a class="item"><i class="rss icon"></i> Feed</a>
+      <a class="item"><i class="tag icon"></i> Tag</a>
+      <a class="item"><i class="folder icon"></i> Group</a>
+    </div>
+  </div>
+</div>

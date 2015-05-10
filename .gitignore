@@ -1,0 +1,5 @@
+dist/
+semantic/
+node_modules/
+
+githubconf.json
