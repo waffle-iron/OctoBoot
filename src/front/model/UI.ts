@@ -2,7 +2,9 @@ module GHBoot.model {
 
     export class UI {
 
-        public static HB_SIDEBAR: string = 'SideBar.hbs';
+        public static HB_PROFIL: string = 'Profil.hbs';
+        public static HB_REPOS_PUBLIC: string = 'ReposPublic.hbs';
+        public static HB_SIDEBAR: string = 'Sidebar.hbs';
         public static SIDEBAR: string = '.ui.sidebar';
         public static SIDEBAR_LAUNCH_BT: string = '.launch.button';
 

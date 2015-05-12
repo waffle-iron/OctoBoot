@@ -1,15 +1,6 @@
 <div class="ui large inverted vertical sidebar menu">
-  {{#if user}}
-    <div class="item profil">
-      <img class="ui avatar rounded image" src="{{user.avatar_url}}">
-      <span class="name">{{user.name}}</span>
-    </div>
-    {{#if user.public_repos}}
-      <a class="item">
-        Public project <span class="ui label">{{user.public_repos}}</span>
-      </a>
-    {{/if}}
-  {{/if}}
+  {{> profil}}
+  {{> repos_public}}
   <a class="active item">
     Dogs Weekly <span class="ui label">213</span>
   </a>

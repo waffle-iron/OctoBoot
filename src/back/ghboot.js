@@ -5,14 +5,20 @@ ghc = require("../../githubconf.json");
 
 var sockets = [];
 
-function updateUser(sid, access_token) {
-    ghapi.getUser(access_token, function(error, data) {
-        if (!error && data) {
-            sockets[sid].s.emit("user", data);
-        } else {
-            console.error(error);
+function updateUI(sid, access_token) {
+    var ctrl = function(event) {
+        return function(error, data) {
+            if (!error && data) {
+                sockets[sid].s.emit(event, data);
+            } else {
+                console.error(error);
+            }
         }
-    });
+    };
+
+    ghapi.getUser(access_token, ctrl("user"));
+    ghapi.getRepos(access_token, "public", ctrl("repos_public"));
+    ghapi.getRepos(access_token, "private", ctrl("repos_private"));
 }
 
 function isLogged(req, res) {
@@ -21,7 +27,7 @@ function isLogged(req, res) {
     } else {
         res.status(200).send("logged");
         sockets[req.params.sid].ghtoken = req.signedCookies.gat;
-        updateUser(req.params.sid, req.signedCookies.gat);
+        updateUI(req.params.sid, req.signedCookies.gat);
     }
 }
 

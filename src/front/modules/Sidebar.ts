@@ -5,18 +5,18 @@ module GHBoot.modules {
     // @See node_modules/DefinitelyTyped/handlebars/handlebars.d.ts#7
     declare var Handlebars: HandlebarsRuntimeStatic;
 
-    export interface SideBarContext {
+    export interface SidebarContext {
         user?: model.GitHubUser;
     }
 
     export class Sidebar {
 
-        public template: HandlebarsTemplateDelegate;
         public html: string;
-        public context: SideBarContext;
+        public context: SidebarContext;
 
         constructor() {
-            this.template = Handlebars.templates[model.UI.HB_SIDEBAR];
+            Handlebars.registerPartial('profil', Handlebars.templates[model.UI.HB_PROFIL]);
+            Handlebars.registerPartial('repos_public', Handlebars.templates[model.UI.HB_REPOS_PUBLIC]);
             this.context = {};
         }
 
@@ -25,11 +25,19 @@ module GHBoot.modules {
                 this.context.user = data;
                 this.updateTemplate();
             });
+
+            socket.on("repos_public", (data: model.GitHubUser) => {
+                console.log(data);
+            });
+
+            socket.on("repos_private", (data: model.GitHubUser) => {
+                console.log(data);
+            });
         }
 
-        public updateTemplate(context?: SideBarContext): void {
-            var c: SideBarContext = context || this.context;
-            this.html = this.template(c);
+        public updateTemplate(context?: SidebarContext): void {
+            var c: SidebarContext = context || this.context;
+            this.html = Handlebars.templates[model.UI.HB_SIDEBAR](c);
 
             $(model.UI.SIDEBAR).remove();
             $(document.body).append(this.html);
