@@ -25,17 +25,21 @@ module GHBoot.modules {
 
         public show(sid: number): void {
             if (!this.sid) {
-                $(document.body).append(this.html);
-                $(model.UI.LOGIN_MODAL).modal(this.modalOption);
+                $(document.body)
+                    .append(this.html);
+                $(helper.HandlebarHelper.formatId(model.UI.HB_LOGIN_MODAL, '.'))
+                    .modal(this.modalOption);
             }
 
             this.sid = sid;
 
-            $(model.UI.LOGIN_MODAL).modal('show');
+            $(helper.HandlebarHelper.formatId(model.UI.HB_LOGIN_MODAL, '.'))
+                .modal('show');
         }
 
         public hide(): void {
-            $(model.UI.LOGIN_MODAL).modal('hide');
+            $(helper.HandlebarHelper.formatId(model.UI.HB_LOGIN_MODAL, '.'))
+                .modal('hide');
         }
 
         private connectGitHub(): boolean {

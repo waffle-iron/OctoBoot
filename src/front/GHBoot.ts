@@ -2,6 +2,7 @@
 /// <reference path="../../node_modules/DefinitelyTyped/jquery/jquery.d.ts" />
 /// <reference path="../../node_modules/DefinitelyTyped/socket.io-client/socket.io-client.d.ts" />
 /// <reference path="definition/Jquery.d.ts" />
+/// <reference path="helper/HandlebarHelper.ts" />
 /// <reference path="model/ServerAPI.ts" />
 /// <reference path="model/UI.ts" />
 /// <reference path="modules/Login.ts" />
@@ -18,6 +19,8 @@ module GHBoot {
         private socket: SocketIOClient.Socket;
 
         constructor() {
+            helper.HandlebarHelper.register();
+
             this.initUI();
 
             this.initSocket().then((sid: number) => {

@@ -1,47 +1,40 @@
 /// <reference path="../model/GitHubUser.ts" />
+/// <reference path="../model/GitHubRepo.ts" />
 
 module GHBoot.modules {
 
     // @See node_modules/DefinitelyTyped/handlebars/handlebars.d.ts#7
     declare var Handlebars: HandlebarsRuntimeStatic;
 
-    export interface SidebarContext {
-        user?: model.GitHubUser;
-    }
-
     export class Sidebar {
 
-        public html: string;
-        public context: SidebarContext;
-
         constructor() {
-            Handlebars.registerPartial('profil', Handlebars.templates[model.UI.HB_PROFIL]);
-            Handlebars.registerPartial('repos_public', Handlebars.templates[model.UI.HB_REPOS_PUBLIC]);
-            this.context = {};
+            $(document.body)
+                .append(Handlebars.templates[model.UI.HB_SIDEBAR](null));
+            $(helper.HandlebarHelper.formatId(model.UI.HB_SIDEBAR, '.'))
+                .sidebar("attach events", model.UI.SIDEBAR_LAUNCH_BT);
         }
 
         public bindSocketIo(socket: SocketIOClient.Socket): void {
             socket.on("user", (data: model.GitHubUser) => {
-                this.context.user = data;
-                this.updateTemplate();
+                helper.HandlebarHelper.updateTemplate(model.UI.HB_PROFIL, data);
             });
 
-            socket.on("repos_public", (data: model.GitHubUser) => {
-                console.log(data);
+            socket.on("repos_public", (data: Array<model.GitHubRepo>) => {
+                this.updateTemplateRepo('Public', data);
             });
 
-            socket.on("repos_private", (data: model.GitHubUser) => {
-                console.log(data);
+            socket.on("repos_private", (data: Array<model.GitHubRepo>) => {
+                this.updateTemplateRepo('Private', data);
             });
         }
 
-        public updateTemplate(context?: SidebarContext): void {
-            var c: SidebarContext = context || this.context;
-            this.html = Handlebars.templates[model.UI.HB_SIDEBAR](c);
-
-            $(model.UI.SIDEBAR).remove();
-            $(document.body).append(this.html);
-            $(model.UI.SIDEBAR).sidebar("attach events", model.UI.SIDEBAR_LAUNCH_BT);
+        private updateTemplateRepo(type: string, data: Array<model.GitHubRepo>): void {
+            helper.HandlebarHelper.updateTemplate(model.UI.HB_REPOS, {
+                on: { click: function() { $(this).parent().children('.menu').slideToggle(500) } },
+                repos: data,
+                title: type
+            }, 'Repos' + type);
         }
     }
 }
