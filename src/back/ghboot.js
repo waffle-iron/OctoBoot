@@ -1,41 +1,41 @@
 var cookieSession = require('cookie-session'),
 cookieParser = require('cookie-parser'),
 ghapi = require("github-api"),
-ghc = require("../../githubconf.json");
+ghcli = require("github-cli"),
+ghc = require("../../githubconf.json"),
+fs = require("fs");
+
+// TEMP
+ghcli.debug = true;
+// ####
 
 var sockets = [];
-
-function updateUI(sid, access_token) {
-    var ctrl = function(event) {
-        return function(error, data) {
-            if (!error && data) {
-                sockets[sid].s.emit(event, data);
-            } else {
-                console.error(error);
-            }
-        }
-    };
-
-    ghapi.getUser(access_token, ctrl("user"));
-    ghapi.getRepos(access_token, "public", ctrl("repos_public"));
-    ghapi.getRepos(access_token, "private", ctrl("repos_private"));
-}
 
 function isLogged(req, res) {
     if (!req.signedCookies.gat) {
         res.status(401).send("not logged in");
     } else {
-        res.status(200).send("logged");
         sockets[req.params.sid].ghtoken = req.signedCookies.gat;
-        updateUI(req.params.sid, req.signedCookies.gat);
+        res.status(200).send(req.signedCookies.gat);
     }
 }
 
 function oauth(req, res, access_token) {
-    sockets[req.params.sid].s.emit("connected");
+    sockets[req.params.sid].s.emit("connected", req.signedCookies.gat);
     sockets[req.params.sid].ghtoken = access_token;
     res.cookie("gat", access_token, {signed: true})
         .write("<script>window.close()</script>");
+}
+
+function clone(data) {
+    var baseUri = __dirname + "/../../temp/" + data.sid;
+    var gitUrl = data.url.replace(/https:\/\/.*github/g, "https://" + sockets[data.sid].ghtoken + "@github");
+
+    try{ fs.mkdirSync(baseUri) } catch (e) {};
+
+    ghcli.clone(baseUri, gitUrl, function(err, stdout, stderr) {
+        sockets[data.sid].s.emit("cloned", !err);
+    });
 }
 
 var ghboot = function(app, socketIo) {
@@ -47,8 +47,10 @@ var ghboot = function(app, socketIo) {
     ghapi.init(ghc.app_id, ghc.app_secret, ghc.app_redirect);
 
     socketIo.on("connection", function(socket) {
-        sockets.push({s: socket});
-        socket.emit("sid", sockets.length - 1);
+        var sid = Date.now();
+        sockets[sid] = {s: socket};
+        socket.emit("sid", sid);
+        socket.on("clone", clone);
     });
 
     return function(req, res, next) {

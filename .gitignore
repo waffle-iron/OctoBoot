@@ -1,5 +1,8 @@
 dist/
 semantic/
 node_modules/
+temp/*
+
+!temp/.gitkeep
 
 githubconf.json

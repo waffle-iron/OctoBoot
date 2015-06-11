@@ -29,11 +29,15 @@ module GHBoot.helper {
 
         private static bind(): void {
             Handlebars.registerHelper('bind', (events: any): string => {
-                this.events.push(events);
-                var id: number = this.events.length - 1;
-                console.log('bind event', id, events);
-                this.bindEvent(id);
-                return 'hhb' + id
+                if (!events) {
+                    console.error('bind error, event object is null');
+                } else {
+                    this.events.push(events);
+                    var id: number = this.events.length - 1;
+                    console.log('bind event', id, events);
+                    this.bindEvent(id);
+                    return 'hhb' + id
+                }
             });
         }
 

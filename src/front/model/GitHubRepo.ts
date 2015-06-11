@@ -54,4 +54,9 @@ module GHBoot.model {
             pull: boolean;
         }
     }
+
+    export var RepoType = {
+        PUBLIC: 'public',
+        PRIVATE: 'private'
+    }
 }
