@@ -1,3 +1,5 @@
+/// <reference path="../controllers/Alert.ts" />
+
 module GHBoot.core {
 
     export class Repos {
@@ -32,7 +34,10 @@ module GHBoot.core {
                 });
 
                 if (convert) {
-                    alert('need to be convert');
+                    new controllers.Alert(
+                        'Not a GHBoot project',
+                        'Sorry, it seems that your project are not a GHBoot project, did you want to convert it ?',
+                        () => alert("toto"), true);
                 }
             });
         }

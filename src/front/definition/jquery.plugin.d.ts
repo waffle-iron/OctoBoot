@@ -6,5 +6,5 @@ interface JQuery {
     /**
      * Semantic modal
      */
-    modal(action: string, value1?: string, value2?: boolean): JQuery;
+    modal(action: any, value1?: string, value2?: boolean): JQuery;
 }
