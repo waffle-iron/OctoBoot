@@ -1,7 +1,7 @@
 /// <reference path="../core/Repos.ts" />
 /// <reference path="../model/HTMLEvent.ts" />
 
-module GHBoot.ui {
+module GHBoot.controllers {
 
     // @See node_modules/DefinitelyTyped/handlebars/handlebars.d.ts#7
     declare var Handlebars: HandlebarsRuntimeStatic;

@@ -8,7 +8,7 @@
     "build": "npm run build:ts && npm run build:handlebars",
     "build:semantic": "cd semantic && gulp build && cd ..",
     "build:ts": "tsc src/front/GHBoot.ts --removeComments --sourceMap --out dist/ghboot.js",
-    "build:handlebars": "handlebars --min src/front/templates/*.hbs -f dist/handlebars_templates.min.js"
+    "build:handlebars": "handlebars --min src/front/view/*.hbs -f dist/handlebars_templates.min.js"
   },
   "repository": {
     "type": "git",

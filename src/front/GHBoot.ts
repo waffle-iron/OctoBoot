@@ -4,8 +4,8 @@
 /// <reference path="helper/HandlebarHelper.ts" />
 /// <reference path="model/ServerAPI.ts" />
 /// <reference path="model/UI.ts" />
-/// <reference path="ui/Login.ts" />
-/// <reference path="ui/Sidebar.ts" />
+/// <reference path="controllers/Login.ts" />
+/// <reference path="controllers/Sidebar.ts" />
 /// <reference path="core/GitHub.ts" />
 /// <reference path="core/Socket.ts" />
 
@@ -15,8 +15,8 @@ module GHBoot {
 
     export class App {
 
-        private login: ui.Login;
-        private sidebar: ui.Sidebar;
+        private login: controllers.Login;
+        private sidebar: controllers.Sidebar;
 
         private gat: string;
 
@@ -49,8 +49,8 @@ module GHBoot {
         }
 
         private initUI(): void {
-            this.sidebar = new ui.Sidebar();
-            this.login = new ui.Login();
+            this.sidebar = new controllers.Sidebar();
+            this.login = new controllers.Login();
         }
 
         private updateUI(gat: string): void {
