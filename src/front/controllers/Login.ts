@@ -1,41 +1,23 @@
-module GHBoot.controllers {
+/// <reference path="Alert.ts" />
+
+module OctoBoot.controllers {
 
     export class Login {
 
-        public template: HandlebarsTemplateDelegate;
-        public html: string;
-        public appended: boolean = false;
+        private alert: Alert;
 
-        private modalOption: any = {
-            closable: false,
-            onApprove: () => this.connectGitHub()
-        };
-
-        constructor() {
-            this.template = Handlebars.templates[model.UI.HB_LOGIN_MODAL];
-            this.html = this.template({});
-        }
+        constructor() {}
 
         public isLogged(): JQueryXHR {
             return $.get(model.ServerAPI.IS_LOGGED.replace(/:sid/, SOCKET_ID.toString()));
         }
 
         public show(): void {
-            if (!this.appended) {
-                this.appended = true;
-                $(document.body)
-                    .append(this.html);
-                $(helper.HandlebarHelper.formatId(model.UI.HB_LOGIN_MODAL, '.'))
-                    .modal(this.modalOption);
-            }
-
-            $(helper.HandlebarHelper.formatId(model.UI.HB_LOGIN_MODAL, '.'))
-                .modal('show');
+            this.alert = new controllers.Alert(model.UI.LOGIN_TITLE, model.UI.LOGIN_BODY, () => this.connectGitHub(), false, 'github square');
         }
 
         public hide(): void {
-            $(helper.HandlebarHelper.formatId(model.UI.HB_LOGIN_MODAL, '.'))
-                .modal('hide');
+            this.alert.hide();
         }
 
         private connectGitHub(): boolean {

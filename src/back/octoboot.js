@@ -38,9 +38,9 @@ function clone(data) {
     });
 }
 
-var ghboot = function(app, socketIo) {
-    app.use(cookieParser('ghboot'));
-    app.use(cookieSession({ secret: 'ghboot'}));
+var octoboot = function(app, socketIo) {
+    app.use(cookieParser('octoboot'));
+    app.use(cookieSession({ secret: 'octoboot'}));
     app.get("/api/isLogged/:sid", isLogged);
     app.get("/api/GitHubApi/:sid", ghapi.oauth(oauth));
 
@@ -58,4 +58,4 @@ var ghboot = function(app, socketIo) {
     };
 };
 
-exports = module.exports = ghboot;
+exports = module.exports = octoboot;

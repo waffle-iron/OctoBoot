@@ -1,6 +1,6 @@
 /// <reference path="../controllers/Alert.ts" />
 
-module GHBoot.core {
+module OctoBoot.core {
 
     export class Repos {
 
@@ -13,7 +13,7 @@ module GHBoot.core {
         }
 
         private select(): void {
-            this.convertRepoToGHBoot(() => {
+            this.convertRepoToOctoBoot(() => {
                 core.GitHub.cloneOnServer(this.url, (success: boolean) => {
                     if (success) {
                         // TODO WORK :D
@@ -24,19 +24,19 @@ module GHBoot.core {
             });
         }
 
-        private convertRepoToGHBoot(done: () => any): void {
+        private convertRepoToOctoBoot(done: () => any): void {
             var convert = true;
             core.GitHub.getTree(this.name, (dataTree: model.GitHubTree) => {
                 dataTree.tree.forEach((value: model.GitHubTreeFile) => {
-                    if (value.path.indexOf('.ghboot') !== -1) {
+                    if (value.path.indexOf('.octoboot') !== -1) {
                         convert = false;
                     }
                 });
 
                 if (convert) {
                     new controllers.Alert(
-                        'Not a GHBoot project',
-                        'Sorry, it seems that your project are not a GHBoot project, did you want to convert it ?',
+                        'Not a OctoBoot project',
+                        'Sorry, it seems that your project are not a OctoBoot project, did you want to convert it ?',
                         () => alert("toto"), true);
                 }
             });
@@ -50,7 +50,7 @@ module GHBoot.core {
                 .modal(<any>{
                     onApprove: function() {
                         var name: string = $(this).get()[0].getElementsByTagName('input')[0].value;
-                        core.GitHub.createRepo(name, type, __this.convertRepoToGHBoot.bind(__this, name));
+                        core.GitHub.createRepo(name, type, __this.convertRepoToOctoBoot.bind(__this, name));
                     }
                 })
                 .modal('show');

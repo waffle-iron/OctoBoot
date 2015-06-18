@@ -9,7 +9,7 @@
 /// <reference path="core/GitHub.ts" />
 /// <reference path="core/Socket.ts" />
 
-module GHBoot {
+module OctoBoot {
 
     export var SOCKET_ID: number; //SocketIo id
 

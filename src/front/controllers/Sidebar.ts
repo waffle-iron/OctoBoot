@@ -1,7 +1,7 @@
 /// <reference path="../core/Repos.ts" />
 /// <reference path="../model/HTMLEvent.ts" />
 
-module GHBoot.controllers {
+module OctoBoot.controllers {
 
     export class Sidebar {
 

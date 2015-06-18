@@ -1,4 +1,4 @@
-module GHBoot.helper {
+module OctoBoot.helper {
 
     export class HandlebarHelper {
 

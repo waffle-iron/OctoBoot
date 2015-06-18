@@ -3,7 +3,7 @@
 /// <reference path="../model/GitHubBranch.ts" />
 /// <reference path="../model/GitHubTree.ts" />
 
-module GHBoot.core {
+module OctoBoot.core {
 
     export class GitHub {
 

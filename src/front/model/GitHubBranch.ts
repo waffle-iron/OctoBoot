@@ -1,4 +1,4 @@
-module GHBoot.model {
+module OctoBoot.model {
 
     export interface GitHubBranch {
         name: string;

@@ -1,13 +1,13 @@
 var express = require("express"),
 io = require("socket.io"),
 http = require("http"),
-ghboot = require("./src/back/ghboot");
+octoboot = require("./src/back/octoboot");
 
 var app = express();
 var serverIo = http.createServer(app);
 var socketIo = io.listen(serverIo);
 
-app.use(ghboot(app, socketIo));
+app.use(octoboot(app, socketIo));
 
 app.use("/", express.static(__dirname + "/static/"));
 app.use("/lib", express.static(__dirname + "/dist/"));

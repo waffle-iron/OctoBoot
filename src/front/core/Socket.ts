@@ -1,6 +1,6 @@
 /// <reference path="../definition/socket.io-client.d.ts" />
 
-module GHBoot.core {
+module OctoBoot.core {
 
     export class Socket {
 
