@@ -10,5 +10,7 @@ module GHBoot.model {
 
         public static HB_LOGIN_MODAL: string = 'Login.hbs';
         public static LOGIN_MODAL_CONNECT: string = '#login .button';
+
+        public static HB_ALERT: string = 'Alert.hbs';
     }
 }
