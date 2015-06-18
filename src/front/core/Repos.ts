@@ -35,8 +35,8 @@ module OctoBoot.core {
 
                 if (convert) {
                     new controllers.Alert(
-                        'Not a OctoBoot project',
-                        'Sorry, it seems that your project are not a OctoBoot project, did you want to convert it ?',
+                        model.UI.REPO_ALERT_CONVERT_TITLE,
+                        model.UI.REPO_ALERT_CONVERT_BODY,
                         () => alert("toto"), true);
                 }
             });
