@@ -1,4 +1,4 @@
-/// <reference path="../../../node_modules/DefinitelyTyped/socket.io-client/socket.io-client.d.ts" />
+/// <reference path="../definition/socket.io-client.d.ts" />
 
 module GHBoot.core {
 

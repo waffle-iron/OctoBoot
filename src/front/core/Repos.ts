@@ -1,8 +1,5 @@
 module GHBoot.core {
 
-    // @See node_modules/DefinitelyTyped/handlebars/handlebars.d.ts#7
-    declare var Handlebars: HandlebarsRuntimeStatic;
-
     export class Repos {
 
         constructor (public name: string, public url: string, type: string) {

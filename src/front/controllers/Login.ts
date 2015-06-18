@@ -1,8 +1,5 @@
 module GHBoot.controllers {
 
-    // @See node_modules/DefinitelyTyped/handlebars/handlebars.d.ts#7
-    declare var Handlebars: HandlebarsRuntimeStatic;
-
     export class Login {
 
         public template: HandlebarsTemplateDelegate;

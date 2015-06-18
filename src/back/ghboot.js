@@ -44,7 +44,7 @@ var ghboot = function(app, socketIo) {
     app.get("/api/isLogged/:sid", isLogged);
     app.get("/api/GitHubApi/:sid", ghapi.oauth(oauth));
 
-    ghapi.init(ghc.app_id, ghc.app_secret, ghc.app_redirect);
+    ghapi.init(ghc.client_id, ghc.client_secret, ghc.authorization_callback_url);
 
     socketIo.on("connection", function(socket) {
         var sid = Date.now();
