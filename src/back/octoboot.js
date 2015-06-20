@@ -32,9 +32,39 @@ function clone(data) {
     var gitUrl = data.url.replace(/https:\/\/.*github/g, "https://" + sockets[data.sid].ghtoken + "@github");
 
     try{ fs.mkdirSync(baseUri) } catch (e) {};
-
+    
     ghcli.clone(baseUri, gitUrl, function(err, stdout, stderr) {
         sockets[data.sid].s.emit("cloned", !err);
+    });
+}
+
+function convert(data) {
+    var baseUri = __dirname + "/../../temp/" + data.sid + "/" + data.name;
+    
+    fs.writeFileSync(baseUri + "/.octoboot", JSON.stringify({
+        name: data.name,
+        type: 'project',
+        version: '1'
+    }));
+    
+    ghcli.add(baseUri, baseUri + "/.octoboot", function() {
+        ghcli.commit(baseUri, "Octoboot - create ref file", function() {
+            ghcli.push(sockets[data.sid].ghtoken, baseUri, data.url, "master", function(push_error) {
+                if (!push_error) {
+                    ghcli.branch(baseUri, "gh-pages", function(branch_error) {
+                        if (!branch_error) {
+                            ghcli.push(sockets[data.sid].ghtoken, baseUri, data.url, "gh-pages", function(push_error2) {
+                                sockets[data.sid].s.emit("converted", !push_error2);
+                            }, true);
+                        } else {
+                            //TODO TRIGER ERROR
+                        }
+                    });
+                } else {
+                    //TODO TRIGER ERROR
+                }
+            });
+        });
     });
 }
 
@@ -51,6 +81,7 @@ var octoboot = function(app, socketIo) {
         sockets[sid] = {s: socket};
         socket.emit("sid", sid);
         socket.on("clone", clone);
+        socket.on("convert", convert);
     });
 
     return function(req, res, next) {

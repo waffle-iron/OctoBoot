@@ -1,8 +1,11 @@
 /// <reference path="../controllers/Alert.ts" />
+/// <reference path="Socket.ts" />
 
 module OctoBoot.core {
 
     export class Repos {
+
+        private alertConvert: controllers.Alert;
 
         constructor (public name: string, public url: string, type: string) {
             if (!name) {
@@ -13,18 +16,21 @@ module OctoBoot.core {
         }
 
         private select(): void {
-            this.convertRepoToOctoBoot(() => {
-                core.GitHub.cloneOnServer(this.url, (success: boolean) => {
-                    if (success) {
-                        // TODO WORK :D
-                    } else {
-                        // TODO trigger error
-                    }
-                });
+            this.didConvertRepoToOctoBoot((convert: boolean) => {
+
+                if (convert) {
+                    this.alertConvert = new controllers.Alert(
+                        model.UI.REPO_ALERT_CONVERT_TITLE,
+                        model.UI.REPO_ALERT_CONVERT_BODY,
+                        () => this.clone(convert), true);
+                } else {
+                    this.clone(convert);
+                }
+                
             });
         }
 
-        private convertRepoToOctoBoot(done: () => any): void {
+        private didConvertRepoToOctoBoot(done: (convert: boolean) => any): void {
             var convert = true;
             core.GitHub.getTree(this.name, (dataTree: model.GitHubTree) => {
                 dataTree.tree.forEach((value: model.GitHubTreeFile) => {
@@ -33,11 +39,48 @@ module OctoBoot.core {
                     }
                 });
 
-                if (convert) {
-                    new controllers.Alert(
-                        model.UI.REPO_ALERT_CONVERT_TITLE,
-                        model.UI.REPO_ALERT_CONVERT_BODY,
-                        () => alert("toto"), true);
+                done(convert);
+            });
+        }
+
+        private clone(convert: boolean): boolean {
+            core.GitHub.cloneOnServer(this.url, (success: boolean) => {
+                if (success) {
+                    if (convert) {
+                        this.convertAndWait(() => {
+                            //START WORK    
+                            alert('start work');
+                        });
+                    } else {
+                        //START WORK
+                        alert('start work');
+                    }
+                } else {
+                    // TODO trigger error
+                }
+            });
+
+            return false
+        }
+
+        private convertAndWait(done: () => any): void {
+            Socket.io.emit('convert', {
+                name: this.name,
+                url: this.url,
+                sid: SOCKET_ID
+            });
+
+            Socket.io.once('converted', (success: boolean) => {
+                if (success) {
+                    
+                    if (this.alertConvert) {
+                        this.alertConvert.hide();
+                    }
+                    
+                    done();
+                } else {
+                    // TODO ERROR ON ALERT
+                    alert('error');
                 }
             });
         }
@@ -49,8 +92,11 @@ module OctoBoot.core {
             $(helper.HandlebarHelper.formatId(model.UI.HB_NEW_REPO, '.'))
                 .modal(<any>{
                     onApprove: function() {
-                        var name: string = $(this).get()[0].getElementsByTagName('input')[0].value;
-                        core.GitHub.createRepo(name, type, __this.convertRepoToOctoBoot.bind(__this, name));
+                        __this.name = $(this).get()[0].getElementsByTagName('input')[0].value;
+                        core.GitHub.createRepo(__this.name, type, (repo: model.GitHubRepo) => {
+                            __this.url = repo.clone_url;
+                            __this.clone.bind(__this)(true);
+                        });
                     }
                 })
                 .modal('show');
