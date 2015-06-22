@@ -6,6 +6,7 @@ module OctoBoot.model {
         public static HB_REPOS: string = 'Repos.hbs';
         public static HB_SIDEBAR: string = 'Sidebar.hbs';
         public static HB_TOOLSBAR: string = 'Toolsbar.hbs';
+        public static HB_STAGE: string = 'Stage.hbs';
         public static HB_NEW_REPO: string = 'NewRepo.hbs';
         public static HB_ALERT: string = 'Alert.hbs';
 

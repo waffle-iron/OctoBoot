@@ -1,0 +1,14 @@
+.profil span {
+    max-width: 160px;
+    overflow: hidden;
+    display: inline-block;
+}
+
+.octofont {
+	font-family: "OctoBoot";
+}
+
+@font-face {
+    font-family: "OctoBoot";
+    src: url(../fonts/Drakolomb.otf);
+}

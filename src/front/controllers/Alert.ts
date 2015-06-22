@@ -1,31 +1,30 @@
+/// <reference path="Handlebar.ts" />
+
 module OctoBoot.controllers {
 
-	export class Alert {
+	export class Alert extends Handlebar {
 
 		public onDeny: boolean;
 		public onApprove: boolean;
 		public buttonCount: string;
 
 		constructor(public title: string, public body: string, onApprove?: any, onDeny?: any, public icon: string = 'warning sign') {
+			super(model.UI.HB_ALERT);
+
 			this.onDeny = !!onDeny;
 			this.onApprove = !!onApprove;
 			this.buttonCount = onDeny && onApprove ? 'two' : 'one';
 
-			$(document.body)
-                .append(Handlebars.templates[model.UI.HB_ALERT](this));
-
-            $(helper.HandlebarHelper.formatId(model.UI.HB_ALERT, '.'))
-				.modal({
-					closable: this.onDeny,
-					onApprove: onApprove,
-					onDeny: onDeny
-				})
-				.modal('show');
+            this.initWithContext(this).modal({
+				closable: this.onDeny,
+				onApprove: onApprove,
+				onDeny: onDeny
+			})
+			.modal('show');
 		}
 
 		public hide(): void {
-			$(helper.HandlebarHelper.formatId(model.UI.HB_ALERT, '.'))
-				.modal('hide');
+			this.jDom.modal('hide');
 		}
 	}
 }

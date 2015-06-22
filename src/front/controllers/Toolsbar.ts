@@ -1,10 +1,12 @@
+/// <reference path="Handlebar.ts" />
+
 module OctoBoot.controllers {
 
-    export class Toolsbar {
+    export class Toolsbar extends Handlebar {
 
         constructor() {
-            $(document.body)
-                .append(Handlebars.templates[model.UI.HB_TOOLSBAR](null));
+            super(model.UI.HB_TOOLSBAR);
+            this.initWithContext(null);
         }
 
     }

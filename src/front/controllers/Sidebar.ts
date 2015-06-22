@@ -1,17 +1,16 @@
 /// <reference path="../core/Repos.ts" />
 /// <reference path="../model/HTMLEvent.ts" />
+/// <reference path="Handlebar.ts" />
 
 module OctoBoot.controllers {
 
-    export class Sidebar {
+    export class Sidebar extends Handlebar {
 
         public selected: core.Repos;
 
         constructor() {
-            $(document.body)
-                .append(Handlebars.templates[model.UI.HB_SIDEBAR](null));
-            $(helper.HandlebarHelper.formatId(model.UI.HB_SIDEBAR, '.'))
-                .sidebar("attach events", model.UI.SIDEBAR_LAUNCH_BT);
+            super(model.UI.HB_SIDEBAR);
+            this.initWithContext(null).sidebar("attach events", model.UI.SIDEBAR_LAUNCH_BT);
         }
 
         public update(): void {
