@@ -15,8 +15,7 @@ app.use("/lib/handlebars/", express.static(__dirname + "/node_modules/handlebars
 
 // 404 not found
 app.use(function(req, res, next) {
-    res.setHeader("Content-Type", "text/plain");
-    res.status(404).send("Not Found");
+    res.status(404).sendFile(__dirname + "/static/404.html");
 });
 
 serverIo.listen(process.env.PORT || 8080);
