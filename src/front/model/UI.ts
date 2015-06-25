@@ -2,6 +2,8 @@ module OctoBoot.model {
 
     export class UI {
 
+        public static MAIN_CONTAINER: string = '.pusher';
+
         public static HB_PROFIL: string = 'Profil.hbs';
         public static HB_REPOS: string = 'Repos.hbs';
         public static HB_SIDEBAR: string = 'Sidebar.hbs';

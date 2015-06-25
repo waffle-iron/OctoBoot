@@ -1,9 +1,12 @@
 /// <reference path="../controllers/Alert.ts" />
+/// <reference path="../controllers/Stage.ts" />
 /// <reference path="Socket.ts" />
 
 module OctoBoot.core {
 
     export class Repos {
+
+        public stage: controllers.Stage;
 
         private alertConvert: controllers.Alert;
 
@@ -26,7 +29,7 @@ module OctoBoot.core {
                 } else {
                     this.clone(convert);
                 }
-                
+
             });
         }
 
@@ -46,14 +49,13 @@ module OctoBoot.core {
         private clone(convert: boolean): boolean {
             core.GitHub.cloneOnServer(this.url, (success: boolean) => {
                 if (success) {
+                    var projectUrl: string = "/temp/" + SOCKET_ID + "/" + this.name + "/index.html";
                     if (convert) {
                         this.convertAndWait(() => {
-                            //START WORK    
-                            alert('start work');
+                            this.stage = new controllers.Stage(projectUrl);
                         });
                     } else {
-                        //START WORK
-                        alert('start work');
+                        this.stage = new controllers.Stage(projectUrl);
                     }
                 } else {
                     // TODO trigger error
@@ -72,11 +74,11 @@ module OctoBoot.core {
 
             Socket.io.once('converted', (success: boolean) => {
                 if (success) {
-                    
+
                     if (this.alertConvert) {
                         this.alertConvert.hide();
                     }
-                    
+
                     done();
                 } else {
                     // TODO ERROR ON ALERT

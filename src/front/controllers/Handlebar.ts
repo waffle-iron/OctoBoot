@@ -14,10 +14,12 @@ module OctoBoot.controllers {
         }
 
         initWithContext(context: any): JQuery {
-            $(document.body)
-                .append(Handlebars.templates[this.hbTemplate](context));
+            // If main container are not ready yet, append on body, sidebar pusher will take everything in body and put in on pusher
+            var container: JQuery = $(model.UI.MAIN_CONTAINER).length ? $(model.UI.MAIN_CONTAINER) : $(document.body);
+            container.append(Handlebars.templates[this.hbTemplate](context));
 
-            this.jDom = $(this.hbClassName);
+            this.jDom = $(this.hbClassName).last();
+
             return this.jDom;
         }
     }
