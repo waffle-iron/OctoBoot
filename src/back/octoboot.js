@@ -32,21 +32,28 @@ function clone(data) {
     var gitUrl = data.url.replace(/https:\/\/.*github/g, "https://" + sockets[data.sid].ghtoken + "@github");
 
     try{ fs.mkdirSync(baseUri) } catch (e) {};
-    
+
     ghcli.clone(baseUri, gitUrl, function(err, stdout, stderr) {
-        sockets[data.sid].s.emit("cloned", !err);
+        if (err && stderr.indexOf("already exists") !== -1) {
+            // Project already cloned, just refresh it
+            ghcli.pull(baseUri + "/" + data.name, function(err, stdout, stderr) {
+                sockets[data.sid].s.emit("cloned", !err);
+            });
+        } else {
+            sockets[data.sid].s.emit("cloned", !err);
+        }
     });
 }
 
 function convert(data) {
     var baseUri = __dirname + "/../../temp/" + data.sid + "/" + data.name;
-    
+
     fs.writeFileSync(baseUri + "/.octoboot", JSON.stringify({
         name: data.name,
         type: 'project',
         version: '1'
     }));
-    
+
     ghcli.add(baseUri, baseUri + "/.octoboot", function() {
         ghcli.commit(baseUri, "Octoboot - create ref file", function() {
             ghcli.push(sockets[data.sid].ghtoken, baseUri, data.url, "master", function(push_error) {

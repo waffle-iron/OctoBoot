@@ -4,13 +4,19 @@
 
 module OctoBoot.core {
 
+    export enum REPO_STATE {
+        LOADING,
+        SELECT,
+        UNSELECT
+    }
+
     export class Repos {
 
         public stage: controllers.Stage;
 
         private alertConvert: controllers.Alert;
 
-        constructor (public name: string, public url: string, type: string) {
+        constructor (public name: string, public url: string, public type: string, public sidebarButton?: HTMLElement) {
             if (!name) {
                 this.create(type);
             } else {
@@ -18,7 +24,13 @@ module OctoBoot.core {
             }
         }
 
+        public destroy(): void {
+            this.setState(REPO_STATE.UNSELECT);
+            this.stage.destroy();
+        }
+
         private select(): void {
+            this.setState(REPO_STATE.LOADING);
             this.didConvertRepoToOctoBoot((convert: boolean) => {
 
                 if (convert) {
@@ -47,14 +59,16 @@ module OctoBoot.core {
         }
 
         private clone(convert: boolean): boolean {
-            core.GitHub.cloneOnServer(this.url, (success: boolean) => {
+            core.GitHub.cloneOnServer(this.name, this.url, (success: boolean) => {
                 if (success) {
                     var projectUrl: string = "/temp/" + SOCKET_ID + "/" + this.name + "/index.html";
                     if (convert) {
                         this.convertAndWait(() => {
+                            this.setState(REPO_STATE.SELECT);
                             this.stage = new controllers.Stage(projectUrl);
                         });
                     } else {
+                        this.setState(REPO_STATE.SELECT);
                         this.stage = new controllers.Stage(projectUrl);
                     }
                 } else {
@@ -102,6 +116,23 @@ module OctoBoot.core {
                     }
                 })
                 .modal('show');
+        }
+
+        private setState(state: REPO_STATE): void {
+            switch (state) {
+                case REPO_STATE.LOADING:
+                    if (this.sidebarButton) this.sidebarButton.innerHTML = this.name + ' <i class="spinner loading icon" > </i>';
+                    break;
+
+                case REPO_STATE.SELECT:
+                    if (this.sidebarButton) this.sidebarButton.innerHTML = this.name + ' <i class="checkmark icon" > </i>';
+                    $(helper.HandlebarHelper.formatId(model.UI.HB_SIDEBAR, '.')).sidebar('toggle');
+                    break;
+
+                case REPO_STATE.UNSELECT:
+                    if (this.sidebarButton) this.sidebarButton.innerHTML = this.name;
+                    break;
+            }
         }
     }
 }

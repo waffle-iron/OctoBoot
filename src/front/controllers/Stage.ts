@@ -8,5 +8,9 @@ module OctoBoot.controllers {
 			super(model.UI.HB_STAGE);
 			this.initWithContext(this);
 		}
+
+        public destroy(): void {
+            this.jDom.remove();
+        }
 	}
 }

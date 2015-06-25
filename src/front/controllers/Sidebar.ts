@@ -35,11 +35,23 @@ module OctoBoot.controllers {
 
         private repoEvent(type: string): model.HTMLEvent {
             var __this = this;
-            return { click: function() { __this.selected = new core.Repos(this.innerText, this.getAttribute('data-url'), type) } }
+            return { click: function() { __this.select(__this, this, type) } }
         }
 
         private newEvent(type: string): model.HTMLEvent {
-            return { click: () => this.selected = new core.Repos(null, null, type) }
+            return { click: () => { this.select(null, null, type) } }
+        }
+
+        private select(classContext: any, buttonContext: any, type: string): void {
+            if (classContext.selected) {
+                classContext.selected.destroy();
+            }
+
+            classContext.selected = new core.Repos(
+                buttonContext ? buttonContext.innerText : null,
+                buttonContext ? buttonContext.getAttribute('data-url') : null,
+                type,
+                buttonContext ? buttonContext : null)
         }
     }
 }

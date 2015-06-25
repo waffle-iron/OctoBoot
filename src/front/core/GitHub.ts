@@ -16,8 +16,8 @@ module OctoBoot.core {
             return this.ghapi + '/repos/' + this.user.name + '/';
         }
 
-        public static cloneOnServer(repo: string, done: (success: boolean) => any): void {
-            Socket.io.emit('clone', { url: repo, sid: SOCKET_ID });
+        public static cloneOnServer(name: string, url: string, done: (success: boolean) => any): void {
+            Socket.io.emit('clone', { name: name, url: url, sid: SOCKET_ID });
             Socket.io.once('cloned', done);
         }
 
