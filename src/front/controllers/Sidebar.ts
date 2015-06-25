@@ -21,24 +21,24 @@ module OctoBoot.controllers {
 
         private updateTemplateRepo(type: string, data: Array<model.GitHubRepo>): void {
             helper.HandlebarHelper.updateTemplate(model.UI.HB_REPOS, {
-                titleEvent: this.titleEvent(),
-                repoEvent: this.repoEvent(type),
-                newEvent: this.newEvent(type),
+                titleHandlers: this.titleHandlers(),
+                repoHandlers: this.repoHandlers(type),
+                newHandlers: this.newHandlers(type),
                 repos: data,
                 title: type
             }, 'Repos' + type);
         }
 
-        private titleEvent(): model.HTMLEvent {
+        private titleHandlers(): model.HTMLEvent {
             return { click: function() { $(this).parent().children('.menu').slideToggle(500) } }
         }
 
-        private repoEvent(type: string): model.HTMLEvent {
+        private repoHandlers(type: string): model.HTMLEvent {
             var __this = this;
             return { click: function() { __this.select(__this, this, type) } }
         }
 
-        private newEvent(type: string): model.HTMLEvent {
+        private newHandlers(type: string): model.HTMLEvent {
             return { click: () => { this.select(null, null, type) } }
         }
 

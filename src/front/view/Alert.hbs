@@ -5,33 +5,33 @@
   <i class="close icon"></i>
   {{/if}}
   
-  <div class="header">
-    {{title}}
-  </div>
+    <div class="header">
+        {{title}}
+    </div>
   
-  <div class="content">
-    <div class="image">
-      <i class="{{icon}} icon"></i>
+    <div class="content">
+        <div class="image">
+            <i class="{{icon}} icon"></i>
+        </div>
+
+        <div class="description">
+            {{body}}
+        </div>
     </div>
-    
-    <div class="description">
-      {{body}}
-    </div>
-  </div>
   
-  <div class="actions">
-    <div class="{{buttonCount}} fluid ui inverted buttons">
-      
-      {{#if onDeny}}
-      <div class="ui red nok basic inverted button"><i class="remove icon"></i>CANCEL</div>
-      {{/if}}
-      
-      {{#if onApprove}}
-      <div class="ui green ok basic inverted button"><i class="checkmark icon"></i>OK</div>
-      {{/if}}
-   
+    <div class="actions">
+        <div class="{{buttonCount}} fluid ui inverted buttons">
+
+            {{#if onDeny}}
+            <div class="ui red nok basic inverted button"><i class="remove icon"></i>CANCEL</div>
+            {{/if}}
+
+            {{#if onApprove}}
+            <div class="ui green ok basic inverted button"><i class="checkmark icon"></i>OK</div>
+            {{/if}}
+
+        </div>
     </div>
-  </div>
 
 </div>
 

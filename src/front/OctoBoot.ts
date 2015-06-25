@@ -8,6 +8,7 @@
 /// <reference path="controllers/Sidebar.ts" />
 /// <reference path="controllers/Toolsbar.ts" />
 /// <reference path="controllers/Stage.ts" />
+/// <reference path="controllers/Templates.ts" />
 /// <reference path="core/GitHub.ts" />
 /// <reference path="core/Socket.ts" />
 

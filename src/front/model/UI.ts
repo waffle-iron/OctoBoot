@@ -11,6 +11,7 @@ module OctoBoot.model {
         public static HB_STAGE: string = 'Stage.hbs';
         public static HB_NEW_REPO: string = 'NewRepo.hbs';
         public static HB_ALERT: string = 'Alert.hbs';
+        public static HB_TEMPLATES: string = 'Templates.hbs';
 
         public static SIDEBAR_LAUNCH_BT: string = '.Toolsbar .sidebar';
 

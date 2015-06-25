@@ -103,6 +103,7 @@ module OctoBoot.core {
 
         private create(type: string): void {
             var __this = this;
+            // TODO See to use controller Alert for this
             $(document.body)
                 .append(Handlebars.templates[model.UI.HB_NEW_REPO](null));
             $(helper.HandlebarHelper.formatId(model.UI.HB_NEW_REPO, '.'))

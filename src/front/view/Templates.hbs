@@ -1,0 +1,19 @@
+{{!-- data context -> controllers.Templates --}}
+<div class="ui modal Templates">
+    <i class="close icon"></i>
+    <div class="header"> Select a template </div>
+    <div class="content">
+        <div class="ui five column grid">
+        {{#each data}}
+            <div class="column">
+                <div class="ui fluid image">
+                    <div class="ui black ribbon label">
+                        {{name}}
+                    </div>
+                    <img src="{{min}}">
+                </div>
+            </div>
+        {{/each}}
+        </div>
+    </div>
+</div> 
