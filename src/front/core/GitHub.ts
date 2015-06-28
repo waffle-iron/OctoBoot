@@ -17,8 +17,7 @@ module OctoBoot.core {
         }
 
         public static cloneOnServer(name: string, url: string, done: (success: boolean) => any): void {
-            Socket.io.emit('clone', { name: name, url: url, sid: SOCKET_ID });
-            Socket.io.once('cloned', done);
+            Socket.emit('clone', { name: name, url: url }, done);
         }
 
         public static getRepos(type: string, done: (repos: Array<model.GitHubRepo>) => any ): void {

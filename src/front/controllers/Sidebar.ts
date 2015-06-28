@@ -39,7 +39,7 @@ module OctoBoot.controllers {
         }
 
         private newHandlers(type: string): model.HTMLEvent {
-            return { click: () => { this.select(null, null, type) } }
+            return { click: () => { this.select(this, null, type) } }
         }
 
         private select(classContext: any, buttonContext: any, type: string): void {

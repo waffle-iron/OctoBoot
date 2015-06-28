@@ -1,21 +1,41 @@
 {{!-- data context -> controllers.Alert --}}
+{{#if options.image}}
+<div class="ui basic modal Alert">
+{{else}}
 <div class="ui basic small modal Alert">
-  
+{{/if}}
+
   {{#if onDeny}}
   <i class="close icon"></i>
   {{/if}}
   
     <div class="header">
-        {{title}}
+        {{options.title}}
     </div>
   
     <div class="content">
-        <div class="image">
-            <i class="{{icon}} icon"></i>
+        <div class="ui {{#if options.image}}huge{{/if}} image">
+            {{#if options.icon}}
+            <i class="{{options.icon}} icon"></i>
+            {{/if}}
+            {{#if options.image}}
+            <img src="{{options.image}}">
+            {{/if}}
         </div>
 
         <div class="description">
-            {{body}}
+            {{#if options.body}}
+            <p>{{options.body}}</p>
+            {{/if}}
+
+            {{#if options.input}}
+            <div class="ui fluid corner labeled input">
+                <input type="text" placeholder="{{options.input}}">
+                <div class="ui corner label">
+                    <i class="add circle icon"></i>
+                </div>
+            </div>
+            {{/if}}
         </div>
     </div>
   

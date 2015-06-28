@@ -31,7 +31,6 @@ module OctoBoot.helper {
                 } else {
                     this.events.push(events);
                     var id: number = this.events.length - 1;
-                    console.log('bind event', id, events);
                     this.bindEvent(id);
                     return 'hhb' + id
                 }
@@ -41,12 +40,10 @@ module OctoBoot.helper {
         private static bindEvent(id: number): void {
             var o: JQuery = $('.hhb' + id);
             if (o.length) {
-                console.log('bindEvent success', id);
                 for (var i in this.events[id]) {
                     o.on(i, this.events[id][i]);
                 }
             } else {
-                console.log('bindEvent retry', id);
                 setTimeout(() => this.bindEvent(id), 500);
             }
         }

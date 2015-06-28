@@ -1,4 +1,5 @@
 /// <reference path="Alert.ts" />
+/// <reference path="../core/Socket.ts" />
 
 module OctoBoot.controllers {
 
@@ -9,11 +10,17 @@ module OctoBoot.controllers {
         constructor() {}
 
         public isLogged(): JQueryXHR {
-            return $.get(model.ServerAPI.IS_LOGGED.replace(/:sid/, SOCKET_ID.toString()));
+            return $.get(model.ServerAPI.IS_LOGGED.replace(/:sid/, core.Socket.sid.toString()));
         }
 
         public show(): void {
-            this.alert = new controllers.Alert(model.UI.LOGIN_TITLE, model.UI.LOGIN_BODY, () => this.connectGitHub(), false, 'github square');
+            this.alert = new controllers.Alert({
+                title: model.UI.LOGIN_TITLE,
+                body: model.UI.LOGIN_BODY,
+                onApprove: () => this.connectGitHub(),
+                onDeny: false,
+                icon: 'github square'
+            });
         }
 
         public hide(): void {
@@ -21,7 +28,7 @@ module OctoBoot.controllers {
         }
 
         private connectGitHub(): boolean {
-            window.open(model.ServerAPI.GITHUB_LOG.replace(/:sid/, SOCKET_ID.toString()), "", "width=1050, height=700, scrollbars=1");
+            window.open(model.ServerAPI.GITHUB_LOG.replace(/:sid/, core.Socket.sid.toString()), "", "width=1050, height=700, scrollbars=1");
             return false;
         }
     }

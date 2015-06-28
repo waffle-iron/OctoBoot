@@ -1,6 +1,9 @@
 /// <reference path="../controllers/Alert.ts" />
 /// <reference path="../controllers/Stage.ts" />
+/// <reference path="../definition/jquery.plugin.d.ts" />
+/// <reference path="../model/UI.ts" />
 /// <reference path="Socket.ts" />
+/// <reference path="GitHub.ts" />
 
 module OctoBoot.core {
 
@@ -26,7 +29,9 @@ module OctoBoot.core {
 
         public destroy(): void {
             this.setState(REPO_STATE.UNSELECT);
-            this.stage.destroy();
+            if (this.stage) {
+                this.stage.destroy();
+            }
         }
 
         private select(): void {
@@ -34,10 +39,12 @@ module OctoBoot.core {
             this.didConvertRepoToOctoBoot((convert: boolean) => {
 
                 if (convert) {
-                    this.alertConvert = new controllers.Alert(
-                        model.UI.REPO_ALERT_CONVERT_TITLE,
-                        model.UI.REPO_ALERT_CONVERT_BODY,
-                        () => this.clone(convert), true);
+                    this.alertConvert = new controllers.Alert({
+                        title: model.UI.REPO_ALERT_CONVERT_TITLE,
+                        body: model.UI.REPO_ALERT_CONVERT_BODY,
+                        onApprove: () => this.clone(convert), 
+                        onDeny: true
+                    });
                 } else {
                     this.clone(convert);
                 }
@@ -61,7 +68,7 @@ module OctoBoot.core {
         private clone(convert: boolean): boolean {
             core.GitHub.cloneOnServer(this.name, this.url, (success: boolean) => {
                 if (success) {
-                    var projectUrl: string = "/temp/" + SOCKET_ID + "/" + this.name + "/index.html";
+                    var projectUrl: string = "/temp/" + Socket.sid + "/" + this.name + "/index.html";
                     if (convert) {
                         this.convertAndWait(() => {
                             this.setState(REPO_STATE.SELECT);
@@ -80,13 +87,10 @@ module OctoBoot.core {
         }
 
         private convertAndWait(done: () => any): void {
-            Socket.io.emit('convert', {
+            Socket.emit('convert', {
                 name: this.name,
-                url: this.url,
-                sid: SOCKET_ID
-            });
-
-            Socket.io.once('converted', (success: boolean) => {
+                url: this.url
+            }, (success: boolean) => {
                 if (success) {
 
                     if (this.alertConvert) {
@@ -102,21 +106,20 @@ module OctoBoot.core {
         }
 
         private create(type: string): void {
-            var __this = this;
-            // TODO See to use controller Alert for this
-            $(document.body)
-                .append(Handlebars.templates[model.UI.HB_NEW_REPO](null));
-            $(helper.HandlebarHelper.formatId(model.UI.HB_NEW_REPO, '.'))
-                .modal(<any>{
-                    onApprove: function() {
-                        __this.name = $(this).get()[0].getElementsByTagName('input')[0].value;
-                        core.GitHub.createRepo(__this.name, type, (repo: model.GitHubRepo) => {
-                            __this.url = repo.clone_url;
-                            __this.clone.bind(__this)(true);
-                        });
-                    }
-                })
-                .modal('show');
+            var alert: controllers.Alert = new controllers.Alert({
+                title: 'New Project',
+                body: model.UI.REPO_ALERT_NEW_BODY,
+                onApprove: () => {
+                    this.name = alert.jDom.find('input').val();
+                    core.GitHub.createRepo(this.name, type, (repo: model.GitHubRepo) => {
+                        this.url = repo.clone_url;
+                        this.clone(true);
+                    });
+                },
+                onDeny: true,
+                icon: 'at',
+                input: 'NewProject...'
+            });
         }
 
         private setState(state: REPO_STATE): void {

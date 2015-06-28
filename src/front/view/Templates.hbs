@@ -1,16 +1,14 @@
 {{!-- data context -> controllers.Templates --}}
-<div class="ui modal Templates">
+<div class="ui basic modal Templates">
     <i class="close icon"></i>
-    <div class="header"> Select a template </div>
+    <div class="header"><center>SELECT YOUR TEMPLATE</center></div>
     <div class="content">
-        <div class="ui five column grid">
+        <div class="ui two column grid">
         {{#each data}}
-            <div class="column">
-                <div class="ui fluid image">
-                    <div class="ui black ribbon label">
-                        {{name}}
-                    </div>
-                    <img src="{{min}}">
+            <div class="column {{bind event}}" style="cursor:pointer">
+                <div>
+                    <img src="{{path}}{{min}}" class="ui bordered fluid image">
+                    <div class="ui bottom left attached label">{{name}}</div>
                 </div>
             </div>
         {{/each}}

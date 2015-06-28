@@ -37,10 +37,10 @@ function clone(data) {
         if (err && stderr.indexOf("already exists") !== -1) {
             // Project already cloned, just refresh it
             ghcli.pull(baseUri + "/" + data.name, function(err, stdout, stderr) {
-                sockets[data.sid].s.emit("cloned", !err);
+                sockets[data.sid].s.emit("clone", !err);
             });
         } else {
-            sockets[data.sid].s.emit("cloned", !err);
+            sockets[data.sid].s.emit("clone", !err);
         }
     });
 }
@@ -61,7 +61,7 @@ function convert(data) {
                     ghcli.branch(baseUri, "gh-pages", function(branch_error) {
                         if (!branch_error) {
                             ghcli.push(sockets[data.sid].ghtoken, baseUri, data.url, "gh-pages", function(push_error2) {
-                                sockets[data.sid].s.emit("converted", !push_error2);
+                                sockets[data.sid].s.emit("convert", !push_error2);
                             }, true);
                         } else {
                             //TODO TRIGER ERROR
@@ -73,6 +73,11 @@ function convert(data) {
             });
         });
     });
+}
+
+function templatesList(data) {
+    var templates = fs.readdirSync(__dirname + "/../../static/templates");
+    sockets[data.sid].s.emit("templatesList", templates);
 }
 
 var octoboot = function(app, socketIo) {
@@ -89,6 +94,7 @@ var octoboot = function(app, socketIo) {
         socket.emit("sid", sid);
         socket.on("clone", clone);
         socket.on("convert", convert);
+        socket.on("templatesList", templatesList);
     });
 
     return function(req, res, next) {

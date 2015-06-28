@@ -14,8 +14,6 @@
 
 module OctoBoot {
 
-    export var SOCKET_ID: number; //SocketIo id
-
     export class App {
 
         private login: controllers.Login;
@@ -41,14 +39,13 @@ module OctoBoot {
         }
 
         private initSocket(done: () => any): void {
-            core.Socket.init().then((sid: number) => {
+            core.Socket.init().then(() => {
 
                 core.Socket.io.on("connected", (gat: string) => {
                     this.updateUI(gat);
                     this.login.hide();
                 });
 
-                SOCKET_ID = sid;
                 done();
             });
         }

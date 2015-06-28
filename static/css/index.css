@@ -12,3 +12,7 @@
     font-family: "OctoBoot";
     src: url(../fonts/Drakolomb.otf);
 }
+
+.Templates .column > div:hover {
+	background: rgb(232, 232, 232);
+}
