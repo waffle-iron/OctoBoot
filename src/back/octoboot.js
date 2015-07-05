@@ -3,13 +3,16 @@ cookieParser = require('cookie-parser'),
 ghapi = require("github-api"),
 ghcli = require("github-cli"),
 ghc = require("../../githubconf.json"),
-fs = require("fs");
+fs = require("fs"),
+child_process = require("child_process");
 
 // TEMP
 ghcli.debug = true;
 // ####
 
 var sockets = [];
+var projectDir = __dirname + "/../../temp/";
+var templateDir = __dirname + "/../../static/templates";
 
 function isLogged(req, res) {
     if (!req.signedCookies.gat) {
@@ -28,7 +31,7 @@ function oauth(req, res, access_token) {
 }
 
 function clone(data) {
-    var baseUri = __dirname + "/../../temp/" + data.sid;
+    var baseUri = projectDir + data.sid;
     var gitUrl = data.url.replace(/https:\/\/.*github/g, "https://" + sockets[data.sid].ghtoken + "@github");
 
     try{ fs.mkdirSync(baseUri) } catch (e) {};
@@ -46,7 +49,7 @@ function clone(data) {
 }
 
 function convert(data) {
-    var baseUri = __dirname + "/../../temp/" + data.sid + "/" + data.name;
+    var baseUri = projectDir + data.sid + "/" + data.name;
 
     fs.writeFileSync(baseUri + "/.octoboot", JSON.stringify({
         name: data.name,
@@ -76,8 +79,17 @@ function convert(data) {
 }
 
 function templatesList(data) {
-    var templates = fs.readdirSync(__dirname + "/../../static/templates");
+    var templates = fs.readdirSync(templateDir);
     sockets[data.sid].s.emit("templatesList", templates);
+}
+
+function cp(data) {
+    var template = data.template.replace(/\[|\]|\s/ig, '\\$&');
+    var dest = projectDir + data.sid + "/" + data.project + (data.file === "index" ? "/" : "/" + data.file + "/");
+    var src = templateDir + "/" + template + (data.file === "index" ? "/*" : "");
+    child_process.exec("cp " + src + " " + dest, function(error, stdout, stderr) {
+        sockets[data.sid].s.emit("cp", !error);
+    });
 }
 
 var octoboot = function(app, socketIo) {
@@ -95,6 +107,7 @@ var octoboot = function(app, socketIo) {
         socket.on("clone", clone);
         socket.on("convert", convert);
         socket.on("templatesList", templatesList);
+        socket.on("cp", cp);
     });
 
     return function(req, res, next) {

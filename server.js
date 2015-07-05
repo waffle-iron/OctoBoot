@@ -11,6 +11,7 @@ app.use(octoboot(app, socketIo));
 
 app.use("/", express.static(__dirname + "/static/"));
 app.use("/lib", express.static(__dirname + "/dist/"));
+app.use("/temp", express.static(__dirname + "/temp/"));
 app.use("/lib/handlebars/", express.static(__dirname + "/node_modules/handlebars/dist/"));
 
 // 404 not found

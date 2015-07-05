@@ -20,7 +20,7 @@ module OctoBoot.core {
             }
         }
 
-        public static emit(event: string, data: any, done: (data?: any) => any): void {
+        public static emit(event: string, data: any, done?: (data?: any) => any): void {
             if (data) {
                 data.sid = this.sid;
             }

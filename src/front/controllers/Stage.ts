@@ -14,5 +14,9 @@ module OctoBoot.controllers {
         public destroy(): void {
             this.jDom.remove();
         }
+
+        public reload(): void {
+            this.jDom.get()[0].contentWindow.location.reload();
+        }
     }
 }

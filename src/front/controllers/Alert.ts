@@ -23,7 +23,7 @@ module OctoBoot.controllers {
 
             $('.Alert').remove();
 
-            if (!options.icon && options.image) {
+            if (!options.icon && !options.image) {
                 this.options.icon = 'warning sign'; //default
             }
 
@@ -37,6 +37,10 @@ module OctoBoot.controllers {
                 onDeny: options.onDeny
             })
             .modal('show');
+        }
+
+        public getInputValue(): string {
+            return this.jDom.find('input').val();
         }
 
         public hide(): void {

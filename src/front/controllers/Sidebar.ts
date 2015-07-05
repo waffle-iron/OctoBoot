@@ -10,10 +10,11 @@ module OctoBoot.controllers {
 
         constructor() {
             super(model.UI.HB_SIDEBAR);
-            this.initWithContext(null).sidebar("attach events", model.UI.SIDEBAR_LAUNCH_BT);
+            this.initWithContext(null).sidebar('hide');
         }
 
         public update(): void {
+            this.jDom.sidebar('show');
             core.GitHub.getUser((user: model.GitHubUser) => helper.HandlebarHelper.updateTemplate(model.UI.HB_PROFIL, user))
             core.GitHub.getRepos(model.RepoType.PUBLIC, (repos: Array<model.GitHubRepo>) => this.updateTemplateRepo('Public', repos));
             core.GitHub.getRepos(model.RepoType.PRIVATE, (repos: Array<model.GitHubRepo>) => this.updateTemplateRepo('Private', repos));

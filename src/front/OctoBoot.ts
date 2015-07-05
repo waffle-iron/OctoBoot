@@ -6,7 +6,6 @@
 /// <reference path="model/UI.ts" />
 /// <reference path="controllers/Login.ts" />
 /// <reference path="controllers/Sidebar.ts" />
-/// <reference path="controllers/Toolsbar.ts" />
 /// <reference path="controllers/Stage.ts" />
 /// <reference path="controllers/Templates.ts" />
 /// <reference path="core/GitHub.ts" />
@@ -18,7 +17,6 @@ module OctoBoot {
 
         private login: controllers.Login;
         private sidebar: controllers.Sidebar;
-        private toolsbar: controllers.Toolsbar;
         private stage: controllers.Stage;
 
         private gat: string;
@@ -51,7 +49,6 @@ module OctoBoot {
         }
 
         private initUI(): void {
-            this.toolsbar = new controllers.Toolsbar();
             this.stage = new controllers.Stage();
             this.sidebar = new controllers.Sidebar();
             this.login = new controllers.Login();

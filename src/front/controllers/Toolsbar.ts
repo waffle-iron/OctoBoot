@@ -1,5 +1,6 @@
 /// <reference path="Handlebar.ts" />
 /// <reference path="Templates.ts" />
+/// <reference path="Stage.ts" />
 
 module OctoBoot.controllers {
 
@@ -10,9 +11,9 @@ module OctoBoot.controllers {
         	create: {click: () => this.create()}
         }
 
-        constructor() {
+        constructor(public projectName: string, public stage: Stage) {
             super(model.UI.HB_TOOLSBAR);
-            this.templates = new Templates();
+            this.templates = new Templates(projectName, stage);
             this.initWithContext(this);
         }
 

@@ -1,7 +1,9 @@
 /// <reference path="../controllers/Alert.ts" />
 /// <reference path="../controllers/Stage.ts" />
+/// <reference path="../controllers/Toolsbar.ts" />
 /// <reference path="../definition/jquery.plugin.d.ts" />
 /// <reference path="../model/UI.ts" />
+/// <reference path="../model/ServerAPI.ts" />
 /// <reference path="Socket.ts" />
 /// <reference path="GitHub.ts" />
 
@@ -16,6 +18,7 @@ module OctoBoot.core {
     export class Repos {
 
         public stage: controllers.Stage;
+        private toolsbar: controllers.Toolsbar;
 
         private alertConvert: controllers.Alert;
 
@@ -52,6 +55,12 @@ module OctoBoot.core {
             });
         }
 
+        private open(url: string): void {
+            this.setState(REPO_STATE.SELECT);
+            this.stage = new controllers.Stage(url);
+            this.toolsbar = new controllers.Toolsbar(this.name, this.stage);
+        }
+
         private didConvertRepoToOctoBoot(done: (convert: boolean) => any): void {
             var convert = true;
             core.GitHub.getTree(this.name, (dataTree: model.GitHubTree) => {
@@ -68,15 +77,11 @@ module OctoBoot.core {
         private clone(convert: boolean): boolean {
             core.GitHub.cloneOnServer(this.name, this.url, (success: boolean) => {
                 if (success) {
-                    var projectUrl: string = "/temp/" + Socket.sid + "/" + this.name + "/index.html";
+                    var projectUrl: string = model.ServerAPI.getProjectPath(this.name) + "index.html";
                     if (convert) {
-                        this.convertAndWait(() => {
-                            this.setState(REPO_STATE.SELECT);
-                            this.stage = new controllers.Stage(projectUrl);
-                        });
+                        this.convertAndWait(() => this.open(projectUrl));
                     } else {
-                        this.setState(REPO_STATE.SELECT);
-                        this.stage = new controllers.Stage(projectUrl);
+                        this.open(projectUrl);
                     }
                 } else {
                     // TODO trigger error
@@ -110,7 +115,7 @@ module OctoBoot.core {
                 title: 'New Project',
                 body: model.UI.REPO_ALERT_NEW_BODY,
                 onApprove: () => {
-                    this.name = alert.jDom.find('input').val();
+                    this.name = alert.getInputValue();
                     core.GitHub.createRepo(this.name, type, (repo: model.GitHubRepo) => {
                         this.url = repo.clone_url;
                         this.clone(true);
