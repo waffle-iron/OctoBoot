@@ -45,7 +45,7 @@ module OctoBoot.controllers {
                         onApprove: () => this.createFileFromTemplate(alert.getInputValue(), templateName),
                         onDeny: () => this.show(),
                         image: model.ServerAPI.getTemplatePath(templateName) + 'min.jpg',
-                        input: 'filename...'
+                        input: this.stage.url.split('/').pop().replace(/\.html/ig, '')
                     });
                 }
             }

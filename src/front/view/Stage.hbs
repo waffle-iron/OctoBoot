@@ -1,2 +1,17 @@
 {{!-- data context -> controllers.Stage --}}
-<iframe class="Stage" style="width:100%;height:100%;border:none;position:absolute;background:#f7f7f7" border="0" src="{{url}}"></iframe>
+<div class="Stage" style="width:100%;height:100%;position:absolute;background:#f7f7f7">
+	{{#if showAdress}}
+	<div class="ui fluid left action input">
+		<button class="ui labeled icon button Tools">
+			<i class="configure icon"></i>
+			TOOLS
+		</button>
+		<button class="ui teal labeled icon button">
+			<i class="at icon"></i>
+			GO !
+		</button>
+		<input type="text" value="{{url}}">
+	</div>
+	{{/if}}
+	<iframe style="width:100%;height:100%;border:none;" border="0" src="{{url}}"></iframe>
+</div>

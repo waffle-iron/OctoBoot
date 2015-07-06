@@ -4,9 +4,14 @@ module OctoBoot.controllers {
 
     export class Stage extends Handlebar {
 
-        constructor(public url: string = "/logo.html") {
+        public showAdress: boolean;
+        public iframe: HTMLIFrameElement;
+
+        constructor(public url: string = '/logo.html') {
             super(model.UI.HB_STAGE);
+            this.showAdress = url !== '/logo.html';
             this.initWithContext(this);
+            this.iframe = this.jDom.children('iframe').get()[0];
             // Fix an issue with logo font size (wv) and modal scroll how set body height to document height
             this.jDom.css('max-height', window.screen.availHeight + 'px');
         }
@@ -16,7 +21,7 @@ module OctoBoot.controllers {
         }
 
         public reload(): void {
-            this.jDom.get()[0].contentWindow.location.reload();
+            this.iframe.contentWindow.location.reload();
         }
     }
 }

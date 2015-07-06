@@ -10,7 +10,7 @@ module OctoBoot.controllers {
 
         constructor() {
             super(model.UI.HB_SIDEBAR);
-            this.initWithContext(null).sidebar('hide');
+            this.initWithContext(null).sidebar({ closable: false }).sidebar('hide');
         }
 
         public update(): void {

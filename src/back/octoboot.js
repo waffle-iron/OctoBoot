@@ -87,7 +87,7 @@ function cp(data) {
     var template = data.template.replace(/\[|\]|\s/ig, '\\$&');
     var dest = projectDir + data.sid + "/" + data.project + (data.file === "index" ? "/" : "/" + data.file + "/");
     var src = templateDir + "/" + template + (data.file === "index" ? "/*" : "");
-    child_process.exec("cp " + src + " " + dest, function(error, stdout, stderr) {
+    child_process.exec("cp -r " + src + " " + dest, function(error, stdout, stderr) {
         sockets[data.sid].s.emit("cp", !error);
     });
 }

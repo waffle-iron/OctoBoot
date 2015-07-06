@@ -2,9 +2,9 @@ interface JQuery {
     /**
      * Semantic sidebar
      */
-    sidebar(action: string, target?: string): JQuery;
+    sidebar(action: any, value1?: any, value2?: any): JQuery;
     /**
      * Semantic modal
      */
-    modal(action: any, value1?: string, value2?: boolean): JQuery;
+    modal(action: any, value1?: any, value2?: any): JQuery;
 }

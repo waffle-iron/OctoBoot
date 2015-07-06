@@ -11,10 +11,10 @@
     "build:semantic": "cd semantic && gulp build && cd ..",
 
     "build:ts": "tsc src/front/OctoBoot.ts --removeComments --sourceMap --out dist/octoboot.js",
-    "watch:ts": "watch 'npm run build:ts' src/front/",
+    "watch:ts": "watch 'date +\"%m-%d-%Y %T\" && npm run build:ts' src/front/",
 
     "build:handlebars": "handlebars --min src/front/view/*.hbs -f dist/handlebars_templates.min.js",
-    "watch:handlebars": "watch 'npm run build:handlebars' src/front/view/"
+    "watch:handlebars": "watch 'date +\"%m-%d-%Y %T\" && npm run build:handlebars' src/front/view/"
   },
   "repository": {
     "type": "git",
