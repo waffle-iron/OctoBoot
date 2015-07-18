@@ -58,7 +58,7 @@ module OctoBoot.core {
         private open(url: string): void {
             this.setState(REPO_STATE.SELECT);
             this.stage = new controllers.Stage(url);
-            this.toolsbar = new controllers.Toolsbar(this.name, this.stage);
+            this.toolsbar = new controllers.Toolsbar(this.name, this.stage, this.url);
         }
 
         private didConvertRepoToOctoBoot(done: (convert: boolean) => any): void {

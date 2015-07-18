@@ -10,7 +10,7 @@ module OctoBoot.controllers {
 
         constructor() {
             super(model.UI.HB_SIDEBAR);
-            this.initWithContext(null).sidebar({ closable: false }).sidebar('hide');
+            this.initWithContext(null).sidebar({ closable: false }).sidebar('setting', 'transition', 'push').sidebar('hide');
         }
 
         public update(): void {
@@ -44,6 +44,8 @@ module OctoBoot.controllers {
         }
 
         private select(classContext: any, buttonContext: any, type: string): void {
+            this.jDom.sidebar({ closable: true });
+            
             if (classContext.selected) {
                 classContext.selected.destroy();
             }

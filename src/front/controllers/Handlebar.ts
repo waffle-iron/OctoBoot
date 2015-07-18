@@ -13,9 +13,9 @@ module OctoBoot.controllers {
             this.hbClassName = helper.HandlebarHelper.formatId(hbTemplate, '.');
         }
 
-        initWithContext(context: any, insertInBody: boolean = false): JQuery {
+        initWithContext(context: any, customContainer?: JQuery): JQuery {
             // If main container are not ready yet, append on body, sidebar pusher will take everything in body and put in on pusher
-            var container: JQuery = $(model.UI.MAIN_CONTAINER).length && !insertInBody ? $(model.UI.MAIN_CONTAINER) : $(document.body);
+            var container: JQuery = customContainer ? customContainer : $(model.UI.MAIN_CONTAINER).length ? $(model.UI.MAIN_CONTAINER) : $(document.body)
             container.append(Handlebars.templates[this.hbTemplate](context));
 
             this.jDom = $(this.hbClassName).last();

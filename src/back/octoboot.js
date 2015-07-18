@@ -4,6 +4,7 @@ ghapi = require("github-api"),
 ghcli = require("github-cli"),
 ghc = require("../../githubconf.json"),
 fs = require("fs"),
+pa = require("path"),
 child_process = require("child_process");
 
 // TEMP
@@ -89,7 +90,35 @@ function cp(data) {
     var src = templateDir + "/" + template + (data.file === "index" ? "/*" : "");
     child_process.exec("cp -r " + src + " " + dest, function(error, stdout, stderr) {
         sockets[data.sid].s.emit("cp", !error);
+        sockets[data.sid].s.emit("save_available");
     });
+}
+
+function save(data) {
+    var baseUri = projectDir + data.sid + "/" + data.name;
+
+    ghcli.add(baseUri, '-A', function() {
+        ghcli.commit(baseUri, "Octoboot - " + new Date().toString(), function() {
+            ghcli.push(sockets[data.sid].ghtoken, baseUri, data.url, "master", function(push_error) {
+                if (!push_error) {
+                    sockets[data.sid].s.emit("save", !push_error);
+                }
+            });
+        })
+    })
+}
+
+function r404(req, res, next) {
+    var path = req.path.split('/'), sid;
+    
+    if (path.length > 2) {
+        sid = parseInt(path[2]);
+        if (sockets[sid]) {
+            sockets[sid].s.emit("404");
+        }
+    }
+
+    res.status(404).sendFile(pa.resolve(__dirname + "/../../static/404.html"));
 }
 
 var octoboot = function(app, socketIo) {
@@ -97,6 +126,9 @@ var octoboot = function(app, socketIo) {
     app.use(cookieSession({ secret: 'octoboot'}));
     app.get("/api/isLogged/:sid", isLogged);
     app.get("/api/GitHubApi/:sid", ghapi.oauth(oauth));
+
+    // 404
+    app.use(r404);
 
     ghapi.init(ghc.client_id, ghc.client_secret, ghc.authorization_callback_url);
 
@@ -108,6 +140,7 @@ var octoboot = function(app, socketIo) {
         socket.on("convert", convert);
         socket.on("templatesList", templatesList);
         socket.on("cp", cp);
+        socket.on("save", save);
     });
 
     return function(req, res, next) {

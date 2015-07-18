@@ -7,17 +7,12 @@ var app = express();
 var serverIo = http.createServer(app);
 var socketIo = io.listen(serverIo);
 
-app.use(octoboot(app, socketIo));
-
 app.use("/", express.static(__dirname + "/static/"));
 app.use("/lib", express.static(__dirname + "/dist/"));
 app.use("/temp", express.static(__dirname + "/temp/"));
 app.use("/lib/handlebars/", express.static(__dirname + "/node_modules/handlebars/dist/"));
 
-// 404 not found
-app.use(function(req, res, next) {
-    res.status(404).sendFile(__dirname + "/static/404.html");
-});
+app.use(octoboot(app, socketIo));
 
 serverIo.listen(process.env.PORT || 8080);
 console.log("now listening on port ", (process.env.PORT || 8080));

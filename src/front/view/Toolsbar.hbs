@@ -1,18 +1,15 @@
 {{!-- data context -> controllers.Toolsbar --}}
-<div class="ui medium inverted vertical sidebar labeled icon menu Toolsbar {{bind handlers.anim}}">
-  <a class="item sidebar {{bind closeHandlers}}">
-    <i class="remove icon"></i> Close
-  </a>
-  <a class="item sidebar Settings">
+<div class="ui vertical right fixed inverted labeled icon menu Toolsbar">
+  <a class="item Settings">
     <i class="settings icon"></i> Settings
   </a>
-  <a class="item {{bind createHandlers}}">
+  <a class="item {{bind createHandlers}} New">
     <i class="plus icon"></i> New File
   </a>
-  <a class="item sidebar">
+  <a class="item {{bind saveHandlers}} Save">
     <i class="save icon"></i> Save
   </a>
-  <a class="item sidebar">
+  <a class="item Publish">
     <i class="cloud upload icon"></i> Publish
   </a>
 </div>
