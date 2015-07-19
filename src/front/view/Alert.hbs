@@ -28,6 +28,10 @@
             <p>{{options.body}}</p>
             {{/if}}
 
+            {{#if options.link}}
+            <a href="{{options.link}}" target="_blank">{{options.link}}</a>
+            {{/if}}
+
             {{#if options.input}}
             <div class="ui fluid corner labeled input">
                 <input type="text" placeholder="{{options.input}}">

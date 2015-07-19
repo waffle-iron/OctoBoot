@@ -10,6 +10,7 @@ module OctoBoot.controllers {
         icon?: string;
         image?: string;
         input?: string;
+        link?: string;
     }
 
     export class Alert extends Handlebar {

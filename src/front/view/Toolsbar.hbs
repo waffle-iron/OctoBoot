@@ -1,15 +1,15 @@
 {{!-- data context -> controllers.Toolsbar --}}
-<div class="ui vertical right fixed inverted labeled icon menu Toolsbar">
-  <a class="item Settings">
+<div class="ui vertical left fixed inverted labeled icon menu Toolsbar">
+  <a class="item settings">
     <i class="settings icon"></i> Settings
   </a>
-  <a class="item {{bind createHandlers}} New">
+  <a class="item {{bind createHandlers}} new">
     <i class="plus icon"></i> New File
   </a>
-  <a class="item {{bind saveHandlers}} Save">
+  <a class="item {{bind saveHandlers}} save">
     <i class="save icon"></i> Save
   </a>
-  <a class="item Publish">
+  <a class="item {{bind publishHandlers}} publish">
     <i class="cloud upload icon"></i> Publish
   </a>
 </div>

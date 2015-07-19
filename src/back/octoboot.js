@@ -1,5 +1,5 @@
-var cookieSession = require('cookie-session'),
-cookieParser = require('cookie-parser'),
+var cookieSession = require("cookie-session"),
+cookieParser = require("cookie-parser"),
 ghapi = require("github-api"),
 ghcli = require("github-cli"),
 ghc = require("../../githubconf.json"),
@@ -54,8 +54,8 @@ function convert(data) {
 
     fs.writeFileSync(baseUri + "/.octoboot", JSON.stringify({
         name: data.name,
-        type: 'project',
-        version: '1'
+        type: "project",
+        version: "1"
     }));
 
     ghcli.add(baseUri, baseUri + "/.octoboot", function() {
@@ -85,7 +85,7 @@ function templatesList(data) {
 }
 
 function cp(data) {
-    var template = data.template.replace(/\[|\]|\s/ig, '\\$&');
+    var template = data.template.replace(/\[|\]|\s/ig, "\\$&");
     var dest = projectDir + data.sid + "/" + data.project + (data.file === "index" ? "/" : "/" + data.file + "/");
     var src = templateDir + "/" + template + (data.file === "index" ? "/*" : "");
     child_process.exec("cp -r " + src + " " + dest, function(error, stdout, stderr) {
@@ -97,7 +97,7 @@ function cp(data) {
 function save(data) {
     var baseUri = projectDir + data.sid + "/" + data.name;
 
-    ghcli.add(baseUri, '-A', function() {
+    ghcli.add(baseUri, "-A", function() {
         ghcli.commit(baseUri, "Octoboot - " + new Date().toString(), function() {
             ghcli.push(sockets[data.sid].ghtoken, baseUri, data.url, "master", function(push_error) {
                 if (!push_error) {
@@ -108,8 +108,26 @@ function save(data) {
     })
 }
 
+function publish(data) {
+    var baseUri = projectDir + data.sid + "/" + data.name;
+
+    ghcli.checkout(baseUri, "gh-pages", function(checkout_err) {
+        if (!checkout_err) {
+            ghcli.reset(baseUri, "master", function(reset_error) {
+                if (!reset_error) {
+                    ghcli.push(sockets[data.sid].ghtoken, baseUri, data.url, "gh-pages", function(push_error) {
+                        if (!push_error) {
+                            sockets[data.sid].s.emit("publish", !push_error);
+                        }
+                    }, true);
+                }
+            });
+        }
+    });
+}
+
 function r404(req, res, next) {
-    var path = req.path.split('/'), sid;
+    var path = req.path.split("/"), sid;
     
     if (path.length > 2) {
         sid = parseInt(path[2]);
@@ -122,8 +140,8 @@ function r404(req, res, next) {
 }
 
 var octoboot = function(app, socketIo) {
-    app.use(cookieParser('octoboot'));
-    app.use(cookieSession({ secret: 'octoboot'}));
+    app.use(cookieParser("octoboot"));
+    app.use(cookieSession({ secret: "octoboot"}));
     app.get("/api/isLogged/:sid", isLogged);
     app.get("/api/GitHubApi/:sid", ghapi.oauth(oauth));
 
@@ -141,6 +159,7 @@ var octoboot = function(app, socketIo) {
         socket.on("templatesList", templatesList);
         socket.on("cp", cp);
         socket.on("save", save);
+        socket.on("publish", publish);
     });
 
     return function(req, res, next) {
