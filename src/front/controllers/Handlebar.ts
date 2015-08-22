@@ -18,7 +18,7 @@ module OctoBoot.controllers {
             var container: JQuery = customContainer ? customContainer : $(model.UI.MAIN_CONTAINER).length ? $(model.UI.MAIN_CONTAINER) : $(document.body)
             container.append(Handlebars.templates[this.hbTemplate](context));
 
-            this.jDom = $(this.hbClassName).last();
+            this.jDom = container.find(this.hbClassName).last();
 
             return this.jDom;
         }
