@@ -2,6 +2,7 @@
 /// <reference path="Templates.ts" />
 /// <reference path="Alert.ts" />
 /// <reference path="Stage.ts" />
+/// <reference path="EditBar.ts" />
 /// <reference path="../model/UI.ts" />
 /// <reference path="../core/Socket.ts" />
 
@@ -15,7 +16,6 @@ module OctoBoot.controllers {
 
         public templates: Templates;
         public editing: boolean;
-        public editingElm: Element[] = [];
 
         public createHandlers: model.HTMLEvent = {
             click: () => this.create()
@@ -32,6 +32,10 @@ module OctoBoot.controllers {
         public editHandlers: model.HTMLEvent = {
             click: () => this.edit()
         };
+
+        private editingElm: Element[] = [];
+        private editBarHover: EditBar;
+        private editBarClick: EditBar;
 
         constructor(public projectName: string, public stage: Stage, public repoUrl: string) {
             super(model.UI.HB_TOOLSBAR);
@@ -86,26 +90,37 @@ module OctoBoot.controllers {
         }
 
         private edit(): void {
-            var click = (elm: Element) => {
+            var click = (element: Element) => {
                 if (this.editing) {
-                    this.editingElm.push(aloha(elm).elem);
+                    this.editingElm.push(aloha(element).elem);
+                    this.editBarClick.show(element, this.stage.iframe.contentDocument);
                 }
             }
 
-            var hoverInOut = (hoverIn: boolean, element: JQuery, previous?: number) => {
+            var hoverInOut = (hoverIn: boolean, element: JQuery, pBorder?: string) => {
                 if (this.editing) {
-                    element.fadeTo(100, hoverIn ? 0.5 : (previous || 1));
                     element.css('cursor', hoverIn ? 'text' : 'auto');
+                    element.css('border', hoverIn ? '1px solid #4798B3' : (pBorder || ''));
+
+                    if (hoverIn) {
+                        this.editBarHover.show(element.get(0), this.stage.iframe.contentDocument);
+                    } else {
+                        this.editBarHover.hide();
+                    }
                 }
             }
 
             if (this.editing === undefined) {
-                $(this.stage.iframe.contentDocument.body).find('p,a,h1,h2,h3,h4,h5,span').each((i: number, elm: Element) => {
+                var container: JQuery = $(this.stage.iframe.contentDocument.body);
+                container.find('p,a,h1,h2,h3,h4,h5,span').each((i: number, elm: Element) => {
                     var element: JQuery = $(elm);
-                    var previous: string = element.css('opacity');
+                    var pBorder: string = element.css('border');
                     element.click(() => click(elm));
-                    element.hover(() => hoverInOut(true, element), () => hoverInOut(false, element, parseFloat(previous)));
+                    element.hover(() => hoverInOut(true, element), () => hoverInOut(false, element, pBorder));
                 });
+
+                this.editBarHover = new EditBar(container);
+                this.editBarClick = new EditBar(container);
             }
 
             this.editing = !this.editing;
@@ -116,11 +131,11 @@ module OctoBoot.controllers {
                 this.setItemActive('null');
                 if (this.editingElm.length) {
                     this.editingElm.every((e: Element, i: number, a: Element[]) => {
-                        console.log(e, a);
                         aloha.mahalo(e);
-                        return true;
+                        return true
                     });
                     this.editingElm = [];
+                    this.editBarClick.hide();
                 }
             }
         }

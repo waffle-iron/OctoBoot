@@ -11,6 +11,8 @@ module OctoBoot.model {
         public static HB_STAGE: string = 'Stage.hbs';
         public static HB_ALERT: string = 'Alert.hbs';
         public static HB_TEMPLATES: string = 'Templates.hbs';
+        public static HB_EDITBAR: string = 'EditBar.hbs';
+        public static HB_EDITBAR_FRAME: string = 'EditBarFrame.hbs';
 
         public static SIDEBAR_LAUNCH_BT: string = '.Toolsbar .sidebar';
 
@@ -20,7 +22,7 @@ module OctoBoot.model {
         public static REPO_ALERT_NEW_BODY: string = 'Cool ! It\'s a greet idea ! Give me a name for your new project please:';
         public static REPO_ALERT_CONVERT_TITLE: string = 'Not a OctoBoot project';
         public static REPO_ALERT_CONVERT_BODY: string = 'Sorry, it seems that your project are not a OctoBoot project, did you want to convert it ?';
-    
+
         public static PUBLISH_ALERT_TITLE: string = 'Publish your website online';
         public static PUBLISH_ALERT_BODY: string = 'Are you sure ? This will update your website online with your current working version';
     }
