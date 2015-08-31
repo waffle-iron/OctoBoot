@@ -1,5 +1,7 @@
 /// <reference path="Handlebar.ts" />
 /// <reference path="../model/UI.ts" />
+/// <reference path="../model/HTMLEvent.ts" />
+/// <reference path="../definition/aloha.d.ts" />
 
 module OctoBoot.controllers {
 
@@ -20,12 +22,14 @@ module OctoBoot.controllers {
             this.iframe.initWithContext(null, container);
 
             var iframeDocument: JQuery = this.iframe.jDom.contents();
-            this.initWithContext(null, iframeDocument.find('body'));
+            var iframeBody: JQuery = iframeDocument.find('body');
+
+            this.initWithContext(this.HBHandlers(iframeBody), iframeBody);
             iframeDocument.find('head').append($.parseHTML(
                 '<link rel=\"stylesheet\" type=\"text/css\" href=\"/lib/semantic/semantic.css\">' +
                 '<script src=\"lib/semantic/semantic.min.js\"></script>'
             ));
-            iframeDocument.find('body').css('background', 'none'); // semantic-ui put a *** background on body
+            iframeBody.css('background', 'none'); // semantic-ui put a *** background on body
             this.iframe.jDom.hide();
         }
 
@@ -77,6 +81,23 @@ module OctoBoot.controllers {
                 width: rect.width + (this.margin * 2),
                 height: rect.height + (this.margin * 2)
             }
+        }
+
+        private HBHandlers(context: JQuery): any {
+            return $.each({
+                bold : {
+                    click: aloha.ui.command(aloha.ui.commands.bold)
+                },
+                underline : {
+                    click: aloha.ui.command(aloha.ui.commands.underline)
+                },
+                italic : {
+                    click: aloha.ui.command(aloha.ui.commands.italic)
+                },
+                unformat : {
+                    click: aloha.ui.command(aloha.ui.commands.unformat)
+                }
+            }, (key: string, handlers: model.HTMLEvent) => handlers.context = context)
         }
     }
 }

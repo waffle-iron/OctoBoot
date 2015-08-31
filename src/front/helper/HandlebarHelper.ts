@@ -25,26 +25,27 @@ module OctoBoot.helper {
         }
 
         private static bind(): void {
-            Handlebars.registerHelper('bind', (events: any): string => {
+            Handlebars.registerHelper('bind', (events: model.HTMLEvent): string => {
                 if (!events) {
                     console.error('bind error, event object is null');
                 } else {
                     this.events.push(events);
                     var id: number = this.events.length - 1;
-                    this.bindEvent(id);
+                    this.bindEvent(id, events.context);
                     return 'hhb' + id
                 }
             });
         }
 
-        private static bindEvent(id: number): void {
-            var o: JQuery = $('.hhb' + id);
+        private static bindEvent(id: number, context: JQuery): void {
+            console.log(context)
+            var o: JQuery = context ? context.find('.hhb' + id) : $('.hhb' + id);
             if (o.length) {
                 for (var i in this.events[id]) {
                     o.on(i, this.events[id][i]);
                 }
             } else {
-                setTimeout(() => this.bindEvent(id), 500);
+                setTimeout(() => this.bindEvent(id, context), 500);
             }
         }
     }

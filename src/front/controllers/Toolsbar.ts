@@ -5,12 +5,11 @@
 /// <reference path="EditBar.ts" />
 /// <reference path="../model/UI.ts" />
 /// <reference path="../core/Socket.ts" />
+/// <reference path="../definition/aloha.d.ts" />
 
 
 
 module OctoBoot.controllers {
-
-    declare var aloha: any;
 
     export class Toolsbar extends Handlebar {
 
