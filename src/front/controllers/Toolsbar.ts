@@ -97,10 +97,9 @@ module OctoBoot.controllers {
                 }
             }
 
-            var hoverInOut = (hoverIn: boolean, element: JQuery, pBorder?: string) => {
+            var hoverInOut = (hoverIn: boolean, element: JQuery) => {
                 if (this.editing) {
-                    element.css('cursor', hoverIn ? 'text' : 'auto');
-                    element.css('border', hoverIn ? '1px solid #4798B3' : (pBorder || ''));
+                    element.css('cursor', hoverIn ? 'pointer' : 'auto');
 
                     if (hoverIn) {
                         this.editBarHover.show(element.get(0), this.stage.iframe.contentDocument);
@@ -114,9 +113,8 @@ module OctoBoot.controllers {
                 var container: JQuery = $(this.stage.iframe.contentDocument.body);
                 container.find('p,a,h1,h2,h3,h4,h5,span').each((i: number, elm: Element) => {
                     var element: JQuery = $(elm);
-                    var pBorder: string = element.css('border');
                     element.click(() => click(elm));
-                    element.hover(() => hoverInOut(true, element), () => hoverInOut(false, element, pBorder));
+                    element.hover(() => hoverInOut(true, element), () => hoverInOut(false, element));
                 });
 
                 this.editBarHover = new EditBar(container);

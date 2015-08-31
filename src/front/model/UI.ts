@@ -13,6 +13,8 @@ module OctoBoot.model {
         public static HB_TEMPLATES: string = 'Templates.hbs';
         public static HB_EDITBAR: string = 'EditBar.hbs';
         public static HB_EDITBAR_FRAME: string = 'EditBarFrame.hbs';
+        public static HB_VERTICAL_LINE: string = 'VerticalLine.hbs';
+        public static HB_HORIZONTAL_LINE: string = 'HorizontalLine.hbs';
 
         public static SIDEBAR_LAUNCH_BT: string = '.Toolsbar .sidebar';
 
