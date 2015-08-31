@@ -8,12 +8,12 @@
   {{#if onDeny}}
   <i class="close icon"></i>
   {{/if}}
-  
+
     <div class="header">
         {{options.title}}
     </div>
-  
-    <div class="content">
+
+    <div class="image content">
         <div class="ui {{#if options.image}}big{{/if}} image">
             {{#if options.icon}}
             <i class="{{options.icon}} icon"></i>
@@ -33,7 +33,7 @@
             {{/if}}
 
             {{#if options.input}}
-            <div class="ui fluid corner labeled input">
+            <div class="ui small corner labeled input">
                 <input type="text" placeholder="{{options.input}}">
                 <div class="ui corner label">
                     <i class="add circle icon"></i>
@@ -42,7 +42,7 @@
             {{/if}}
         </div>
     </div>
-  
+
     <div class="actions">
         <div class="{{buttonCount}} fluid ui inverted buttons">
 
