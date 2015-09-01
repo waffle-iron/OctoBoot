@@ -53,9 +53,16 @@ module OctoBoot.controllers {
         }
 
         private save(): void {
-            var save: JQuery = this.jDom.find('.save.icon').removeClass('save').addClass('spinner loading');
-            var content: string = new XMLSerializer().serializeToString(this.stage.iframe.contentDocument);
+            if (this.editing) {
+                this.edit();
+            }
+
             this.setIconLoading(['save']);
+
+            var content: string = new XMLSerializer()
+                .serializeToString(this.stage.iframe.contentDocument)
+                .replace(/(\sclass="")/, ""); // clean html string from edition misc
+
             core.Socket.emit('save', { name: this.projectName, url: this.repoUrl, content: content, file: this.stage.url.split('/').pop() }, () => {
                 this.setIconLoading(['save'], false);
                 this.setItemActive('publish');
@@ -89,6 +96,8 @@ module OctoBoot.controllers {
         }
 
         private edit(): void {
+            var container: JQuery = $(this.stage.iframe.contentDocument.body);
+
             var click = (element: Element) => {
                 if (this.editing) {
                     this.editingElm.push(aloha(element).elem);
@@ -98,7 +107,7 @@ module OctoBoot.controllers {
 
             var hoverInOut = (hoverIn: boolean, element: JQuery) => {
                 if (this.editing) {
-                    element.css('cursor', hoverIn ? 'pointer' : 'auto');
+                    element.css('cursor', hoverIn ? 'pointer' : '');
 
                     if (hoverIn) {
                         this.editBarHover.show(element.get(0), this.stage.iframe.contentDocument);
@@ -109,30 +118,30 @@ module OctoBoot.controllers {
             }
 
             if (this.editing === undefined) {
-                var container: JQuery = $(this.stage.iframe.contentDocument.body);
                 container.find('p,a,h1,h2,h3,h4,h5,span').each((i: number, elm: Element) => {
                     var element: JQuery = $(elm);
                     element.click(() => click(elm));
                     element.hover(() => hoverInOut(true, element), () => hoverInOut(false, element));
                 });
-
-                this.editBarHover = new EditBar(container);
-                this.editBarClick = new EditBar(container);
             }
 
             this.editing = !this.editing;
 
             if (this.editing) {
                 this.setItemActive('edit');
+                this.editBarHover = new EditBar(container);
+                this.editBarClick = new EditBar(container);
             } else {
                 this.setItemActive('null');
+                this.editBarClick.destroy();
+                this.editBarHover.destroy();
+
                 if (this.editingElm.length) {
                     this.editingElm.every((e: Element, i: number, a: Element[]) => {
                         aloha.mahalo(e);
                         return true
                     });
                     this.editingElm = [];
-                    this.editBarClick.hide();
                 }
             }
         }
