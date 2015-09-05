@@ -38,7 +38,6 @@ module OctoBoot.helper {
         }
 
         private static bindEvent(id: number, context: JQuery): void {
-            console.log(context)
             var o: JQuery = context ? context.find('.hhb' + id) : $('.hhb' + id);
             if (o.length) {
                 for (var i in this.events[id]) {

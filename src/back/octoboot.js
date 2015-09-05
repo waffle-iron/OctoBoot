@@ -34,8 +34,7 @@ function isLogged(req, res) {
 function oauth(req, res, access_token) {
     sockets[req.params.sid].s.emit("connected", req.signedCookies.gat);
     sockets[req.params.sid].ghtoken = access_token;
-    res.cookie("gat", access_token, {signed: true})
-        .write("<script>window.close()</script>");
+    res.cookie("gat", access_token, {signed: true}).redirect("/");
 }
 
 function r404(req, res, next) {

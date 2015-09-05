@@ -18,7 +18,6 @@ module OctoBoot.controllers {
                 title: model.UI.LOGIN_TITLE,
                 body: model.UI.LOGIN_BODY,
                 onApprove: () => this.connectGitHub(),
-                onDeny: false,
                 icon: 'github square'
             });
         }
@@ -28,7 +27,7 @@ module OctoBoot.controllers {
         }
 
         private connectGitHub(): boolean {
-            window.open(model.ServerAPI.GITHUB_LOG.replace(/:sid/, core.Socket.sid.toString()), "", "width=1050, height=700, scrollbars=1");
+            window.location.href = model.ServerAPI.GITHUB_LOGIN.replace(/:sid/, core.Socket.sid.toString());
             return false;
         }
     }
