@@ -51,7 +51,7 @@ module OctoBoot.controllers {
             }
 
             classContext.selected = new core.Repos(
-                buttonContext ? buttonContext.innerText : null,
+                buttonContext ? buttonContext.innerText || buttonContext.innerHTML.trim() : null,
                 buttonContext ? buttonContext.getAttribute('data-url') : null,
                 type,
                 buttonContext ? buttonContext : null)
