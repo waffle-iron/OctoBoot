@@ -46,7 +46,7 @@ module OctoBoot.core {
                         title: model.UI.REPO_ALERT_CONVERT_TITLE,
                         body: model.UI.REPO_ALERT_CONVERT_BODY,
                         onApprove: () => this.clone(convert), 
-                        onDeny: true
+                        onDeny: () => true
                     });
                 } else {
                     this.clone(convert);
@@ -121,7 +121,7 @@ module OctoBoot.core {
                         this.clone(true);
                     });
                 },
-                onDeny: true,
+                onDeny: () => true,
                 icon: 'at',
                 input: 'NewProject...'
             });
