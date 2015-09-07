@@ -25,22 +25,22 @@ module OctoBoot.controllers {
                 var iframeDocument: JQuery = this.iframe.jDom.contents();
                 var iframeBody: JQuery = iframeDocument.find('body');
 
-                
+
                 this.initWithContext(this.HBHandlers(iframeBody), iframeBody);
                 iframeDocument.find('head').append($.parseHTML(
                     '<link rel=\"stylesheet\" type=\"text/css\" href=\"/lib/semantic/semantic.css\">' +
                     '<script src=\"lib/semantic/semantic.min.js\"></script>'
                 ));
                 iframeBody.css('background', 'none'); // semantic-ui put a *** background on body
-                
+
                 this.iframe.jDom.hide();
             }
 
-            // Fix #16 But need to test on other browser than chrome and FF !
-            if (window['chrome']) {
-                onLoad();
+            // Fix #16 - Check if Firefox, and if it is, fill iframe on load
+            if (typeof window['InstallTrigger'] !== 'undefined') {
+                this.iframe.jDom.on('load', onLoad);
             } else {
-                this.iframe.jDom.on('load', onLoad)    
+                onLoad();
             }
         }
 
