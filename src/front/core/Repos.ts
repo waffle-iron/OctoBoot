@@ -18,9 +18,11 @@ module OctoBoot.core {
     export class Repos {
 
         public stage: controllers.Stage;
+        public onCreate: (name: string, url: string) => void;
+        
         private toolsbar: controllers.Toolsbar;
-
         private alertConvert: controllers.Alert;
+        private alertCreate: controllers.Alert;
 
         constructor (public name: string, public url: string, public type: string, public sidebarButton?: HTMLElement) {
             if (!name) {
@@ -56,6 +58,11 @@ module OctoBoot.core {
         }
 
         private open(url: string): void {
+            if (this.alertCreate) {
+                this.alertCreate.hide();
+                this.alertCreate = null;
+            }
+
             this.setState(REPO_STATE.SELECT);
             this.stage = new controllers.Stage(url);
             this.toolsbar = new controllers.Toolsbar(this.name, this.stage, this.url);
@@ -111,15 +118,21 @@ module OctoBoot.core {
         }
 
         private create(type: string): void {
-            var alert: controllers.Alert = new controllers.Alert({
+            this.alertCreate = new controllers.Alert({
                 title: 'New Project',
                 body: model.UI.REPO_ALERT_NEW_BODY,
                 onApprove: () => {
-                    this.name = alert.getInputValue();
+                    this.alertCreate.setWait();
+                    this.name = this.alertCreate.getInputValue();
                     core.GitHub.createRepo(this.name, type, (repo: model.GitHubRepo) => {
                         this.url = repo.clone_url;
                         this.clone(true);
+
+                        if (this.onCreate) {
+                            this.onCreate(this.name, this.url);
+                        }
                     });
+                    return false //don't close Alert right now, wait before clone and select
                 },
                 onDeny: () => true,
                 icon: 'at',

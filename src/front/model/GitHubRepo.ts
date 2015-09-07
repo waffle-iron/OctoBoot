@@ -55,6 +55,63 @@ module OctoBoot.model {
         }
     }
 
+    export var GitHubRepoTemplate = (extendParams?: any): GitHubRepo => {
+        return $.extend({
+            id: 0,
+            owner: {
+                login: '',
+                id: 0,
+                avatar_url: '',
+                gravatar_id: '',
+                url: '',
+                html_url: '',
+                followers_url: '',
+                following_url: '',
+                gists_url: '',
+                starred_url: '',
+                subscriptions_url: '',
+                organizations_url: '',
+                repos_url: '',
+                events_url: '',
+                received_events_url: '',
+                type: '',
+                site_admin: true
+            },
+            name: '',
+            full_name: '',
+            description: '',
+            private: true,
+            fork: true,
+            url: '',
+            html_url: '',
+            clone_url: '',
+            git_url: '',
+            ssh_url: '',
+            svn_url: '',
+            mirror_url: '',
+            homepage: '',
+            language: '',
+            forks_count: 0,
+            stargazers_count: 0,
+            watchers_count: 0,
+            size: 0,
+            default_branch: '',
+            open_issues_count: 0,
+            has_issues: true,
+            has_wiki: true,
+            has_pages: true,
+            has_downloads: true,
+            pushed_at: '',
+            created_at: '',
+            updated_at: '',
+            permissions: {
+                admin: true,
+                push: true,
+                pull: true
+            }
+        }, extendParams);
+    }
+
     export var RepoType = {
         PUBLIC: 'public',
         PRIVATE: 'private'

@@ -4,7 +4,7 @@
     <div class="menu" style="display: none">
         <a class="item {{bind newHandlers}}">NEW PROJECT <i class="add circle icon"></i></a>
         {{#each repos}}
-            <a class="item {{bind ../repoHandlers}}" data-url="{{clone_url}}">
+            <a class="item {{bind ../repoHandlers}} repo{{name}}" data-url="{{clone_url}}">
                 {{name}}
             </a>
         {{/each}}

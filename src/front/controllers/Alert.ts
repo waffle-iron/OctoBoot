@@ -44,6 +44,13 @@ module OctoBoot.controllers {
             return this.jDom.find('input').val();
         }
 
+        public setWait(replace: string = 'checkmark'): void {
+            var i: JQuery = this.jDom.find('.' + replace);
+            if (i.length) {
+                i.removeClass(replace).addClass('spinner loading');
+            }
+        }
+
         public hide(): void {
             this.jDom.modal('hide');
         }

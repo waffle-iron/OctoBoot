@@ -6,7 +6,9 @@ module OctoBoot.controllers {
 
     export class Sidebar extends Handlebar {
 
-        public selected: core.Repos;
+        public selectedRepo: core.Repos;
+        public publicRepos: Array<model.GitHubRepo>;
+        public privateRepos: Array<model.GitHubRepo>;
 
         constructor() {
             super(model.UI.HB_SIDEBAR);
@@ -16,18 +18,19 @@ module OctoBoot.controllers {
         public update(): void {
             this.jDom.sidebar('show');
             core.GitHub.getUser((user: model.GitHubUser) => helper.HandlebarHelper.updateTemplate(model.UI.HB_PROFIL, user))
-            core.GitHub.getRepos(model.RepoType.PUBLIC, (repos: Array<model.GitHubRepo>) => this.updateTemplateRepo('Public', repos));
-            core.GitHub.getRepos(model.RepoType.PRIVATE, (repos: Array<model.GitHubRepo>) => this.updateTemplateRepo('Private', repos));
+            core.GitHub.getRepos(model.RepoType.PUBLIC, (repos: Array<model.GitHubRepo>) => { this.publicRepos = repos; this.updateTemplateRepo(model.RepoType.PUBLIC, repos) });
+            core.GitHub.getRepos(model.RepoType.PRIVATE, (repos: Array<model.GitHubRepo>) => { this.privateRepos = repos; this.updateTemplateRepo(model.RepoType.PRIVATE, repos) });
         }
 
-        private updateTemplateRepo(type: string, data: Array<model.GitHubRepo>): void {
+        private updateTemplateRepo(type: string, repos: Array<model.GitHubRepo>): void {
+            var formatedType: string = type.charAt(0).toUpperCase() + type.slice(1);
             helper.HandlebarHelper.updateTemplate(model.UI.HB_REPOS, {
                 titleHandlers: this.titleHandlers(),
                 repoHandlers: this.repoHandlers(type),
                 newHandlers: this.newHandlers(type),
-                repos: data,
-                title: type
-            }, 'Repos' + type);
+                repos: repos,
+                title: formatedType
+            }, 'Repos' + formatedType);
         }
 
         private titleHandlers(): model.HTMLEvent {
@@ -43,18 +46,30 @@ module OctoBoot.controllers {
             return { click: () => { this.select(this, null, type) } }
         }
 
-        private select(classContext: any, buttonContext: any, type: string): void {
+        private select(__this: Sidebar, button: HTMLElement, type: string): void {
             this.jDom.sidebar({ closable: true });
             
-            if (classContext.selected) {
-                classContext.selected.destroy();
+            if (__this.selectedRepo) {
+                __this.selectedRepo.destroy();
             }
 
-            classContext.selected = new core.Repos(
-                buttonContext ? buttonContext.innerText || buttonContext.innerHTML.trim() : null,
-                buttonContext ? buttonContext.getAttribute('data-url') : null,
+            __this.selectedRepo = new core.Repos(
+                button ? button.innerText || button.innerHTML.trim() : null,
+                button ? button.getAttribute('data-url') : null,
                 type,
-                buttonContext ? buttonContext : null)
+                button ? button : null)
+
+            // if no button, it's a repo creation
+            if (!button) {
+                __this.selectedRepo.onCreate = (name: string, url: string) => {
+                    var repos: Array<model.GitHubRepo> = type === model.RepoType.PUBLIC ? this.publicRepos : this.privateRepos;
+                    // push a fake|temp repo on sidebar (GitHub api has some delay)
+                    repos.unshift(model.GitHubRepoTemplate({ name: name, clone_url: url }));
+                    this.updateTemplateRepo(type, repos);
+                    // fill missing sidebarButton to change button state
+                    __this.selectedRepo.sidebarButton = $('.Repos' + type.charAt(0).toUpperCase() + type.slice(1)).find('.repo' + name).get(0);
+                }
+            }
         }
     }
 }
