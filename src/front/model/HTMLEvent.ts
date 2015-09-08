@@ -1,7 +1,8 @@
 module OctoBoot.model {
 
     export interface HTMLEvent {
-        click?: () => any;
+        click?: (e: MouseEvent) => any;
+        keyup?: (e: KeyboardEvent) => any;
         context?: JQuery;
         // TODO ADD MORE :)
     }
