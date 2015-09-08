@@ -9,7 +9,7 @@ module OctoBoot.controllers {
 
         public iframe: Handlebar;
 
-        private width: number = 150;
+        private width: number = 220;
         private height: number = 40;
         private margin: number = 5;
 
@@ -19,7 +19,7 @@ module OctoBoot.controllers {
             super(model.UI.HB_EDITBAR);
 
             this.iframe = new Handlebar(model.UI.HB_EDITBAR_FRAME);
-            this.iframe.initWithContext(null, container);
+            this.iframe.initWithContext(this, container);
 
             var onLoad: (e?: Event) => void = (e: Event) => {
                 var iframeDocument: JQuery = this.iframe.jDom.contents();
