@@ -117,12 +117,13 @@ module OctoBoot.controllers {
                 }
             }
 
-            if (this.editing === undefined) {
+            if (!this.stage.iframe.contentWindow['editing']) {
                 container.find('p,a,h1,h2,h3,h4,h5,span').each((i: number, elm: Element) => {
                     var element: JQuery = $(elm);
                     element.click(() => click(elm));
                     element.hover(() => hoverInOut(true, element), () => hoverInOut(false, element));
                 });
+                this.stage.iframe.contentWindow['editing'] = true;
             }
 
             this.editing = !this.editing;
