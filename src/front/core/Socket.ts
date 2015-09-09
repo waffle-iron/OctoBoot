@@ -12,7 +12,7 @@ module OctoBoot.core {
 
             return {
                 then: (done: (sid: number) => any) => {
-                    this.io.on('sid', (sid: number) => {
+                    this.io.once('sid', (sid: number) => {
                         this.sid = sid;
                         done(sid);
                     });
