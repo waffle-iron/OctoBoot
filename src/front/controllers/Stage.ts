@@ -38,9 +38,9 @@ module OctoBoot.controllers {
 
         public load(url?: string): void {
             url = url || this.jDom.find('input').val();
-            url = url.replace(/http(:?s)*:\/\/(:?\w+\.){1,}\w+\//ig, '/');
-            this.iframe.src = this.baseUrl + url;
-            this.jDom.find('input').val(url);
+            this.url = url.replace(/http(:?s)*:\/\/(:?\w+\.){1,}\w+\//ig, '/');
+            this.iframe.src = this.baseUrl + this.url;
+            this.jDom.find('input').val(this.url);
         }
 
         public reload(): void {

@@ -63,7 +63,7 @@ module OctoBoot.controllers {
                 .serializeToString(this.stage.iframe.contentDocument)
                 .replace(/(\sclass="")/, ""); // clean html string from edition misc
 
-            core.Socket.emit('save', { name: this.projectName, url: this.repoUrl, content: content, file: this.stage.url.split('/').pop() }, () => {
+            core.Socket.emit('save', { name: this.projectName, url: this.repoUrl, content: content, file: this.stage.url.replace(/\/$/, '').split('/').pop() }, () => {
                 this.setIconLoading(['save'], false);
                 this.setItemActive('publish');
             });
