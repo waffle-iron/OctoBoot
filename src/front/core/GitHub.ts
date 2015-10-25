@@ -2,6 +2,7 @@
 /// <reference path="../model/GitHubRepo.ts" />
 /// <reference path="../model/GitHubBranch.ts" />
 /// <reference path="../model/GitHubTree.ts" />
+/// <reference path="../definition/jquery.d.ts" />
 
 module OctoBoot.core {
 
@@ -72,7 +73,7 @@ module OctoBoot.core {
 
         private static postJSON(url: string, json: any): JQueryXHR {
             return $.ajax(url, {
-                method: 'POST',
+                type: 'POST',
                 headers: { 'Authorization': 'token ' + this.gat },
                 contentType: 'application/json',
                 processData: false,

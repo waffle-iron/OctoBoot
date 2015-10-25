@@ -7,12 +7,24 @@ module OctoBoot.controllers {
 
     export class EditBar extends Handlebar {
 
+        // iframe container of EditingBar
         public iframe: Handlebar;
 
-        private width: number = 220;
-        private height: number = 40;
+        // width and number of buttons on EditBar
+        private buttonWidth: number = 32;
+        private buttonNum: number = 6;
+        
+        // width / height and margin of global EditBar
+        private width: number = this.buttonWidth * this.buttonNum;
+        private height: number = 100;
         private margin: number = 5;
+        
+        // current editing element
+        private editingElement: Element;
+        // callback called when a new element is append (eg duplicate)
+        private cbkNewElement: Function;
 
+        // lines who border the editing element
         private lines: { top: JQuery, bottom: JQuery, left: JQuery, right: JQuery };
 
         constructor(public container: JQuery) {
@@ -27,6 +39,11 @@ module OctoBoot.controllers {
 
 
                 this.initWithContext(this.HBHandlers(iframeBody), iframeBody);
+                
+                // activate popup on edit button
+                iframeBody.find('button.topleft').popup({inline: true}); 
+                iframeBody.find('button.topright').popup({inline: true, position: 'top right'});
+
                 iframeDocument.find('head').append($.parseHTML(
                     '<link rel=\"stylesheet\" type=\"text/css\" href=\"/lib/semantic/semantic.css\">' +
                     '<script src=\"lib/semantic/semantic.min.js\"></script>'
@@ -46,6 +63,8 @@ module OctoBoot.controllers {
 
         public show(element: Element, document: Document): void {
             if (element.getBoundingClientRect) {
+                this.editingElement = element;
+
                 var rect: ClientRect = this.getRect(element, document);
                 var down: boolean = rect.top - this.height < 0;
 
@@ -65,6 +84,10 @@ module OctoBoot.controllers {
         public destroy(): void {
             this.iframe.jDom.remove();
             this.border(null);
+        }
+
+        public onNewElement(cbk: (newElement: JQuery) => any): void {
+            this.cbkNewElement = cbk;
         }
 
         private border(rect: ClientRect): void {
@@ -94,6 +117,17 @@ module OctoBoot.controllers {
             }
         }
 
+        private duplicate(): void {
+            var duplicateElement: JQuery = $(this.editingElement).clone();
+            duplicateElement.insertAfter(this.editingElement);
+            this.cbkNewElement(duplicateElement);
+        }
+
+        private remove(): void {
+            $(this.editingElement).remove();
+            this.hide();
+        }
+
         private HBHandlers(context: JQuery): any {
             return $.each({
                 bold : {
@@ -107,6 +141,12 @@ module OctoBoot.controllers {
                 },
                 unformat : {
                     click: aloha.ui.command(aloha.ui.commands.unformat)
+                },
+                duplicate : {
+                    click: () => this.duplicate()
+                },
+                remove : {
+                    click: () => this.remove()
                 }
             }, (key: string, handlers: model.HTMLEvent) => handlers.context = context)
         }

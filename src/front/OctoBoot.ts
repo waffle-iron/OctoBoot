@@ -28,7 +28,6 @@ module OctoBoot {
                 this.initUI();
 
                 this.login.isLogged().done((gat: string) => {
-                    console.log("OK", gat);
                     this.updateUI(gat);
                 }).fail(() => {
                     this.login.show();

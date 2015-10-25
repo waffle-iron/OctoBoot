@@ -98,6 +98,7 @@ module OctoBoot.controllers {
         private edit(): void {
             var container: JQuery = $(this.stage.iframe.contentDocument.body);
 
+            // Function call when we click on a editable element
             var click = (element: Element) => {
                 if (this.editing) {
                     this.editingElm.push(aloha(element).elem);
@@ -105,6 +106,7 @@ module OctoBoot.controllers {
                 }
             }
 
+            // Function call when hover in or out an editable element
             var hoverInOut = (hoverIn: boolean, element: JQuery) => {
                 if (this.editing) {
                     element.css('cursor', hoverIn ? 'pointer' : '');
@@ -117,6 +119,7 @@ module OctoBoot.controllers {
                 }
             }
 
+            // Init editable element (TODO need to improve targeted tag)
             if (!this.stage.iframe.contentWindow['editing']) {
                 container.find('p,a,h1,h2,h3,h4,h5,span').each((i: number, elm: Element) => {
                     var element: JQuery = $(elm);
@@ -126,17 +129,26 @@ module OctoBoot.controllers {
                 this.stage.iframe.contentWindow['editing'] = true;
             }
 
+            // Editing flag
             this.editing = !this.editing;
 
             if (this.editing) {
+                // If editing, create or reset EditBar on click and hover (need two different EditBar)
                 this.setItemActive('edit');
                 this.editBarHover = new EditBar(container);
                 this.editBarClick = new EditBar(container);
+                this.editBarClick.onNewElement((newElement: JQuery) => {
+                    // Callback called when a new element is inserted on the stage (eg with duplicate)
+                    newElement.click(() => click(newElement.get(0)));
+                    newElement.hover(() => hoverInOut(true, newElement), () => hoverInOut(false, newElement));
+                })
             } else {
+                // If not editing, destroy EditBar
                 this.setItemActive('null');
                 this.editBarClick.destroy();
                 this.editBarHover.destroy();
 
+                // And unactive aloha on editable element if they are
                 if (this.editingElm.length) {
                     this.editingElm.every((e: Element, i: number, a: Element[]) => {
                         aloha.mahalo(e);

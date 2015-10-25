@@ -1,6 +1,38 @@
-<div class="ui icon buttons EditBar" style="position:absolute;bottom:0;right:0;">
-  <button class="ui vertical animated button {{bind bold}}"><div class="hidden content">bold</div><div class="visible content"><i class="bold icon"></i></div></button>
-  <button class="ui vertical animated button {{bind italic}}"><div class="hidden content">italic</div><div class="visible content"><i class="italic icon"></i></div></button>
-  <button class="ui vertical animated button {{bind underline}}" style="width:65px"><div class="hidden content">underline</div><div class="visible content"><i class="underline icon"></i></div></button>
-  <button class="ui vertical animated button {{bind unformat}}" style="width:65px"><div class="hidden content">unformat</div><div class="visible content"><i class="erase icon"></i></div></button>
+<div class="ui small icon buttons EditBar" style="position:absolute;bottom:0;right:0;">
+  <button class="ui button {{bind duplicate}} topleft">
+  	<i class="plus icon"></i>
+  </button>
+  <div class="ui popup inverted tiny">
+    duplicate
+  </div>
+  <button class="ui button {{bind remove}} topleft">
+  	<i class="remove icon"></i>
+  </button>
+  <div class="ui popup inverted tiny">
+    remove
+  </div>
+  <button class="ui button {{bind bold}} topleft">
+  	<i class="bold icon"></i>
+  </button>
+  <div class="ui popup inverted tiny">
+    bold
+  </div>
+  <button class="ui button {{bind italic}} topleft">
+  	<i class="italic icon"></i>
+  </button>
+  <div class="ui popup inverted tiny">
+    italic
+  </div>
+  <button class="ui button {{bind underline}} topright">
+  	<i class="underline icon"></i>
+  </button>
+  <div class="ui popup inverted tiny right">
+    underline
+  </div>
+  <button class="ui button {{bind unformat}} topright">
+  	<i class="erase icon"></i>
+  </button>
+  <div class="ui popup inverted tiny">
+    erase
+  </div>
 </div>
