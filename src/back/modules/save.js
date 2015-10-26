@@ -1,7 +1,7 @@
 var ghcli = require("github-cli");
 var fs = require("fs");
 
-exports.init = function(dir, sockets) {
+module.exports = function(dir, socketEvent, sockets) {
     return function(data) {
         var baseUri = dir + data.sid + "/" + data.name;
         
@@ -13,7 +13,7 @@ exports.init = function(dir, sockets) {
                 ghcli.commit(baseUri, "Octoboot - " + new Date().toString(), function() {
                     ghcli.push(sockets[data.sid].ghtoken, baseUri, data.url, "master", function(push_error) {
                         if (!push_error) {
-                            sockets[data.sid].s.emit("save", !push_error);
+                            sockets[data.sid].s.emit(socketEvent, !push_error);
                         }
                     });
                 })

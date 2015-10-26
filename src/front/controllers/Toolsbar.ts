@@ -63,7 +63,7 @@ module OctoBoot.controllers {
                 .serializeToString(this.stage.iframe.contentDocument)
                 .replace(/(\sclass="")/, ""); // clean html string from edition misc
 
-            core.Socket.emit('save', { name: this.projectName, url: this.repoUrl, content: content, file: this.stage.url.replace(/\/$/, '').split('/').pop() }, () => {
+            core.Socket.emit(model.ServerAPI.SOCKET_SAVE, { name: this.projectName, url: this.repoUrl, content: content, file: this.stage.url.replace(/\/$/, '').split('/').pop() }, () => {
                 this.setIconLoading(['save'], false);
                 this.setItemActive('publish');
             });
@@ -77,7 +77,7 @@ module OctoBoot.controllers {
 
                     this.setIconLoading(['cloud', 'upload']);
 
-                    core.Socket.emit('publish', { name: this.projectName, url: this.repoUrl }, () => {
+                    core.Socket.emit(model.ServerAPI.SOCKET_PUBLISH, { name: this.projectName, url: this.repoUrl }, () => {
 
                         this.setIconLoading(['cloud', 'upload'], false);
 

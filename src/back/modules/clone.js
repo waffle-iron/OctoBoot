@@ -1,7 +1,7 @@
 var fs = require("fs"),
 ghcli = require("github-cli");
 
-exports.init = function(dir, sockets) {
+module.exports = function(dir, socketEvent, sockets) {
     return function(data) {
         var baseUri = dir + data.sid;
         var gitUrl = data.url.replace(/https:\/\/.*github/g, "https://" + sockets[data.sid].ghtoken + "@github");
@@ -12,10 +12,10 @@ exports.init = function(dir, sockets) {
             if (err && stderr.indexOf("already exists") !== -1) {
                 // Project already cloned, just refresh it
                 ghcli.pull(baseUri + "/" + data.name, function(err, stdout, stderr) {
-                    sockets[data.sid].s.emit("clone", !err);
+                    sockets[data.sid].s.emit(socketEvent, !err);
                 });
             } else {
-                sockets[data.sid].s.emit("clone", !err);
+                sockets[data.sid].s.emit(socketEvent, !err);
             }
         });
     }

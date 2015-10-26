@@ -1,4 +1,6 @@
 /// <reference path="Handlebar.ts" />
+/// <reference path="../core/Socket.ts" />
+/// <reference path="../model/ServerApi.ts" />
 
 module OctoBoot.controllers {
 
@@ -7,12 +9,13 @@ module OctoBoot.controllers {
         public showAdress: boolean;
         public iframe: HTMLIFrameElement;
 
-        private loadUrl: model.HTMLEvent = {
+        private buttonEvent: model.HTMLEvent = {
             click: (e: MouseEvent) => this.load()
         }
 
-        private loadUrlByKeyboard: model.HTMLEvent = {
-            keyup: (e: KeyboardEvent) => e.keyCode === 13 && this.load()
+        private inputEvent: model.HTMLEvent = {
+            keyup: (e: KeyboardEvent) => e.keyCode === 13 && this.load(),
+            focus: (e: FocusEvent) => this.refreshAndShowUrl() 
         }
 
         private baseUrl: string;
@@ -45,6 +48,13 @@ module OctoBoot.controllers {
 
         public reload(): void {
             this.iframe.contentWindow.location.reload();
+        }
+
+        public refreshAndShowUrl(): void {
+            var dirToInspect = this.baseUrl.split('/').pop() + '/' + this.url.split('/')[1];
+            core.Socket.emit(model.ServerAPI.SOCKET_LIST_DIR, { dir: dirToInspect }, (data: any) => {
+                console.log(data);
+            })
         }
     }
 }

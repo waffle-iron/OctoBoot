@@ -23,7 +23,7 @@ module OctoBoot.controllers {
         constructor(public projectName: string, public stage: Stage) {
             super(model.UI.HB_TEMPLATES);
 
-            core.Socket.emit('templatesList', null, (templateList: Array<string>) => {
+            core.Socket.emit(model.ServerAPI.SOCKET_LIST_TEMPLATE, null, (templateList: Array<string>) => {
                 this.data = templateList.filter((name: string) => {
                     return !(name.indexOf('.') === 0)
                 }).map((name: string) => {
@@ -52,7 +52,7 @@ module OctoBoot.controllers {
         }
 
         private createFileFromTemplate(fileName: string, templateName: string): void {
-            core.Socket.emit('cp', { file: fileName, template: templateName, project: this.projectName }, () => this.stage.reload());
+            core.Socket.emit(model.ServerAPI.SOCKET_COPY, { file: fileName, template: templateName, project: this.projectName }, () => this.stage.reload());
         }
 
     }
