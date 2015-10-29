@@ -4,13 +4,19 @@ OctoBoot is a fast, powerful, and user friendly tools to create your own website
 ## Online Version
 WIP !! Available Soon
 
+## Local Requirement
+
+    > node
+    > npm
+    > gulp (just for semantic build first time)
+
 ## Local Install
 
-    > npm i -g gulp && npm i
+    > npm i
 
 ## Local Build
 	
-	First time
+    First time (need gulp for build:semantic)
     > npm run build:semantic && npm run build
 
     Next time
