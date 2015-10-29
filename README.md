@@ -6,7 +6,7 @@ WIP !! Available Soon
 
 ## Local Install
 
-    > npm i
+    > npm i -g gulp && npm i
 
 ## Local Build
 	
