@@ -1,6 +1,6 @@
 var ghcli = require("github-cli");
 
-exports.init = function(dir, sockets) {
+module.exports = function(dir, socketEvent, sockets) {
     return function (data) {
         var baseUri = dir + data.sid + "/" + data.name;
 
@@ -10,7 +10,7 @@ exports.init = function(dir, sockets) {
                     if (!reset_error) {
                         ghcli.push(sockets[data.sid].ghtoken, baseUri, data.url, "gh-pages", function(push_error) {
                             if (!push_error) {
-                                sockets[data.sid].s.emit("publish", !push_error);
+                                sockets[data.sid].s.emit(socketEvent, !push_error);
                             }
                         }, true);
                     }

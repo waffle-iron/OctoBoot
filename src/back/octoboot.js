@@ -7,10 +7,12 @@ pa = require("path"),
 // Internal module
 convert = require("./modules/convert.js"),
 clone = require("./modules/clone.js"),
-templates = require("./modules/templates.js"),
+list = require("./modules/list.js"),
 copy = require("./modules/copy.js"),
 save = require("./modules/save.js"),
 publish = require("./modules/publish.js"),
+// Model API share with front
+modelApi = require("./model/serverapi.js"),
 // GitHub conf
 ghc = require("../../githubconf.json");
 
@@ -53,8 +55,8 @@ function r404(req, res, next) {
 var octoboot = function(app, socketIo) {
     app.use(cookieParser("octoboot"));
     app.use(cookieSession({ secret: "octoboot"}));
-    app.get("/api/isLogged/:sid", isLogged);
-    app.get("/api/GitHubApi/:sid", ghapi.oauth(oauth));
+    app.get(modelApi.IS_LOGGED, isLogged);
+    app.get(modelApi.GITHUB_LOGIN, ghapi.oauth(oauth));
 
     // 404
     app.use(r404);
@@ -66,12 +68,15 @@ var octoboot = function(app, socketIo) {
         sockets[sid] = {s: socket};
         socket.emit("sid", sid);
 
-        socket.on("clone", clone.init(projectDir, sockets));
-        socket.on("convert", convert.init(projectDir, sockets));
-        socket.on("templatesList", templates.init(templateDir, sockets));
-        socket.on("cp", copy.init(projectDir, templateDir, sockets));
-        socket.on("save", save.init(projectDir, sockets));
-        socket.on("publish", publish.init(projectDir, sockets));
+        
+        socket.on(modelApi.SOCKET_SAVE, save(projectDir, modelApi.SOCKET_SAVE, sockets));
+        socket.on(modelApi.SOCKET_COPY, copy(projectDir, templateDir, modelApi.SOCKET_COPY, sockets));
+        socket.on(modelApi.SOCKET_CLONE, clone(projectDir, modelApi.SOCKET_CLONE, sockets));
+        socket.on(modelApi.SOCKET_PUBLISH, publish(projectDir, modelApi.SOCKET_PUBLISH, sockets));
+        socket.on(modelApi.SOCKET_CONVERT, convert(projectDir, modelApi.SOCKET_CONVERT, sockets));
+        socket.on(modelApi.SOCKET_LIST_DIR, list(projectDir, modelApi.SOCKET_LIST_DIR, sockets));
+        socket.on(modelApi.SOCKET_LIST_TEMPLATE, list(templateDir, modelApi.SOCKET_LIST_TEMPLATE, sockets));
+        
     });
 
     return function(req, res, next) {

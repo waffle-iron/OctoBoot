@@ -3,6 +3,7 @@
 /// <reference path="../model/GitHubBranch.ts" />
 /// <reference path="../model/GitHubTree.ts" />
 /// <reference path="../definition/jquery.d.ts" />
+/// <reference path="../model/ServerApi.ts" />
 
 module OctoBoot.core {
 
@@ -18,7 +19,7 @@ module OctoBoot.core {
         }
 
         public static cloneOnServer(name: string, url: string, done: (success: boolean) => any): void {
-            Socket.emit('clone', { name: name, url: url }, done);
+            Socket.emit(model.ServerAPI.SOCKET_CLONE, { name: name, url: url }, done);
         }
 
         public static getRepos(type: string, done: (repos: Array<model.GitHubRepo>) => any ): void {

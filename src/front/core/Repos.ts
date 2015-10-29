@@ -99,7 +99,7 @@ module OctoBoot.core {
         }
 
         private convertAndWait(done: () => any): void {
-            Socket.emit('convert', {
+            Socket.emit(model.ServerAPI.SOCKET_CONVERT, {
                 name: this.name,
                 url: this.url
             }, (success: boolean) => {

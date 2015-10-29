@@ -1,7 +1,7 @@
 var fs = require("fs"),
 ghcli = require("github-cli");
 
-exports.init = function(dir, sockets) {
+module.exports = function(dir, socketEvent, sockets) {
     return function(data) {
         var baseUri = dir + data.sid + "/" + data.name;
 
@@ -18,7 +18,7 @@ exports.init = function(dir, sockets) {
                         ghcli.branch(baseUri, "gh-pages", function(branch_error) {
                             if (!branch_error) {
                                 ghcli.push(sockets[data.sid].ghtoken, baseUri, data.url, "gh-pages", function(push_error2) {
-                                    sockets[data.sid].s.emit("convert", !push_error2);
+                                    sockets[data.sid].s.emit(socketEvent, !push_error2);
                                 }, true);
                             } else {
                                 //TODO TRIGER ERROR
