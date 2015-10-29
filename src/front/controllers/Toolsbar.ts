@@ -143,13 +143,11 @@ module OctoBoot.controllers {
                     newElement.hover(() => hoverInOut(true, newElement), () => hoverInOut(false, newElement));
                 });
                 this.editBarClick.onSwitchElement((text: string, value: string, selectedItem: JQuery) => {
-                    console.log('coucou');
-                    console.log(text, value, selectedItem);
+                    // callback called when we select an other editable element from editbar button
                     let newTarget: Element = $(this.editBarClick.editingElement).find(value).get(0);
                     click(newTarget);
-                    //aloha.selections.show(aloha.editor.selection.caret, aloha.editor.selection.boundaries[0]);
                     let selection: any = aloha.selections.select(aloha.editor.selection, aloha.editor.selection.boundaries[0], aloha.editor.selection.boundaries[1], 'start');
-                    aloha.selections.focus(selection.boundaries[0]);
+                    $(this.editBarClick.editingElement).focus();
                 });
             } else {
                 // If not editing, destroy EditBar
