@@ -1,6 +1,8 @@
 /// <reference path="Handlebar.ts" />
 /// <reference path="../core/Socket.ts" />
 /// <reference path="../model/ServerApi.ts" />
+/// <reference path="../model/UI.ts" />
+/// <reference path="../definition/jquery.plugin.d.ts" />
 
 module OctoBoot.controllers {
 
@@ -8,15 +10,6 @@ module OctoBoot.controllers {
 
         public showAdress: boolean;
         public iframe: HTMLIFrameElement;
-
-        private buttonEvent: model.HTMLEvent = {
-            click: (e: MouseEvent) => this.load()
-        }
-
-        private inputEvent: model.HTMLEvent = {
-            keyup: (e: KeyboardEvent) => e.keyCode === 13 && this.load(),
-            focus: (e: FocusEvent) => this.refreshAndShowUrl() 
-        }
 
         private baseUrl: string;
 
@@ -40,10 +33,13 @@ module OctoBoot.controllers {
         }
 
         public load(url?: string): void {
-            url = url || this.jDom.find('input').val();
+            url = url || this.jDom.find('.text').html();
             this.url = url.replace(/http(:?s)*:\/\/(:?\w+\.){1,}\w+\//ig, '/');
             this.iframe.src = this.baseUrl + this.url;
-            this.jDom.find('input').val(this.url);
+            this.jDom.find('.text').html(this.url);
+            if (this.showAdress) {
+                this.refreshAndShowUrl(); 
+            }
         }
 
         public reload(): void {
@@ -51,9 +47,19 @@ module OctoBoot.controllers {
         }
 
         public refreshAndShowUrl(): void {
-            var dirToInspect = this.baseUrl.split('/').pop() + '/' + this.url.split('/')[1];
-            core.Socket.emit(model.ServerAPI.SOCKET_LIST_DIR, { dir: dirToInspect }, (data: any) => {
-                console.log(data);
+            // clean
+            this.jDom.find('.dropdown .menu').html('');
+            // ask back for a list of dirs/files
+            let dirToInspect = this.baseUrl.split('/').pop() + '/' + this.url.split('/')[1];
+            core.Socket.emit(model.ServerAPI.SOCKET_LIST_DIR, { dir: dirToInspect }, (data: string[]) => {
+                // filter files
+                let dirs: string[] = data.filter((value: string, i: number, a: string[]) => { return value === 'index.html' || !value.match(/(?:\.|bootstrap|assets)/) });
+                dirs.forEach((dir: string, i: number, a: string[]) => {
+                    // and append it to dropdown
+                    this.jDom.find('.dropdown .menu').append('<div class="item">/' + this.url.split('/')[1] + '/' + dir + '</div>');
+                })
+                // active dropdown
+                this.jDom.find('.dropdown').dropdown({ onChange: (value: string, text: string) => this.load(text) });
             })
         }
     }
