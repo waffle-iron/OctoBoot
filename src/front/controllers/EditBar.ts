@@ -1,6 +1,7 @@
 /// <reference path="Handlebar.ts" />
 /// <reference path="../model/UI.ts" />
 /// <reference path="../model/HTMLEvent.ts" />
+/// <reference path="../model/Editable.ts" />
 /// <reference path="../definition/aloha.d.ts" />
 
 module OctoBoot.controllers {
@@ -9,20 +10,24 @@ module OctoBoot.controllers {
 
         // iframe container of EditingBar
         public iframe: Handlebar;
+        public iframeBody: JQuery;
+
+        // current editing element
+        public editingElement: Element;
 
         // width and number of buttons on EditBar
-        private buttonWidth: number = 32;
-        private buttonNum: number = 6;
+        private buttonWidth: number = 35;
+        private buttonNum: number = 7;
         
         // width / height and margin of global EditBar
         private width: number = this.buttonWidth * this.buttonNum;
-        private height: number = 100;
+        private height: number = 150;
         private margin: number = 5;
         
-        // current editing element
-        private editingElement: Element;
         // callback called when a new element is append (eg duplicate)
         private cbkNewElement: Function;
+        // callback called when we switch element with tag button
+        private cbkSwitchElement: Function;
 
         // lines who border the editing element
         private lines: { top: JQuery, bottom: JQuery, left: JQuery, right: JQuery };
@@ -35,20 +40,28 @@ module OctoBoot.controllers {
 
             var onLoad: (e?: Event) => void = (e: Event) => {
                 var iframeDocument: JQuery = this.iframe.jDom.contents();
-                var iframeBody: JQuery = iframeDocument.find('body');
+                this.iframeBody = iframeDocument.find('body');
 
 
-                this.initWithContext(this.HBHandlers(iframeBody), iframeBody);
+                this.initWithContext(this.HBHandlers(this.iframeBody), this.iframeBody);
                 
                 // activate popup on edit button
-                iframeBody.find('button.topleft').popup({inline: true}); 
-                iframeBody.find('button.topright').popup({inline: true, position: 'top right'});
+                this.iframeBody.find('.button.topleft').popup({inline: true}); 
+                this.iframeBody.find('.button.topright').popup({inline: true, position: 'top right'});
+
+                // activate dropdown on tag
+                this.iframeBody.find('.ui.dropdown').dropdown({ 
+                    direction: 'upward', 
+                    on: 'hover', 
+                    action: 'hide', 
+                    onChange: (value: string, text: string, selectedItem: JQuery) => this.cbkSwitchElement(text, value, selectedItem) 
+                });
 
                 iframeDocument.find('head').append($.parseHTML(
                     '<link rel=\"stylesheet\" type=\"text/css\" href=\"/lib/semantic/semantic.css\">' +
                     '<script src=\"lib/semantic/semantic.min.js\"></script>'
                 ));
-                iframeBody.css('background', 'none'); // semantic-ui put a *** background on body
+                this.iframeBody.css('background', 'none'); // semantic-ui put a *** background on body
 
                 this.iframe.jDom.hide();
             }
@@ -73,6 +86,7 @@ module OctoBoot.controllers {
                     'left': rect.right - this.width
                 }).show();
                 this.border(rect);
+                this.fillTagButton(element);
             }
         }
 
@@ -88,6 +102,10 @@ module OctoBoot.controllers {
 
         public onNewElement(cbk: (newElement: JQuery) => any): void {
             this.cbkNewElement = cbk;
+        }
+
+        public onSwitchElement(cbk: (text: string, value: string, selectedItem: JQuery) => any): void {
+            this.cbkSwitchElement = cbk;
         }
 
         private border(rect: ClientRect): void {
@@ -126,6 +144,19 @@ module OctoBoot.controllers {
         private remove(): void {
             $(this.editingElement).remove();
             this.hide();
+        }
+
+        private fillTagButton(element: Element): void {
+            let button: JQuery = this.iframeBody.find('.button').last();
+            
+            // Fill button with current tag name and reset dropdown
+            button.find('.text').html(element.tagName);
+            button.find('.menu').html('');
+
+            // search in current tag if we have some editable children
+            $(element).find(model.Editable.stringList).each((index: number, el: Element) => {
+                button.find('.menu').append('<div class="item">' + el.tagName + '</div>');
+            })
         }
 
         private HBHandlers(context: JQuery): any {
