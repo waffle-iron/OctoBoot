@@ -4,7 +4,6 @@
 /// <reference path="Stage.ts" />
 /// <reference path="EditBar.ts" />
 /// <reference path="../model/UI.ts" />
-/// <reference path="../model/Editable.ts" />
 /// <reference path="../core/Socket.ts" />
 /// <reference path="../definition/aloha.d.ts" />
 
@@ -97,33 +96,20 @@ module OctoBoot.controllers {
         private edit(): void {
             var container: JQuery = $(this.stage.iframe.contentDocument.body);
 
-            // Function call when we click on a editable element
-            var click = (element: Element) => {
-                if (this.editing) {
-                    this.editingElm.push(aloha(element).elem);
-                    this.editBarClick.show(element, this.stage.iframe.contentDocument);
-                }
-            }
-
-            // Function call when hover in or out an editable element
-            var hoverInOut = (hoverIn: boolean, element: JQuery) => {
-                if (this.editing) {
-                    element.css('cursor', hoverIn ? 'pointer' : '');
-
-                    if (hoverIn) {
-                        this.editBarHover.show(element.get(0), this.stage.iframe.contentDocument);
-                    } else {
-                        this.editBarHover.hide();
-                    }
-                }
-            }
-
+            // Bind events on window if not already done for editing
             if (!this.stage.iframe.contentWindow['editing']) {
-                // Init editable element (TODO need to improve targeted tag on model.Editable.stringList)
-                container.find(model.Editable.stringList).each((i: number, elm: Element) => {
-                    var element: JQuery = $(elm);
-                    element.click(() => click(elm));
-                    element.hover(() => hoverInOut(true, element), () => hoverInOut(false, element));
+                this.stage.iframe.contentWindow.addEventListener('mousemove', (e: MouseEvent) => {
+                    if (this.editing) {
+                        let element: JQuery = $(e.target)
+                        this.editBarHover.show(e.target as Element, this.stage.iframe.contentDocument);
+                    }
+                });
+                this.stage.iframe.contentWindow.addEventListener('click', (e: MouseEvent) => {
+                    if (this.editing) {
+                        let element: Element = e.target as Element;
+                        this.editingElm.push(aloha(element).elem);
+                        this.editBarClick.show(element, this.stage.iframe.contentDocument);
+                    }
                 });
                 // Editing flag for binded event
                 this.stage.iframe.contentWindow['editing'] = true;
@@ -137,16 +123,14 @@ module OctoBoot.controllers {
                 this.setItemActive('edit');
                 this.editBarHover = new EditBar(container);
                 this.editBarClick = new EditBar(container);
-                this.editBarClick.onNewElement((newElement: JQuery) => {
-                    // Callback called when a new element is inserted on the stage (eg with duplicate)
-                    newElement.click(() => click(newElement.get(0)));
-                    newElement.hover(() => hoverInOut(true, newElement), () => hoverInOut(false, newElement));
-                });
+
                 this.editBarClick.onSwitchElement((text: string, value: string, selectedItem: JQuery) => {
                     // callback called when we select an other editable element from editbar button
                     let newTarget: Element = $(this.editBarClick.editingElement).find(value).get(0);
-                    click(newTarget);
-                    let selection: any = aloha.selections.select(aloha.editor.selection, aloha.editor.selection.boundaries[0], aloha.editor.selection.boundaries[1], 'start');
+                    this.editingElm.push(aloha(newTarget).elem);
+                    this.editBarClick.show(newTarget, this.stage.iframe.contentDocument);
+                    this.editBarHover.hide();
+                    aloha.selections.select(aloha.editor.selection, aloha.editor.selection.boundaries[0], aloha.editor.selection.boundaries[1], 'start');
                     $(this.editBarClick.editingElement).focus();
                 });
             } else {

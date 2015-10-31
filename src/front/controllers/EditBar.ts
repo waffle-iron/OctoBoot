@@ -1,7 +1,6 @@
 /// <reference path="Handlebar.ts" />
 /// <reference path="../model/UI.ts" />
 /// <reference path="../model/HTMLEvent.ts" />
-/// <reference path="../model/Editable.ts" />
 /// <reference path="../definition/aloha.d.ts" />
 
 module OctoBoot.controllers {
@@ -23,9 +22,7 @@ module OctoBoot.controllers {
         private width: number = this.buttonWidth * this.buttonNum;
         private height: number = 150;
         private margin: number = 5;
-        
-        // callback called when a new element is append (eg duplicate)
-        private cbkNewElement: Function;
+
         // callback called when we switch element with tag button
         private cbkSwitchElement: Function;
 
@@ -100,10 +97,6 @@ module OctoBoot.controllers {
             this.border(null);
         }
 
-        public onNewElement(cbk: (newElement: JQuery) => any): void {
-            this.cbkNewElement = cbk;
-        }
-
         public onSwitchElement(cbk: (text: string, value: string, selectedItem: JQuery) => any): void {
             this.cbkSwitchElement = cbk;
         }
@@ -138,7 +131,6 @@ module OctoBoot.controllers {
         private duplicate(): void {
             var duplicateElement: JQuery = $(this.editingElement).clone();
             duplicateElement.insertAfter(this.editingElement);
-            this.cbkNewElement(duplicateElement);
         }
 
         private remove(): void {
@@ -154,7 +146,7 @@ module OctoBoot.controllers {
             button.find('.menu').html('');
 
             // search in current tag if we have some editable children
-            $(element).find(model.Editable.stringList).each((index: number, el: Element) => {
+            $(element).children().each((index: number, el: Element) => {
                 button.find('.menu').append('<div class="item">' + el.tagName + '</div>');
             })
         }
