@@ -23,9 +23,6 @@ module OctoBoot.controllers {
         private height: number = 150;
         private margin: number = 5;
 
-        // callback called when we switch element with tag button
-        private cbkSwitchElement: Function;
-
         // lines who border the editing element
         private lines: { top: JQuery, bottom: JQuery, left: JQuery, right: JQuery };
 
@@ -51,7 +48,7 @@ module OctoBoot.controllers {
                     direction: 'upward', 
                     on: 'hover', 
                     action: 'hide', 
-                    onChange: (value: string, text: string, selectedItem: JQuery) => this.cbkSwitchElement(text, value, selectedItem) 
+                    //onChange: (value: string, text: string, selectedItem: JQuery) => this.cbkSwitchElement(text, value, selectedItem) 
                 });
 
                 iframeDocument.find('head').append($.parseHTML(
@@ -90,15 +87,12 @@ module OctoBoot.controllers {
         public hide(): void {
             this.iframe.jDom.hide();
             this.border(null);
+            this.editingElement = null;
         }
 
         public destroy(): void {
+            this.hide();
             this.iframe.jDom.remove();
-            this.border(null);
-        }
-
-        public onSwitchElement(cbk: (text: string, value: string, selectedItem: JQuery) => any): void {
-            this.cbkSwitchElement = cbk;
         }
 
         private border(rect: ClientRect): void {
@@ -140,15 +134,8 @@ module OctoBoot.controllers {
 
         private fillTagButton(element: Element): void {
             let button: JQuery = this.iframeBody.find('.button').last();
-            
-            // Fill button with current tag name and reset dropdown
+            // Fill button with current tag name
             button.find('.text').html(element.tagName);
-            button.find('.menu').html('');
-
-            // search in current tag if we have some editable children
-            $(element).children().each((index: number, el: Element) => {
-                button.find('.menu').append('<div class="item">' + el.tagName + '</div>');
-            })
         }
 
         private HBHandlers(context: JQuery): any {
