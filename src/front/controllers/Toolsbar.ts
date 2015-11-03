@@ -131,7 +131,7 @@ module OctoBoot.controllers {
             }
             
             this.stage.iframe.contentWindow.addEventListener('mousemove', (e: MouseEvent) => {
-                let element: Element = e.target as Element;
+                let element: Element = $(e.target).get(0);
                 if (this.editing && !this.editBarClick.editingElement && !helper.Dom.isAlohaCaret(element)) {
                     // if we are in editing mode AND nothing currently editing
                     this.editBarHover.show(element, this.stage.iframe.contentDocument);
@@ -139,7 +139,7 @@ module OctoBoot.controllers {
             });
             
             this.stage.iframe.contentWindow.addEventListener('click', (e: MouseEvent) => {
-                let element: Element = e.target as Element;
+                let element: Element = $(e.target).get(0);
                 if (helper.Dom.isAlohaCaret(element)) {
                     // if user clic on aloha caret, return immediatly 
                     return;
