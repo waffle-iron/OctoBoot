@@ -3,7 +3,7 @@
 /// <reference path="../controllers/Toolsbar.ts" />
 /// <reference path="../definition/jquery.plugin.d.ts" />
 /// <reference path="../model/UI.ts" />
-/// <reference path="../model/ServerAPI.ts" />
+/// <reference path="../model/ServerApi.ts" />
 /// <reference path="Socket.ts" />
 /// <reference path="GitHub.ts" />
 

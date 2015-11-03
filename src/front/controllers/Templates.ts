@@ -4,7 +4,7 @@
 /// <reference path="../core/Socket.ts" />
 /// <reference path="../model/HTMLEvent.ts" />
 /// <reference path="../model/UI.ts" />
-/// <reference path="../model/ServerAPI.ts" />
+/// <reference path="../model/ServerApi.ts" />
 /// <reference path="../definition/jquery.plugin.d.ts" />
 
 module OctoBoot.controllers {
