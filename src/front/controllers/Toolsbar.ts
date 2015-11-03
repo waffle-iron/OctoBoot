@@ -5,9 +5,8 @@
 /// <reference path="EditBar.ts" />
 /// <reference path="../model/UI.ts" />
 /// <reference path="../core/Socket.ts" />
+/// <reference path="../helper/Dom.ts" />
 /// <reference path="../definition/aloha.d.ts" />
-
-
 
 module OctoBoot.controllers {
 
@@ -32,7 +31,7 @@ module OctoBoot.controllers {
             click: () => this.edit()
         };
 
-        private editingElm: Element[] = [];
+        private editingElms: Element[] = [];
         private editBarHover: EditBar;
         private editBarClick: EditBar;
 
@@ -98,36 +97,8 @@ module OctoBoot.controllers {
         private edit(): void {
             var container: JQuery = $(this.stage.iframe.contentDocument.body);
 
-            // Function call when we click on a editable element
-            var click = (element: Element) => {
-                if (this.editing) {
-                    this.editingElm.push(aloha(element).elem);
-                    this.editBarClick.show(element, this.stage.iframe.contentDocument);
-                }
-            }
-
-            // Function call when hover in or out an editable element
-            var hoverInOut = (hoverIn: boolean, element: JQuery) => {
-                if (this.editing) {
-                    element.css('cursor', hoverIn ? 'pointer' : '');
-
-                    if (hoverIn) {
-                        this.editBarHover.show(element.get(0), this.stage.iframe.contentDocument);
-                    } else {
-                        this.editBarHover.hide();
-                    }
-                }
-            }
-
-            // Init editable element (TODO need to improve targeted tag)
-            if (!this.stage.iframe.contentWindow['editing']) {
-                container.find('p,a,h1,h2,h3,h4,h5,span').each((i: number, elm: Element) => {
-                    var element: JQuery = $(elm);
-                    element.click(() => click(elm));
-                    element.hover(() => hoverInOut(true, element), () => hoverInOut(false, element));
-                });
-                this.stage.iframe.contentWindow['editing'] = true;
-            }
+            // Bind events on window if not already done for editing
+            this.bindEditionEvents();
 
             // Editing flag
             this.editing = !this.editing;
@@ -137,11 +108,6 @@ module OctoBoot.controllers {
                 this.setItemActive('edit');
                 this.editBarHover = new EditBar(container);
                 this.editBarClick = new EditBar(container);
-                this.editBarClick.onNewElement((newElement: JQuery) => {
-                    // Callback called when a new element is inserted on the stage (eg with duplicate)
-                    newElement.click(() => click(newElement.get(0)));
-                    newElement.hover(() => hoverInOut(true, newElement), () => hoverInOut(false, newElement));
-                })
             } else {
                 // If not editing, destroy EditBar
                 this.setItemActive('null');
@@ -149,14 +115,50 @@ module OctoBoot.controllers {
                 this.editBarHover.destroy();
 
                 // And unactive aloha on editable element if they are
-                if (this.editingElm.length) {
-                    this.editingElm.every((e: Element, i: number, a: Element[]) => {
+                if (this.editingElms.length) {
+                    this.editingElms.every((e: Element, i: number, a: Element[]) => {
                         aloha.mahalo(e);
                         return true
                     });
-                    this.editingElm = [];
+                    this.editingElms = [];
                 }
             }
+        }
+
+        private bindEditionEvents(): void {
+            if (this.stage.iframe.contentWindow['editing']) {
+                return
+            }
+            
+            this.stage.iframe.contentWindow.addEventListener('mousemove', (e: MouseEvent) => {
+                let element: Element = e.target as Element;
+                if (this.editing && !this.editBarClick.editingElement && !helper.Dom.isAlohaCaret(element)) {
+                    // if we are in editing mode AND nothing currently editing
+                    this.editBarHover.show(element, this.stage.iframe.contentDocument);
+                }
+            });
+            
+            this.stage.iframe.contentWindow.addEventListener('click', (e: MouseEvent) => {
+                let element: Element = e.target as Element;
+                if (helper.Dom.isAlohaCaret(element)) {
+                    // if user clic on aloha caret, return immediatly 
+                    return;
+                }
+
+                if (this.editing && !this.editBarClick.editingElement) {
+                    // if we are in editing mode, and nothing currently in edition, active edit bar
+                    this.editingElms.push(aloha(element).elem);
+                    this.editBarClick.show(element, this.stage.iframe.contentDocument);
+                } else if (!helper.Dom.hasParent(element, this.editBarClick.editingElement) && 
+                           !helper.Dom.mouseIsOverElement(e, this.editBarClick.editingElement)) {
+                    // else if the click append outside the editing zone, disable edit bar (so reactive on mousemove)
+                    this.editBarClick.hide();
+                    this.editBarHover.hide();
+                }
+            });
+
+            // Editing flag for binded event
+            this.stage.iframe.contentWindow['editing'] = true;
         }
 
         private setItemActive(wich: string): void {
