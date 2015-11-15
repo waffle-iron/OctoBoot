@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "npm start",
-    "build": "npm run build:ts && npm run build:model && npm run build:handlebars",
+    "postinstall": "bower i",
+    "start": "npm run build:ts && npm run build:model && npm run build:handlebars",
     "watch": "parallelshell 'npm run watch:ts' 'npm run watch:handlebars'",
     "build:ts": "tsc src/front/OctoBoot.ts --removeComments --sourceMap --out dist/octoboot.js",
     "build:model": "tsc src/front/model/ServerApi.ts --out src/back/model/serverapi.js && echo 'module.exports = OctoBoot.model.ServerAPI' >> src/back/model/serverapi.js",

@@ -8,19 +8,16 @@ WIP !! Available Soon
 
     > node
     > npm
-    > gulp (just for semantic build first time)
+    > bower
 
 ## Local Install
 
     > npm i
 
 ## Local Build
-	
-    First time (need gulp for build:semantic)
-    > npm run build:semantic && npm run build
 
     Next time
-    > npm run build
+    > npm start
 
     Or watch
     > npm run watch
