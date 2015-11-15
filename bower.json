@@ -1,0 +1,26 @@
+{
+  "name": "octoboot",
+  "description": "OctoBoot is a fast, powerful, and user friendly tools to create your own website in a few clic, all free !! (with help of some free/custom template and gh-pages)",
+  "main": "server.js",
+  "authors": [
+    "RonanDrouglazet"
+  ],
+  "license": "GPL",
+  "keywords": [
+    "gh-pages",
+    "website",
+    "create"
+  ],
+  "homepage": "https://github.com/RonanDrouglazet/OctoBoot",
+  "moduleType": [],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "semantic": "semantic-ui#~2.1.6"
+  }
+}

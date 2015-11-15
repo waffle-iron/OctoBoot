@@ -7,7 +7,6 @@
     "test": "npm start",
     "build": "npm run build:ts && npm run build:model && npm run build:handlebars",
     "watch": "parallelshell 'npm run watch:ts' 'npm run watch:handlebars'",
-    "build:semantic": "cd semantic && gulp build && cd ..",
     "build:ts": "tsc src/front/OctoBoot.ts --removeComments --sourceMap --out dist/octoboot.js",
     "build:model": "tsc src/front/model/ServerApi.ts --out src/back/model/serverapi.js && echo 'module.exports = OctoBoot.model.ServerAPI' >> src/back/model/serverapi.js",
     "watch:ts": "watch 'date +\"%m-%d-%Y %T\" && npm run build:ts' src/front/",
@@ -37,7 +36,6 @@
     "github-cli": "git+https://github.com/RonanDrouglazet/github-cli.git",
     "handlebars": "^3.0.3",
     "parallelshell": "latest",
-    "semantic-ui": "2.1.3",
     "socket.io": "^1.3.5",
     "typescript": "^1.4.1",
     "watch": "latest"

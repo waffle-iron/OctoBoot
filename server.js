@@ -9,6 +9,7 @@ var socketIo = io.listen(serverIo);
 
 app.use("/", express.static(__dirname + "/static/"));
 app.use("/lib", express.static(__dirname + "/dist/"));
+app.use("/lib", express.static(__dirname + "/bower_components/"));
 app.use("/temp", express.static(__dirname + "/temp/"));
 app.use("/lib/handlebars/", express.static(__dirname + "/node_modules/handlebars/dist/"));
 
