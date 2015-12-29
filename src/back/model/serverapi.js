@@ -1,36 +1,3 @@
-/// <reference path="../definition/socket.io-client.d.ts" />
-var OctoBoot;
-(function (OctoBoot) {
-    var core;
-    (function (core) {
-        var Socket = (function () {
-            function Socket() {
-            }
-            Socket.init = function () {
-                var _this = this;
-                this.io = io('http://' + window.location.host);
-                return {
-                    then: function (done) {
-                        _this.io.once('sid', function (sid) {
-                            _this.sid = sid;
-                            done(sid);
-                        });
-                    }
-                };
-            };
-            Socket.emit = function (event, data, done) {
-                if (data) {
-                    data.sid = this.sid;
-                }
-                this.io.emit(event, data || { sid: this.sid });
-                this.io.once(event, done);
-            };
-            return Socket;
-        })();
-        core.Socket = Socket;
-    })(core = OctoBoot.core || (OctoBoot.core = {}));
-})(OctoBoot || (OctoBoot = {}));
-/// <reference path="../core/Socket.ts" />
 var OctoBoot;
 (function (OctoBoot) {
     var model;
@@ -38,8 +5,8 @@ var OctoBoot;
         var ServerAPI = (function () {
             function ServerAPI() {
             }
-            ServerAPI.getProjectPath = function (projectName) {
-                return '/temp/' + OctoBoot.core.Socket.sid + '/' + projectName + '/';
+            ServerAPI.getProjectPath = function (sid, projectName) {
+                return '/temp/' + sid + '/' + projectName + '/';
             };
             ServerAPI.getTemplatePath = function (name) {
                 return 'templates/' + name + '/';
@@ -53,6 +20,7 @@ var OctoBoot;
             ServerAPI.SOCKET_PUBLISH = 'publish';
             ServerAPI.SOCKET_CLONE = 'clone';
             ServerAPI.SOCKET_CONVERT = 'convert';
+            ServerAPI.SOCKET_SCRAPP = 'scrapp';
             return ServerAPI;
         })();
         model.ServerAPI = ServerAPI;

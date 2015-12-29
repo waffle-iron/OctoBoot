@@ -48,12 +48,12 @@ module OctoBoot.controllers {
                     direction: 'upward', 
                     on: 'hover', 
                     action: 'hide', 
-                    //onChange: (value: string, text: string, selectedItem: JQuery) => this.cbkSwitchElement(text, value, selectedItem) 
+                    onChange: (value: string, text: string, selectedItem: JQuery) => this.link(text, value, selectedItem) 
                 });
 
                 iframeDocument.find('head').append($.parseHTML(
-                    '<link rel=\"stylesheet\" type=\"text/css\" href=\"/lib/semantic/semantic.css\">' +
-                    '<script src=\"lib/semantic/semantic.min.js\"></script>'
+                    '<link rel=\"stylesheet\" type=\"text/css\" href=\"/lib/semantic/dist/semantic.css\">' +
+                    '<script src=\"lib/semantic/dist/semantic.min.js\"></script>'
                 ));
                 this.iframeBody.css('background', 'none'); // semantic-ui put a *** background on body
 
@@ -81,6 +81,7 @@ module OctoBoot.controllers {
                 }).show();
                 this.border(rect);
                 this.fillTagButton(element);
+                this.appendSpecialButton(element);
             }
         }
 
@@ -132,10 +133,29 @@ module OctoBoot.controllers {
             this.hide();
         }
 
+        private link(text: string, value: string, selectedItem: JQuery): void {
+
+        }
+
         private fillTagButton(element: Element): void {
             let button: JQuery = this.iframeBody.find('.button').last();
             // Fill button with current tag name
-            button.find('.text').html(element.tagName);
+            button.html(element.tagName);
+        }
+
+        private appendSpecialButton(element: Element): void {
+            this.iframeBody.find('.button.special').hide();
+
+            switch (element.tagName.toUpperCase()) {
+
+                case 'A':
+                    this.appendLinkButton(element as HTMLAnchorElement);
+                    break
+            }
+        }
+
+        private appendLinkButton(link: HTMLAnchorElement): void {
+            this.iframeBody.find('.dropdown.link').show().find('.text').html(link.href);
         }
 
         private HBHandlers(context: JQuery): any {

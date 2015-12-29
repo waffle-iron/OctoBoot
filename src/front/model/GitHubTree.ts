@@ -14,5 +14,6 @@ module OctoBoot.model {
         size: number;
         sha: string;
         url: string;
+        name?: string;
     }
 }

@@ -84,7 +84,7 @@ module OctoBoot.core {
         private clone(convert: boolean): boolean {
             core.GitHub.cloneOnServer(this.name, this.url, (success: boolean) => {
                 if (success) {
-                    var projectUrl: string = model.ServerAPI.getProjectPath(this.name) + "index.html";
+                    var projectUrl: string = model.ServerAPI.getProjectPath(Socket.sid, this.name) + "index.html";
                     if (convert) {
                         this.convertAndWait(() => this.open(projectUrl));
                     } else {
