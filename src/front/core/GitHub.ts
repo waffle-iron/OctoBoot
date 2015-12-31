@@ -32,7 +32,7 @@ module OctoBoot.core {
             .fail(this.throwError);
         }
 
-        public static createRepo(name: string, type: string, done: (repo: model.GitHubRepo) => any): void {
+        public static createRepo(name: string, done: (repo: model.GitHubRepo) => any): void {
             this.postJSON(this.ghapi + '/user/repos', {
                 name: name
             })

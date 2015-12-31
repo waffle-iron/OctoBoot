@@ -10,6 +10,7 @@ module OctoBoot.controllers {
         public selected: core.Repos;
         public repos_public: Array<model.GitHubRepo>;
         public repos_private: Array<model.GitHubRepo>;
+        public repo_template: model.GitHubRepo;
 
         constructor() {
             super(model.UI.HB_SIDEBAR);
@@ -49,8 +50,9 @@ module OctoBoot.controllers {
 
         private check_for_template(repos: Array<model.GitHubRepo>): void {
             repos.forEach(function(repo: model.GitHubRepo) {
-                if (repo.name === 'OctoBoot-templates') {
-                    core.GitHub.getTree(repo.name, (dir: model.GitHubTree) => this.update_view_template(dir))
+                if (repo.name === CreateTemplate.NAME_REPO_TEMPLATE) {
+                    this.repo_template = repo;
+                    core.GitHub.getTree(repo.name, (dir: model.GitHubTree) => this.update_view_template(dir));
                 }
             })
         }
@@ -61,20 +63,30 @@ module OctoBoot.controllers {
 
         private handlers_repo(type: string): model.HTMLEvent {
             var __this = this;
-            return { click: function() { __this.select(__this, this, type) } }
+            return { click: function() { __this.select_repo(__this, this, type) } }
         }
 
         private handlers_new_repo(type: string): model.HTMLEvent {
-            return { click: () => { this.select(this, null, type) } }
+            return { click: () => { this.select_repo(this, null, type) } }
         }
 
         private handler_new_template(): model.HTMLEvent {
-            return { click: () => { new CreateTemplate() }}
+            return {
+                click: () => {
+                    let template: CreateTemplate = new CreateTemplate(
+                        this.repo_template,
+                        () => { // done
+                            this.repo_template = this.repo_template || template.repo;
+                            core.GitHub.getTree(this.repo_template.name, (dir: model.GitHubTree) => this.update_view_template(dir))
+                        }
+                    )
+                }
+            }
         }
 
-        private select(__this: Sidebar, button: HTMLElement, type: string): void {
+        private select_repo(__this: Sidebar, button: HTMLElement, type: string): void {
             this.jDom.sidebar({ closable: true });
-            
+
             if (__this.selected) {
                 __this.selected.destroy();
             }
