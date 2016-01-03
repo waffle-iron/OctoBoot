@@ -2,6 +2,7 @@
 /// <reference path="../model/GitHubRepo.ts" />
 /// <reference path="../model/GitHubBranch.ts" />
 /// <reference path="../model/GitHubTree.ts" />
+/// <reference path="../model/GitHubLinkHeader.ts" />
 /// <reference path="../definition/jquery.d.ts" />
 /// <reference path="../model/ServerApi.ts" />
 
@@ -26,9 +27,10 @@ module OctoBoot.core {
             $.getJSON(this.ghapi + '/user/repos', {
                 sort: 'created',
                 type: type,
-                access_token: this.gat
+                access_token: this.gat,
+                per_page: 100
             })
-            .done(done)
+            .done(GitHub.pagination(done))
             .fail(this.throwError);
         }
 
@@ -48,14 +50,13 @@ module OctoBoot.core {
 
         public static getAllBranch(repo: string, done: (branches: Array<model.GitHubBranch>) => any): void {
             $.getJSON(this.getApiUrl() + repo + '/branches/', { access_token: this.gat })
-            .done(done)
+            .done(GitHub.pagination(done))
             .fail(this.throwError);
         }
 
         public static getTree(repo: string, done: (tree: model.GitHubTree) => any, branch: string = 'master'): void {
             this.getBranch(repo, (branch: model.GitHubBranch) => {
                 $.getJSON(this.getApiUrl() + repo + '/git/trees/' + branch.commit.sha, {
-                    recursive: 1,
                     access_token: this.gat
                 })
                 .done(done)
@@ -84,6 +85,56 @@ module OctoBoot.core {
 
         private static throwError(jqxhr: JQueryXHR, status: string, error: any): void {
             console.error(error);
+        }
+
+        /*
+         * pagination()
+         *
+         * GitHub API pagination 
+         * if we have trunkated data, and so link header, continue to store data
+         */
+        private static pagination(done: (datas: Array<any>) => any): (datas: Array<any>, status: string, xhr: JQueryXHR) => any {
+            var acc_datas: Array<any> = []
+            var checkPagination = (datas: Array<any>, status: string, xhr: JQueryXHR) => {
+                acc_datas = datas.concat(acc_datas)
+                var links = xhr.getResponseHeader('Link');
+                if (links && GitHub.parse_link_header(links).next) {
+                    $.getJSON(GitHub.parse_link_header(links).next).done(checkPagination).fail(this.throwError);
+                } else {
+                    done(acc_datas)
+                }
+            }
+            
+            return checkPagination
+        }
+
+
+        /*
+         * parse_link_header()
+         *
+         * Parse the Github Link HTTP header used for pageination
+         * http://developer.github.com/v3/#pagination
+         */
+        private static parse_link_header(header): model.GitHubLinkHeader {
+            if (header.length == 0) {
+                throw new Error("input must not be of zero length");
+            }
+
+            // Split parts by comma
+            var parts: Array<string> = header.split(',');
+            var links: model.GitHubLinkHeader = {};
+            // Parse each part into a named link
+            parts.forEach(function(p) {
+                var section = p.split(';');
+                if (section.length != 2) {
+                    throw new Error("section could not be split on ';'");
+                }
+                var url = section[0].replace(/<(.*)>/, '$1').trim();
+                var name = section[1].replace(/rel="(.*)"/, '$1').trim();
+                links[name] = url;
+            });
+
+            return links;
         }
     }
 }

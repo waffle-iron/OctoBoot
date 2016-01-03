@@ -8,6 +8,7 @@ module OctoBoot.controllers {
     export class Sidebar extends Handlebar {
 
         public selected: core.Repos;
+        public user: model.GitHubUser;
         public repos_public: Array<model.GitHubRepo>;
         public repos_private: Array<model.GitHubRepo>;
         public repo_template: model.GitHubRepo;
@@ -19,10 +20,15 @@ module OctoBoot.controllers {
 
         public update(): void {
             this.jDom.sidebar('show');
-            core.GitHub.getUser((user: model.GitHubUser) => helper.HandlebarHelper.updateTemplate(model.UI.HB_PROFIL, user))
-            core.GitHub.getRepos(model.RepoType.PUBLIC, (repos: Array<model.GitHubRepo>) => { this.repos_public = repos; this.update_view_repo(model.RepoType.PUBLIC, repos) });
-            core.GitHub.getRepos(model.RepoType.PRIVATE, (repos: Array<model.GitHubRepo>) => { this.repos_private = repos; this.update_view_repo(model.RepoType.PRIVATE, repos) });
-            this.update_view_template()
+            core.GitHub.getUser((user: model.GitHubUser) => { 
+                this.user = user; 
+                helper.HandlebarHelper.updateTemplate(model.UI.HB_PROFIL, user);
+
+                core.GitHub.getRepos(model.RepoType.PUBLIC, (repos: Array<model.GitHubRepo>) => { this.repos_public = repos; this.update_view_repo(model.RepoType.PUBLIC, repos) });
+                core.GitHub.getRepos(model.RepoType.PRIVATE, (repos: Array<model.GitHubRepo>) => { this.repos_private = repos; this.update_view_repo(model.RepoType.PRIVATE, repos) });
+                
+                this.update_view_template()
+            })
         }
 
         private update_view_repo(type: string, repos: Array<model.GitHubRepo>): void {
@@ -31,7 +37,7 @@ module OctoBoot.controllers {
                 titleHandlers: this.handlers_title(),
                 repoHandlers: this.handlers_repo(type),
                 newHandlers: this.handlers_new_repo(type),
-                repos: repos,
+                repos: repos.filter((repo: model.GitHubRepo) => { return !!repo.owner.login.match(this.user.name) && !repo.name.match(model.ServerAPI.TEMPLATE_REPO_NAME) }), // filter by owner
                 title: formatedType
             }, 'Repos' + formatedType);
 
@@ -49,10 +55,11 @@ module OctoBoot.controllers {
         }
 
         private check_for_template(repos: Array<model.GitHubRepo>): void {
-            repos.forEach(function(repo: model.GitHubRepo) {
-                if (repo.name === CreateTemplate.NAME_REPO_TEMPLATE) {
+            repos.forEach((repo: model.GitHubRepo) => {
+                if (repo.name === model.ServerAPI.TEMPLATE_REPO_NAME) {
                     this.repo_template = repo;
                     core.GitHub.getTree(repo.name, (dir: model.GitHubTree) => this.update_view_template(dir));
+                    core.GitHub.cloneOnServer(repo.name, repo.clone_url, null);
                 }
             })
         }

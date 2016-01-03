@@ -11,6 +11,7 @@ var OctoBoot;
             ServerAPI.getTemplatePath = function (name) {
                 return 'templates/' + name + '/';
             };
+            ServerAPI.TEMPLATE_REPO_NAME = 'OctoBoot-templates';
             ServerAPI.IS_LOGGED = '/api/isLogged/:sid';
             ServerAPI.GITHUB_LOGIN = '/api/GitHubApi/:sid';
             ServerAPI.SOCKET_COPY = 'cp';
@@ -21,6 +22,7 @@ var OctoBoot;
             ServerAPI.SOCKET_CLONE = 'clone';
             ServerAPI.SOCKET_CONVERT = 'convert';
             ServerAPI.SOCKET_SCRAPP = 'scrapp';
+            ServerAPI.SOCKET_FILL_TEMPLATE = 'fill';
             return ServerAPI;
         })();
         model.ServerAPI = ServerAPI;

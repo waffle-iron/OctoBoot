@@ -1,12 +1,11 @@
 /// <reference path="Alert.ts" />
 /// <reference path="../core/Socket.ts" />
 /// <reference path="../model/ServerApi.ts" />
+/// <reference path="../model/GitHubRepo.ts" />
 
 module OctoBoot.controllers {
 
     export class CreateTemplate {
-
-        public static NAME_REPO_TEMPLATE: string = 'OctoBoot-templates'
 
         private alert: Alert;
 
@@ -43,9 +42,10 @@ module OctoBoot.controllers {
         }
 
         private create_repo_template(): boolean {
+            this.alert.setWait();
             if (!this.repo) {
                 // if not exist, create it
-                core.GitHub.createRepo(CreateTemplate.NAME_REPO_TEMPLATE, (repo: model.GitHubRepo) => {
+                core.GitHub.createRepo(model.ServerAPI.TEMPLATE_REPO_NAME, (repo: model.GitHubRepo) => {
                     this.repo = repo;
                     core.GitHub.cloneOnServer(this.repo.name, this.repo.clone_url, (success: boolean) => {
                         if (success) {
@@ -61,7 +61,13 @@ module OctoBoot.controllers {
         }
 
         private fill_repo_template(): void {
+            core.Socket.emit(model.ServerAPI.SOCKET_FILL_TEMPLATE, { file: this.alert.getInputValue(), repo_url: this.repo.clone_url }, (error: string) => {
+                this.alert.hide();
 
+                if (!error) {
+                    setTimeout(this.done, 1000); // wait a little for gh-api to be updated
+                }
+            })
         }
 
     }

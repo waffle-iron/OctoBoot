@@ -124,7 +124,7 @@ module OctoBoot.core {
                 onApprove: () => {
                     this.alertCreate.setWait();
                     this.name = this.alertCreate.getInputValue();
-                    core.GitHub.createRepo(this.name, type, (repo: model.GitHubRepo) => {
+                    core.GitHub.createRepo(this.name, (repo: model.GitHubRepo) => {
                         this.url = repo.clone_url;
                         this.clone(true);
 

@@ -12,6 +12,7 @@ copy = require("./modules/copy.js"),
 save = require("./modules/save.js"),
 publish = require("./modules/publish.js"),
 scrapp = require("./modules/scrapp.js"),
+fill = require("./modules/fill.js"),
 // Model API share with front
 modelApi = require("./model/serverapi.js"),
 // GitHub conf
@@ -78,6 +79,7 @@ var octoboot = function(app, socketIo) {
         socket.on(modelApi.SOCKET_LIST_DIR, list(projectDir, modelApi.SOCKET_LIST_DIR, sockets))
         socket.on(modelApi.SOCKET_LIST_TEMPLATE, list(templateDir, modelApi.SOCKET_LIST_TEMPLATE, sockets))
         socket.on(modelApi.SOCKET_SCRAPP, scrapp(projectDir, modelApi.SOCKET_SCRAPP, sockets))
+        socket.on(modelApi.SOCKET_FILL_TEMPLATE, fill(projectDir, modelApi.SOCKET_FILL_TEMPLATE, sockets))
         
     })
 
