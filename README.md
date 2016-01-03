@@ -1,4 +1,7 @@
 # OctoBoot (WIP !!)
+![screen1](http://ronandrouglazet.github.io/OctoBoot/screen1.png)
+![screen2](http://ronandrouglazet.github.io/OctoBoot/screen2.png)
+![screen3](http://ronandrouglazet.github.io/OctoBoot/screen3.png)
 OctoBoot is a fast, powerful, and user friendly tools to create your own website in a few clic, all free !! (with help of some free/custom template and gh-pages)
 
 ## Online Version
