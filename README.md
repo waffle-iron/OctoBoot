@@ -32,7 +32,7 @@ OctoBoot is a GitHub application, so you need to get your GitHub app credential 
 Go to your GitHub account `settings / application / Devellopers Application` => Register New Application
 
 `Authorization callback URL` Is important, as `Homepage URL`, fill these with `http://localhost:8080` to work on this project
-Then, you need to create and fill `gituhubconf.json` file at `./` with your credentials like this:
+Then, you need to create and fill `githubconf.json` file at `./` with your credentials like this:
 
     {
         "client_id": "[CLIENT-ID]",

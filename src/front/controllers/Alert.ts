@@ -9,6 +9,7 @@ module OctoBoot.controllers {
         onDeny?: any;
         icon?: string;
         image?: string;
+        iframe?: string;
         input?: string;
         link?: string;
     }
@@ -24,7 +25,7 @@ module OctoBoot.controllers {
 
             $('.Alert').remove();
 
-            if (!options.icon && !options.image) {
+            if (!options.icon && !options.image && !options.iframe) {
                 this.options.icon = 'warning sign'; //default
             }
 

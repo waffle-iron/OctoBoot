@@ -39,6 +39,7 @@
     "parallelshell": "latest",
     "socket.io": "^1.3.5",
     "typescript": "^1.4.1",
-    "watch": "latest"
+    "watch": "latest",
+    "website-scraper": "^0.3.0"
   }
 }

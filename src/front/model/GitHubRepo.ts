@@ -32,6 +32,7 @@ module OctoBoot.model {
         git_url: string;
         ssh_url: string;
         svn_url: string;
+        trees_url: string;
         mirror_url: string;
         homepage: string;
         language: string;

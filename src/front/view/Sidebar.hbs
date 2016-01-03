@@ -1,5 +1,11 @@
 <div class="ui large inverted vertical sidebar menu Sidebar">
-    <div class="Profil"></div>
-    <div class="ReposPublic"></div>
-    <div class="ReposPrivate"></div>
+    <div class="item Profil"></div>
+    <div class="item ReposPublic"><b>Public project</b> <span class="ui label"><i class="spinner loading icon"></i></span></div>
+    <div class="item ReposPrivate"><b>Private project</b> <span class="ui label"><i class="spinner loading icon"></i></span></div>
+    <div class="item ReposTemplates">
+    	<b class="{{bind titleHandlers}}" style="cursor: pointer">Template project</b> <span class="ui label">0</span>
+	    <div class="menu" style="display: none">
+	        <a class="item {{bind newHandlers}}">NEW <i class="add circle icon"></i></a>
+	    </div>
+    </div>
 </div>

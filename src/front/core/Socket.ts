@@ -26,7 +26,9 @@ module OctoBoot.core {
             }
 
             this.io.emit(event, data || { sid: this.sid });
-            this.io.once(event, done);
+            if (done) {
+                this.io.once(event, done); 
+            }
         }
     }
 }

@@ -2,7 +2,7 @@
 <div class="item Repos">
     <b class="{{bind titleHandlers}}" style="cursor: pointer">{{title}} project</b> <span class="ui label">{{repos.length}}</span>
     <div class="menu" style="display: none">
-        <a class="item {{bind newHandlers}}">NEW PROJECT <i class="add circle icon"></i></a>
+        <a class="item {{bind newHandlers}}">NEW <i class="add circle icon"></i></a>
         {{#each repos}}
             <a class="item {{bind ../repoHandlers}} repo{{name}}" data-url="{{clone_url}}">
                 {{name}}

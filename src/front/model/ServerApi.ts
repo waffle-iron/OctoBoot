@@ -1,9 +1,9 @@
-/// <reference path="../core/Socket.ts" />
-
 module OctoBoot.model {
 
     export class ServerAPI {
 
+        public static TEMPLATE_REPO_NAME: string = 'OctoBoot-templates';
+        
         public static IS_LOGGED: string = '/api/isLogged/:sid';
         public static GITHUB_LOGIN: string = '/api/GitHubApi/:sid';
 
@@ -14,9 +14,11 @@ module OctoBoot.model {
         public static SOCKET_PUBLISH: string = 'publish';
         public static SOCKET_CLONE: string = 'clone';
         public static SOCKET_CONVERT: string = 'convert';
+        public static SOCKET_SCRAPP: string = 'scrapp';
+        public static SOCKET_FILL_TEMPLATE: string = 'fill';
 
-        public static getProjectPath(projectName: string): string {
-			return '/temp/' + core.Socket.sid + '/' + projectName + '/'
+        public static getProjectPath(sid: number, projectName: string): string {
+			return '/temp/' + sid + '/' + projectName + '/'
         }
 
         public static getTemplatePath(name: string): string {

@@ -24,6 +24,8 @@ module OctoBoot {
         constructor() {
             helper.HandlebarHelper.register();
 
+            $.ajaxSetup({ cache: false });
+
             this.initSocket(() => {
                 this.initUI();
 
