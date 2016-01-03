@@ -1,4 +1,5 @@
 /// <reference path="../core/Repos.ts" />
+/// <reference path="../core/Template.ts" />
 /// <reference path="../model/HTMLEvent.ts" />
 /// <reference path="../controllers/CreateTemplate.ts" />
 /// <reference path="Handlebar.ts" />
@@ -8,6 +9,7 @@ module OctoBoot.controllers {
     export class Sidebar extends Handlebar {
 
         public selected: core.Repos;
+        public template: core.Template;
         public user: model.GitHubUser;
         public repos_public: Array<model.GitHubRepo>;
         public repos_private: Array<model.GitHubRepo>;
@@ -47,7 +49,7 @@ module OctoBoot.controllers {
         private update_view_template(dir?: model.GitHubTree): void {
             helper.HandlebarHelper.updateTemplate(model.UI.HB_REPOS, {
                 titleHandlers: this.handlers_title(),
-                repoHandlers: null,
+                repoHandlers: this.handlers_template(),
                 newHandlers: this.handler_new_template(),
                 repos: dir ? dir.tree.map((sub: model.GitHubTreeFile) => { sub.name = sub.path; return sub }) : [],
                 title: 'Template'
@@ -77,6 +79,11 @@ module OctoBoot.controllers {
             return { click: () => { this.select_repo(this, null, type) } }
         }
 
+        private handlers_template(): model.HTMLEvent {
+            var __this = this;
+            return { click: function() { __this.select_template(__this, this) } }
+        }
+
         private handler_new_template(): model.HTMLEvent {
             return {
                 click: () => {
@@ -91,12 +98,16 @@ module OctoBoot.controllers {
             }
         }
 
-        private select_repo(__this: Sidebar, button: HTMLElement, type: string): void {
-            this.jDom.sidebar({ closable: true });
+        private select_template(__this: Sidebar, button: HTMLElement): void {
+            __this.jDom.sidebar({ closable: true });
+            __this.clean_selected();
 
-            if (__this.selected) {
-                __this.selected.destroy();
-            }
+            __this.template = new core.Template(button.innerText || button.innerHTML.trim(), this.repo_template.clone_url, button);
+        }
+
+        private select_repo(__this: Sidebar, button: HTMLElement, type: string): void {
+            __this.jDom.sidebar({ closable: true });
+            __this.clean_selected();
 
             __this.selected = new core.Repos(
                 button ? button.innerText || button.innerHTML.trim() : null,
@@ -115,6 +126,16 @@ module OctoBoot.controllers {
                     __this.selected.sidebarButton = $('.Repos' + type.charAt(0).toUpperCase() + type.slice(1)).find('.repo' + name).get(0);
                 }
             }
+        }
+
+        private clean_selected(): void {
+            if (this.selected) {
+                this.selected.destroy();
+            }
+            if (this.template) {
+                this.template.destroy();
+            }
+
         }
     }
 }
