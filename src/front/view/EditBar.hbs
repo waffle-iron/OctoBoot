@@ -1,10 +1,10 @@
-<div class="ui floating fluid dropdown labeled search icon button special link" style="position:absolute;bottom:35px;right:0;">
-  <i class="linkify icon"></i>
-  <span class="text">tag</span>
-  <div class="menu">
-  </div>
-</div>
 <div class="ui small icon buttons EditBar" style="position:absolute;bottom:0;right:0;">
+  <button class="ui button {{bind link}} topleft special link">
+    <i class="linkify icon"></i>
+  </button>
+  <div class="ui popup inverted tiny">
+    link
+  </div>
   <button class="ui button {{bind duplicate}} topleft">
   	<i class="plus icon"></i>
   </button>
@@ -41,7 +41,7 @@
   <div class="ui popup inverted tiny">
     unformat
   </div>
-  <button class="ui disabled button">
+  <button class="ui button">
     Followed
   </button>
 </div>

@@ -138,7 +138,7 @@ module OctoBoot.controllers {
                 }
             });
             
-            this.stage.iframe.contentWindow.addEventListener('click', (e: MouseEvent) => {
+            var click = (e: JQueryEventObject) => {
                 let element: Element = $(e.target).get(0);
                 if (helper.Dom.isAlohaCaret(element)) {
                     // if user clic on aloha caret, return immediatly 
@@ -149,12 +149,21 @@ module OctoBoot.controllers {
                     // if we are in editing mode, and nothing currently in edition, active edit bar
                     this.editingElms.push(aloha(element).elem);
                     this.editBarClick.show(element, this.stage.iframe.contentDocument);
-                } else if (!helper.Dom.hasParent(element, this.editBarClick.editingElement) && 
-                           !helper.Dom.mouseIsOverElement(e, this.editBarClick.editingElement)) {
+                } else if (!helper.Dom.hasParent(element, this.editBarClick.editingElement) &&
+                    !helper.Dom.mouseIsOverElement(e.originalEvent as MouseEvent, this.editBarClick.editingElement)) {
                     // else if the click append outside the editing zone, disable edit bar (so reactive on mousemove)
                     this.editBarClick.hide();
                     this.editBarHover.hide();
                 }
+            }
+
+            $(this.stage.iframe.contentWindow).click(click)
+            // prevent stage link to redirect when editing
+            $(this.stage.iframe.contentDocument).on('click', 'a', (e: JQueryEventObject) => {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                click(e);
+                return false;
             });
 
             // Editing flag for binded event

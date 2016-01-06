@@ -16,11 +16,11 @@ module OctoBoot.controllers {
 
         // width and number of buttons on EditBar
         private buttonWidth: number = 35;
-        private buttonNum: number = 7;
+        private buttonNum: number = 8;
         
         // width / height and margin of global EditBar
-        private width: number = this.buttonWidth * this.buttonNum;
-        private height: number = 150;
+        private width: number = (this.buttonWidth * this.buttonNum) + (this.buttonNum  * 2); // give some extra space for targeted tag (can be one letter like A but also SPAN etc..)
+        private height: number = 34;
         private margin: number = 5;
 
         // lines who border the editing element
@@ -149,14 +149,15 @@ module OctoBoot.controllers {
             switch (element.tagName.toUpperCase()) {
 
                 case 'A':
-                    this.appendLinkButton(element as HTMLAnchorElement);
+                    //this.appendLinkButton(element as HTMLAnchorElement);
+                    this.iframeBody.find('.special.link').show();
                     break
             }
         }
 
-        private appendLinkButton(link: HTMLAnchorElement): void {
-            this.iframeBody.find('.dropdown.link').show().find('.text').html(link.href);
-        }
+        /*private appendLinkButton(link: HTMLAnchorElement): void {
+            
+        }*/
 
         private HBHandlers(context: JQuery): any {
             return $.each({

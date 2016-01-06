@@ -36,6 +36,11 @@ module OctoBoot.controllers {
             url = url || this.jDom.find('.text').html();
             this.url = url.replace(/http(:?s)*:\/\/(:?\w+\.){1,}\w+\//ig, '/');
             this.iframe.src = this.baseUrl + this.url;
+            /*this.iframe.onload = () => {
+                //var toto: any = this.iframe.contentWindow
+                console.log('stage onload');
+                //$(this.iframe.contentDocument).on('a', false);
+            }*/
             this.jDom.find('.text').html(this.url);
             if (this.showAdress) {
                 this.refreshAndShowUrl(); 
