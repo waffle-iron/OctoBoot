@@ -55,7 +55,7 @@ module OctoBoot.controllers {
                         url = model.ServerAPI.getProjectPath(core.Socket.sid, model.ServerAPI.TEMPLATE_REPO_NAME) + name + '/index.html'
                         return { 
                             path: model.ServerAPI.getProjectPath(core.Socket.sid, model.ServerAPI.TEMPLATE_REPO_NAME), 
-                            iframe: name + '/index.html', 
+                            //iframe: name + '/index.html', 
                             name: name, 
                             event: this.event('../../temp/' + core.Socket.sid + '/' + model.ServerAPI.TEMPLATE_REPO_NAME + '/' + name, null, url) 
                         }
