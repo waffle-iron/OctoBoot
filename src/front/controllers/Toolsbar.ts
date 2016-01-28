@@ -6,7 +6,6 @@
 /// <reference path="../model/UI.ts" />
 /// <reference path="../core/Socket.ts" />
 /// <reference path="../helper/Dom.ts" />
-/// <reference path="../definition/ckeditor.d.ts" />
 
 module OctoBoot.controllers {
 
@@ -31,7 +30,6 @@ module OctoBoot.controllers {
             click: () => this.edit()
         };
 
-        private editingElms: CKEDITOR.editor[] = [];
         private editBarHover: EditBar;
         private editBarClick: EditBar;
 
@@ -114,16 +112,6 @@ module OctoBoot.controllers {
                 this.setItemActive('null');
                 this.editBarClick.destroy();
                 this.editBarHover.destroy();
-
-                // And unactive aloha on editable element if they are
-                if (this.editingElms.length) {
-                    this.editingElms.every((e: CKEDITOR.editor, i: number, a: CKEDITOR.editor[]) => {
-                        e.element.$.removeAttribute('contentEditable')
-                        e.destroy()
-                        return true
-                    });
-                    this.editingElms = [];
-                }
             }
         }
 
@@ -133,8 +121,8 @@ module OctoBoot.controllers {
             }
 
             this.stage.iframe.contentWindow.addEventListener('mousemove', (e: MouseEvent) => {
-                let element: Element = $(e.target).get(0);
-                if (this.editing && !this.editBarClick.editingElement && !helper.Dom.isAlohaCaret(element)) {
+                let element: HTMLElement = $(e.target).get(0);
+                if (this.editing && !this.editBarClick.editingElement) {
                     // if we are in editing mode AND nothing currently editing
                     this.editBarHover.show(element, this.stage.iframe.contentDocument);
                 }
@@ -142,16 +130,10 @@ module OctoBoot.controllers {
 
             var click = (e: JQueryEventObject) => {
                 let element: HTMLElement = $(e.target).get(0);
-                if (helper.Dom.isAlohaCaret(element)) {
-                    // if user clic on aloha caret, return immediatly
-                    return;
-                }
 
                 if (this.editing && !this.editBarClick.editingElement) {
                     // if we are in editing mode, and nothing currently in edition, active edit bar
-                    element.contentEditable = 'true'
-                    this.editingElms.push(CKEDITOR.inline(element));
-                    //this.editBarClick.show(element, this.stage.iframe.contentDocument);
+                    this.editBarClick.show(element, this.stage.iframe.contentDocument);
                 } else if (!helper.Dom.hasParent(element, this.editBarClick.editingElement) &&
                     !helper.Dom.mouseIsOverElement(e.originalEvent as MouseEvent, this.editBarClick.editingElement)) {
                     // else if the click append outside the editing zone, disable edit bar (so reactive on mousemove)

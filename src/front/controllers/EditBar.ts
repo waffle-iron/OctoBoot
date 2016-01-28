@@ -1,7 +1,7 @@
 /// <reference path="Handlebar.ts" />
 /// <reference path="../model/UI.ts" />
 /// <reference path="../model/HTMLEvent.ts" />
-/// <reference path="../definition/aloha.d.ts" />
+/// <reference path="../definition/ckeditor.d.ts" />
 
 module OctoBoot.controllers {
 
@@ -12,7 +12,8 @@ module OctoBoot.controllers {
         public iframeBody: JQuery;
 
         // current editing element
-        public editingElement: Element;
+        public editingElement: HTMLElement;
+        public editingDocument: HTMLDocument;
 
         // width and number of buttons on EditBar
         private buttonWidth: number = 35;
@@ -20,11 +21,19 @@ module OctoBoot.controllers {
 
         // width / height and margin of global EditBar
         private width: number = (this.buttonWidth * this.buttonNum) + (this.buttonNum  * 2); // give some extra space for targeted tag (can be one letter like A but also SPAN etc..)
-        private height: number = 34;
+        private height: number = 150;
         private margin: number = 5;
 
         // lines who border the editing element
         private lines: { top: JQuery, bottom: JQuery, left: JQuery, right: JQuery };
+        // text editor
+        private editor: CKEDITOR.editor;
+        // extended editable
+        private editable_extended = { span: 1, strong: 1 };
+        // interval positioning
+        private interval: number;
+        // current position
+        private rect: ClientRect;
 
         constructor(public container: JQuery) {
             super(model.UI.HB_EDITBAR);
@@ -36,25 +45,17 @@ module OctoBoot.controllers {
                 var iframeDocument: JQuery = this.iframe.jDom.contents();
                 this.iframeBody = iframeDocument.find('body');
 
-
-                this.initWithContext(this.HBHandlers(this.iframeBody), this.iframeBody);
-
-                // activate popup on edit button
-                this.iframeBody.find('.button.topleft').popup({inline: true});
-                this.iframeBody.find('.button.topright').popup({inline: true, position: 'top right'});
-
-                // activate dropdown on tag
-                this.iframeBody.find('.ui.dropdown').dropdown({
-                    direction: 'upward',
-                    on: 'hover',
-                    action: 'hide',
-                    onChange: (value: string, text: string, selectedItem: JQuery) => this.link(text, value, selectedItem)
-                });
-
                 iframeDocument.find('head').append($.parseHTML(
                     '<link rel=\"stylesheet\" type=\"text/css\" href=\"/lib/semantic/dist/semantic.css\">' +
                     '<script src=\"lib/semantic/dist/semantic.min.js\"></script>'
                 ));
+
+                this.initWithContext(this.HBHandlers(this.iframeBody), this.iframeBody);
+
+                // activate popup on edit button
+                this.iframeBody.find('.button.topleft').popup({ inline: true, position: 'top left' });
+                this.iframeBody.find('.button.topright').popup({ inline: true, position: 'top left' });
+
                 this.iframeBody.css('background', 'none'); // semantic-ui put a *** background on body
 
                 this.iframe.jDom.hide();
@@ -66,34 +67,66 @@ module OctoBoot.controllers {
             } else {
                 onLoad();
             }
+
+            // extend ckeditor editable because we do the positioning manually ;)
+            jQuery.extend(CKEDITOR.dtd.$editable, this.editable_extended)
         }
 
-        public show(element: Element, document: Document): void {
+        public show(element: HTMLElement, document: Document): void {
             if (element.getBoundingClientRect) {
                 this.editingElement = element;
+                this.editingDocument = document;
 
-                var rect: ClientRect = this.getRect(element, document);
+                // clean interval if already existing on other element
+                // create interval and make manually the first call
+                clearInterval(this.interval);
+                this.interval = null;
+                this.interval = setInterval(() => this.position(element, document), 500)
+                this.position(element, document)
+
+                this.appendSpecialButton(element);
+            }
+        }
+
+        public hide(): void {
+            clearInterval(this.interval);
+            this.interval = null;
+
+            this.iframe.jDom.hide();
+            this.border(null);
+            
+            if (this.editingElement) {
+                this.editingElement.removeAttribute('contentEditable');
+            }
+            
+            this.editingElement = null;
+            this.editingDocument = null;
+            
+            if (this.editor) {
+                this.editor.destroy();
+                this.editor = null;
+            }
+        }
+
+        public destroy(): void {
+            this.hide();
+            this.iframe.jDom.remove();
+        }
+
+        private position(element: HTMLElement, document: Document): void {
+            var rect: ClientRect = this.getRect(element, document);
+
+            if (JSON.stringify(this.rect) !== JSON.stringify(rect)) {
                 var down: boolean = rect.top - this.height < 0;
 
                 this.iframe.jDom.css({
                     'top': down ? rect.bottom : rect.top - this.height,
                     'left': rect.right - this.width
                 }).show();
+
                 this.border(rect);
-                this.fillTagButton(element);
-                this.appendSpecialButton(element);
+                this.rect = rect;
             }
-        }
-
-        public hide(): void {
-            this.iframe.jDom.hide();
-            this.border(null);
-            this.editingElement = null;
-        }
-
-        public destroy(): void {
-            this.hide();
-            this.iframe.jDom.remove();
         }
 
         private border(rect: ClientRect): void {
@@ -133,10 +166,6 @@ module OctoBoot.controllers {
             this.hide();
         }
 
-        private link(text: string, value: string, selectedItem: JQuery): void {
-
-        }
-
         private fillTagButton(element: Element): void {
             let button: JQuery = this.iframeBody.find('.button').last();
             // Fill button with current tag name
@@ -146,38 +175,50 @@ module OctoBoot.controllers {
         private appendSpecialButton(element: Element): void {
             this.iframeBody.find('.button.special').hide();
 
-            switch (element.tagName.toUpperCase()) {
-
-                case 'A':
-                    //this.appendLinkButton(element as HTMLAnchorElement);
-                    this.iframeBody.find('.special.link').show();
-                    break
+            // if it's an CKEDITOR editable element (text/div/etc)
+            if (CKEDITOR.dtd.$editable[element.tagName.toLowerCase()]) {
+                this.iframeBody.find('.special.ckeditor').show();
             }
+
+            // fill tag button with element tag name
+            this.fillTagButton(element);
         }
 
-        /*private appendLinkButton(link: HTMLAnchorElement): void {
+        private ckeditor(): void {
+            if (this.editor) {
+                this.editor.destroy();
+                this.editor = null;
+                this.editingElement.removeAttribute('contentEditable');
+            } else {
+                this.editingElement.contentEditable = 'true';
+                this.editor = CKEDITOR.inline(this.editingElement);
+                this.editingElement.focus();
 
-        }*/
+                this.editor.once('instanceReady', () => {
+                    var dom: JQuery = $('.cke');
+                    var rect: ClientRect = this.getRect(this.editingElement, this.editingDocument);
+                    var down: boolean = rect.top - dom.height() < 0;
+
+                    dom.css({
+                        'top': (down ? rect.bottom : rect.top - dom.height()) + 35,
+                        'left': Math.abs((rect.right - dom.width()) - 52),
+                        'position': 'absolute'
+                    }).show();
+                })
+            }
+            
+        }
 
         private HBHandlers(context: JQuery): any {
             return $.each({
-                bold : {
-                    //click: aloha.ui.command(aloha.ui.commands.bold)
-                },
-                underline : {
-                    //click: aloha.ui.command(aloha.ui.commands.underline)
-                },
-                italic : {
-                    //click: aloha.ui.command(aloha.ui.commands.italic)
-                },
-                unformat : {
-                    //click: aloha.ui.command(aloha.ui.commands.unformat)
-                },
                 duplicate : {
-                    //click: () => this.duplicate()
+                    click: () => this.duplicate()
                 },
                 remove : {
-                    //click: () => this.remove()
+                    click: () => this.remove()
+                },
+                ckeditor: {
+                    click: () => this.ckeditor()
                 }
             }, (key: string, handlers: model.HTMLEvent) => handlers.context = context)
         }
