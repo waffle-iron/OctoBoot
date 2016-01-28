@@ -6,7 +6,7 @@
 /// <reference path="../model/UI.ts" />
 /// <reference path="../core/Socket.ts" />
 /// <reference path="../helper/Dom.ts" />
-/// <reference path="../definition/aloha.d.ts" />
+/// <reference path="../definition/ckeditor.d.ts" />
 
 module OctoBoot.controllers {
 
@@ -31,7 +31,7 @@ module OctoBoot.controllers {
             click: () => this.edit()
         };
 
-        private editingElms: Element[] = [];
+        private editingElms: CKEDITOR.editor[] = [];
         private editBarHover: EditBar;
         private editBarClick: EditBar;
 
@@ -60,7 +60,8 @@ module OctoBoot.controllers {
 
             var content: string = new XMLSerializer()
                 .serializeToString(this.stage.iframe.contentDocument)
-                .replace(/(\sclass="")/, ""); // clean html string from edition misc
+                .replace(/(\sclass="")/, "") // clean html string from edition misc
+                .replace(/^\n$/, ""); // todo maybe remove this
 
             core.Socket.emit(model.ServerAPI.SOCKET_SAVE, { name: this.projectName, url: this.repoUrl, content: content, file: this.stage.url.replace(/\/$/, '').split('/').pop() }, () => {
                 this.setIconLoading(['save'], false);
@@ -116,8 +117,9 @@ module OctoBoot.controllers {
 
                 // And unactive aloha on editable element if they are
                 if (this.editingElms.length) {
-                    this.editingElms.every((e: Element, i: number, a: Element[]) => {
-                        aloha.mahalo(e);
+                    this.editingElms.every((e: CKEDITOR.editor, i: number, a: CKEDITOR.editor[]) => {
+                        e.element.$.removeAttribute('contentEditable')
+                        e.destroy()
                         return true
                     });
                     this.editingElms = [];
@@ -129,7 +131,7 @@ module OctoBoot.controllers {
             if (this.stage.iframe.contentWindow['editing']) {
                 return
             }
-            
+
             this.stage.iframe.contentWindow.addEventListener('mousemove', (e: MouseEvent) => {
                 let element: Element = $(e.target).get(0);
                 if (this.editing && !this.editBarClick.editingElement && !helper.Dom.isAlohaCaret(element)) {
@@ -137,18 +139,19 @@ module OctoBoot.controllers {
                     this.editBarHover.show(element, this.stage.iframe.contentDocument);
                 }
             });
-            
+
             var click = (e: JQueryEventObject) => {
-                let element: Element = $(e.target).get(0);
+                let element: HTMLElement = $(e.target).get(0);
                 if (helper.Dom.isAlohaCaret(element)) {
-                    // if user clic on aloha caret, return immediatly 
+                    // if user clic on aloha caret, return immediatly
                     return;
                 }
 
                 if (this.editing && !this.editBarClick.editingElement) {
                     // if we are in editing mode, and nothing currently in edition, active edit bar
-                    this.editingElms.push(aloha(element).elem);
-                    this.editBarClick.show(element, this.stage.iframe.contentDocument);
+                    element.contentEditable = 'true'
+                    this.editingElms.push(CKEDITOR.inline(element));
+                    //this.editBarClick.show(element, this.stage.iframe.contentDocument);
                 } else if (!helper.Dom.hasParent(element, this.editBarClick.editingElement) &&
                     !helper.Dom.mouseIsOverElement(e.originalEvent as MouseEvent, this.editBarClick.editingElement)) {
                     // else if the click append outside the editing zone, disable edit bar (so reactive on mousemove)

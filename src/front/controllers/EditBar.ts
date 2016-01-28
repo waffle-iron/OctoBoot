@@ -17,7 +17,7 @@ module OctoBoot.controllers {
         // width and number of buttons on EditBar
         private buttonWidth: number = 35;
         private buttonNum: number = 8;
-        
+
         // width / height and margin of global EditBar
         private width: number = (this.buttonWidth * this.buttonNum) + (this.buttonNum  * 2); // give some extra space for targeted tag (can be one letter like A but also SPAN etc..)
         private height: number = 34;
@@ -38,17 +38,17 @@ module OctoBoot.controllers {
 
 
                 this.initWithContext(this.HBHandlers(this.iframeBody), this.iframeBody);
-                
+
                 // activate popup on edit button
-                this.iframeBody.find('.button.topleft').popup({inline: true}); 
+                this.iframeBody.find('.button.topleft').popup({inline: true});
                 this.iframeBody.find('.button.topright').popup({inline: true, position: 'top right'});
 
                 // activate dropdown on tag
-                this.iframeBody.find('.ui.dropdown').dropdown({ 
-                    direction: 'upward', 
-                    on: 'hover', 
-                    action: 'hide', 
-                    onChange: (value: string, text: string, selectedItem: JQuery) => this.link(text, value, selectedItem) 
+                this.iframeBody.find('.ui.dropdown').dropdown({
+                    direction: 'upward',
+                    on: 'hover',
+                    action: 'hide',
+                    onChange: (value: string, text: string, selectedItem: JQuery) => this.link(text, value, selectedItem)
                 });
 
                 iframeDocument.find('head').append($.parseHTML(
@@ -156,28 +156,28 @@ module OctoBoot.controllers {
         }
 
         /*private appendLinkButton(link: HTMLAnchorElement): void {
-            
+
         }*/
 
         private HBHandlers(context: JQuery): any {
             return $.each({
                 bold : {
-                    click: aloha.ui.command(aloha.ui.commands.bold)
+                    //click: aloha.ui.command(aloha.ui.commands.bold)
                 },
                 underline : {
-                    click: aloha.ui.command(aloha.ui.commands.underline)
+                    //click: aloha.ui.command(aloha.ui.commands.underline)
                 },
                 italic : {
-                    click: aloha.ui.command(aloha.ui.commands.italic)
+                    //click: aloha.ui.command(aloha.ui.commands.italic)
                 },
                 unformat : {
-                    click: aloha.ui.command(aloha.ui.commands.unformat)
+                    //click: aloha.ui.command(aloha.ui.commands.unformat)
                 },
                 duplicate : {
-                    click: () => this.duplicate()
+                    //click: () => this.duplicate()
                 },
                 remove : {
-                    click: () => this.remove()
+                    //click: () => this.remove()
                 }
             }, (key: string, handlers: model.HTMLEvent) => handlers.context = context)
         }
