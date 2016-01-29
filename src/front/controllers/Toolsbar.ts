@@ -58,8 +58,8 @@ module OctoBoot.controllers {
 
             var content: string = new XMLSerializer()
                 .serializeToString(this.stage.iframe.contentDocument)
-                .replace(/(\sclass="")/, "") // clean html string from edition misc
-                .replace(/^\n$/, ""); // todo maybe remove this
+                .replace(/(\sclass="")/, '') // clean html string from edition misc
+                .replace(/\n\n\n/ig, ''); // remove extras linebreak
 
             core.Socket.emit(model.ServerAPI.SOCKET_SAVE, { name: this.projectName, url: this.repoUrl, content: content, file: this.stage.url.replace(/\/$/, '').split('/').pop() }, () => {
                 this.setIconLoading(['save'], false);
