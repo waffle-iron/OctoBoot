@@ -70,17 +70,17 @@ var octoboot = function(app, socketIo) {
         sockets[sid] = {s: socket}
         socket.emit("sid", sid)
 
-        
-        socket.on(modelApi.SOCKET_SAVE, save(projectDir, modelApi.SOCKET_SAVE, sockets))
-        socket.on(modelApi.SOCKET_COPY, copy(projectDir, templateDir, modelApi.SOCKET_COPY, sockets))
-        socket.on(modelApi.SOCKET_CLONE, clone(projectDir, modelApi.SOCKET_CLONE, sockets))
-        socket.on(modelApi.SOCKET_PUBLISH, publish(projectDir, modelApi.SOCKET_PUBLISH, sockets))
-        socket.on(modelApi.SOCKET_CONVERT, convert(projectDir, modelApi.SOCKET_CONVERT, sockets))
-        socket.on(modelApi.SOCKET_LIST_DIR, list(projectDir, modelApi.SOCKET_LIST_DIR, sockets))
-        socket.on(modelApi.SOCKET_LIST_TEMPLATE, list(templateDir, modelApi.SOCKET_LIST_TEMPLATE, sockets))
-        socket.on(modelApi.SOCKET_SCRAPP, scrapp(projectDir, modelApi.SOCKET_SCRAPP, sockets))
-        socket.on(modelApi.SOCKET_FILL_TEMPLATE, fill(projectDir, modelApi.SOCKET_FILL_TEMPLATE, sockets))
-        
+
+        socket.on(modelApi.SOCKET_SAVE, save(projectDir, sockets))
+        socket.on(modelApi.SOCKET_COPY, copy(projectDir, templateDir, sockets))
+        socket.on(modelApi.SOCKET_CLONE, clone(projectDir, sockets))
+        socket.on(modelApi.SOCKET_PUBLISH, publish(projectDir, sockets))
+        socket.on(modelApi.SOCKET_CONVERT, convert(projectDir, sockets))
+        socket.on(modelApi.SOCKET_LIST_DIR, list(projectDir, sockets))
+        socket.on(modelApi.SOCKET_LIST_TEMPLATE, list(templateDir, sockets))
+        socket.on(modelApi.SOCKET_SCRAPP, scrapp(projectDir, sockets))
+        socket.on(modelApi.SOCKET_FILL_TEMPLATE, fill(projectDir, sockets))
+
     })
 
     return function(req, res, next) {

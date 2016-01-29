@@ -22,13 +22,13 @@ module OctoBoot.controllers {
 
         public update(): void {
             this.jDom.sidebar('show');
-            core.GitHub.getUser((user: model.GitHubUser) => { 
-                this.user = user; 
+            core.GitHub.getUser((user: model.GitHubUser) => {
+                this.user = user;
                 helper.HandlebarHelper.updateTemplate(model.UI.HB_PROFIL, user);
 
                 core.GitHub.getRepos(model.RepoType.PUBLIC, (repos: Array<model.GitHubRepo>) => { this.repos_public = repos; this.update_view_repo(model.RepoType.PUBLIC, repos) });
                 core.GitHub.getRepos(model.RepoType.PRIVATE, (repos: Array<model.GitHubRepo>) => { this.repos_private = repos; this.update_view_repo(model.RepoType.PRIVATE, repos) });
-                
+
                 this.update_view_template()
             })
         }
@@ -58,7 +58,7 @@ module OctoBoot.controllers {
 
         private check_for_template(repos: Array<model.GitHubRepo>): void {
             repos.forEach((repo: model.GitHubRepo) => {
-                if (repo.name === model.ServerAPI.TEMPLATE_REPO_NAME) {
+                if (repo.name === model.ServerAPI.TEMPLATE_REPO_NAME && !this.repo_template) {
                     this.repo_template = repo;
                     core.GitHub.getTree(repo.name, (dir: model.GitHubTree) => this.update_view_template(dir));
                     core.GitHub.cloneOnServer(repo.name, repo.clone_url, null);

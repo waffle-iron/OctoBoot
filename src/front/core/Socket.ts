@@ -21,14 +21,17 @@ module OctoBoot.core {
         }
 
         public static emit(event: string, data: any, done?: (data?: any) => any): void {
-            if (data) {
-                data.sid = this.sid;
+            var cbk: string = event + 'all';
+
+            if (done) {
+                cbk = event + (Date.now() * Math.random()); // set a cbk event to call to execute done method on side front
+                this.io.once(cbk, done);
             }
 
-            this.io.emit(event, data || { sid: this.sid });
-            if (done) {
-                this.io.once(event, done); 
-            }
+            data = data || {};
+            data._sid = this.sid; // socket id to identify this session
+            data._scbk = cbk; // set a cbk event to call to execute done method on side front
+            this.io.emit(event, data);
         }
     }
 }
