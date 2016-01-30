@@ -94,14 +94,14 @@ module OctoBoot.controllers {
 
             this.iframe.jDom.hide();
             this.border(null);
-            
+
             if (this.editingElement) {
                 this.editingElement.removeAttribute('contentEditable');
             }
-            
+
             this.editingElement = null;
             this.editingDocument = null;
-            
+
             if (this.editor) {
                 this.editor.destroy();
                 this.editor = null;
@@ -194,9 +194,10 @@ module OctoBoot.controllers {
                 this.editor = CKEDITOR.inline(this.editingElement);
                 this.editingElement.focus();
 
+                // we need to manually positionning ckeditor instance
                 this.editor.once('instanceReady', () => {
                     var dom: JQuery = $('.cke');
-                    var rect: ClientRect = this.getRect(this.editingElement, this.editingDocument);
+                    var rect: ClientRect = this.getRect(this.editingElement, document);
                     var down: boolean = rect.top - dom.height() < 0;
 
                     dom.css({
@@ -206,7 +207,7 @@ module OctoBoot.controllers {
                     }).show();
                 })
             }
-            
+
         }
 
         private HBHandlers(context: JQuery): any {
