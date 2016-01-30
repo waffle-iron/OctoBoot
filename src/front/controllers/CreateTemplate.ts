@@ -47,9 +47,11 @@ module OctoBoot.controllers {
                 // if not exist, create it
                 core.GitHub.createRepo(model.ServerAPI.TEMPLATE_REPO_NAME, (repo: model.GitHubRepo) => {
                     this.repo = repo;
-                    core.GitHub.cloneOnServer(this.repo.name, this.repo.clone_url, (success: boolean) => {
-                        if (success) {
+                    core.GitHub.cloneOnServer(this.repo.name, this.repo.clone_url, (error: string) => {
+                        if (!error) {
                             this.fill_repo_template();
+                        } else {
+                            new Alert({ title: 'Error during template creation', body: error, onApprove: () => {}})
                         }
                     })
                 })

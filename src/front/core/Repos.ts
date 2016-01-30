@@ -19,7 +19,7 @@ module OctoBoot.core {
 
         public stage: controllers.Stage;
         public onCreate: (name: string, url: string) => void;
-        
+
         private toolsbar: controllers.Toolsbar;
         private alertConvert: controllers.Alert;
         private alertCreate: controllers.Alert;
@@ -47,7 +47,7 @@ module OctoBoot.core {
                     this.alertConvert = new controllers.Alert({
                         title: model.UI.REPO_ALERT_CONVERT_TITLE,
                         body: model.UI.REPO_ALERT_CONVERT_BODY,
-                        onApprove: () => this.clone(convert), 
+                        onApprove: () => this.clone(convert),
                         onDeny: () => true
                     });
                 } else {
@@ -61,6 +61,11 @@ module OctoBoot.core {
             if (this.alertCreate) {
                 this.alertCreate.hide();
                 this.alertCreate = null;
+            }
+
+            if (this.alertConvert) {
+                this.alertConvert.hide();
+                this.alertConvert = null;
             }
 
             this.setState(REPO_STATE.SELECT);
@@ -82,8 +87,11 @@ module OctoBoot.core {
         }
 
         private clone(convert: boolean): boolean {
-            core.GitHub.cloneOnServer(this.name, this.url, (success: boolean) => {
-                if (success) {
+            if (this.alertConvert) {
+                this.alertConvert.setWait()
+            }
+            core.GitHub.cloneOnServer(this.name, this.url, (error: string) => {
+                if (!error) {
                     var projectUrl: string = model.ServerAPI.getProjectPath(Socket.sid, this.name) + "index.html";
                     if (convert) {
                         this.convertAndWait(() => this.open(projectUrl));
@@ -91,7 +99,7 @@ module OctoBoot.core {
                         this.open(projectUrl);
                     }
                 } else {
-                    // TODO trigger error
+                    new controllers.Alert({ title: 'Error during project creation / refresh', body: error, onApprove: Socket.reset})
                 }
             });
 
@@ -102,8 +110,8 @@ module OctoBoot.core {
             Socket.emit(model.ServerAPI.SOCKET_CONVERT, {
                 name: this.name,
                 url: this.url
-            }, (success: boolean) => {
-                if (success) {
+            }, (error: string) => {
+                if (!error) {
 
                     if (this.alertConvert) {
                         this.alertConvert.hide();
@@ -111,8 +119,7 @@ module OctoBoot.core {
 
                     done();
                 } else {
-                    // TODO ERROR ON ALERT
-                    alert('error');
+                    new controllers.Alert({ title: 'Error during project convertion', body: error , onApprove: () => {}})
                 }
             });
         }

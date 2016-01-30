@@ -19,7 +19,7 @@ module OctoBoot.core {
             return this.ghapi + '/repos/' + this.user.name + '/';
         }
 
-        public static cloneOnServer(name: string, url: string, done: (success: boolean) => any): void {
+        public static cloneOnServer(name: string, url: string, done: (error: string) => any): void {
             Socket.emit(model.ServerAPI.SOCKET_CLONE, { name: name, url: url }, done);
         }
 
@@ -90,7 +90,7 @@ module OctoBoot.core {
         /*
          * pagination()
          *
-         * GitHub API pagination 
+         * GitHub API pagination
          * if we have trunkated data, and so link header, continue to store data
          */
         private static pagination(done: (datas: Array<any>) => any): (datas: Array<any>, status: string, xhr: JQueryXHR) => any {
@@ -104,7 +104,7 @@ module OctoBoot.core {
                     done(acc_datas)
                 }
             }
-            
+
             return checkPagination
         }
 

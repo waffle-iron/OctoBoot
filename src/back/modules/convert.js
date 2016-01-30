@@ -13,19 +13,19 @@ module.exports = function(dir, sockets) {
 
         ghcli.add(baseUri, baseUri + "/.octoboot", function() {
             ghcli.commit(baseUri, "Octoboot - create ref file", function() {
-                ghcli.push(sockets[data._sid].ghtoken, baseUri, data.url, "master", function(push_error) {
-                    if (!push_error) {
-                        ghcli.branch(baseUri, "gh-pages", function(branch_error) {
-                            if (!branch_error) {
-                                ghcli.push(sockets[data._sid].ghtoken, baseUri, data.url, "gh-pages", function(push_error2) {
-                                    sockets[data._sid].s.emit(data._scbk, !push_error2)
+                ghcli.push(sockets[data._sid].ghtoken, baseUri, data.url, "master", function(pe, pstdout, pstderr) {
+                    if (!pe) {
+                        ghcli.branch(baseUri, "gh-pages", function(be, bstdout, bstderr) {
+                            if (!be) {
+                                ghcli.push(sockets[data._sid].ghtoken, baseUri, data.url, "gh-pages", function(pe2, pstdout2, pstderr2) {
+                                    sockets[data._sid].s.emit(data._scbk, pe2 ? pstderr2 : null)
                                 }, true)
                             } else {
-                                //TODO TRIGER ERROR
+                                sockets[data._sid].s.emit(data._scbk, be ? bstderr : null)
                             }
                         })
                     } else {
-                        //TODO TRIGER ERROR
+                        sockets[data._sid].s.emit(data._scbk, pe ? pstderr : null)
                     }
                 })
             })

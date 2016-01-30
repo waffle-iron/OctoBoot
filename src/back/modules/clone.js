@@ -11,11 +11,11 @@ module.exports = function(dir, sockets) {
         ghcli.clone(baseUri, gitUrl, function(err, stdout, stderr) {
             if (err && stderr.indexOf("already exists") !== -1) {
                 // Project already cloned, just refresh it
-                ghcli.pull(baseUri + "/" + data.name, function(err, stdout, stderr) {
-                    sockets[data._sid].s.emit(data._scbk, !err)
+                ghcli.pull(baseUri + "/" + data.name, function(perr, pstdout, pstderr) {
+                    sockets[data._sid].s.emit(data._scbk, perr ? pstderr : null)
                 })
             } else {
-                sockets[data._sid].s.emit(data._scbk, !err)
+                sockets[data._sid].s.emit(data._scbk, null)
             }
         })
     }

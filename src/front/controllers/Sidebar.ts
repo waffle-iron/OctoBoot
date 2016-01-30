@@ -1,8 +1,10 @@
 /// <reference path="../core/Repos.ts" />
 /// <reference path="../core/Template.ts" />
+/// <reference path="../core/Socket.ts" />
 /// <reference path="../model/HTMLEvent.ts" />
 /// <reference path="../controllers/CreateTemplate.ts" />
 /// <reference path="Handlebar.ts" />
+/// <reference path="Alert.ts" />
 
 module OctoBoot.controllers {
 
@@ -61,7 +63,11 @@ module OctoBoot.controllers {
                 if (repo.name === model.ServerAPI.TEMPLATE_REPO_NAME && !this.repo_template) {
                     this.repo_template = repo;
                     core.GitHub.getTree(repo.name, (dir: model.GitHubTree) => this.update_view_template(dir));
-                    core.GitHub.cloneOnServer(repo.name, repo.clone_url, null);
+                    core.GitHub.cloneOnServer(repo.name, repo.clone_url, (error: string) => {
+                        if (error) {
+                            new Alert({ title: 'Error during refresh of template project', body: error, onApprove: core.Socket.reset})
+                        }
+                    });
                 }
             })
         }

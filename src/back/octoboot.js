@@ -66,10 +66,12 @@ var octoboot = function(app, socketIo) {
     ghapi.init(ghc.client_id, ghc.client_secret, ghc.authorization_callback_url)
 
     socketIo.on("connection", function(socket) {
-        var sid = Date.now()
-        sockets[sid] = {s: socket}
-        socket.emit("sid", sid)
 
+        socket.on(modelApi.SOCKET_ID, function(data) {
+            var sid = data._sid || Date.now()
+            sockets[sid] = {s: socket}
+            socket.emit(data._scbk, sid)
+        })
 
         socket.on(modelApi.SOCKET_SAVE, save(projectDir, sockets))
         socket.on(modelApi.SOCKET_COPY, copy(projectDir, templateDir, sockets))
@@ -80,7 +82,6 @@ var octoboot = function(app, socketIo) {
         socket.on(modelApi.SOCKET_LIST_TEMPLATE, list(templateDir, sockets))
         socket.on(modelApi.SOCKET_SCRAPP, scrapp(projectDir, sockets))
         socket.on(modelApi.SOCKET_FILL_TEMPLATE, fill(projectDir, sockets))
-
     })
 
     return function(req, res, next) {

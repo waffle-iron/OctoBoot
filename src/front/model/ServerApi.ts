@@ -3,10 +3,11 @@ module OctoBoot.model {
     export class ServerAPI {
 
         public static TEMPLATE_REPO_NAME: string = 'OctoBoot-templates';
-        
+
         public static IS_LOGGED: string = '/api/isLogged/:sid';
         public static GITHUB_LOGIN: string = '/api/GitHubApi/:sid';
 
+        public static SOCKET_ID: string = 'sid';
         public static SOCKET_COPY: string = 'cp';
         public static SOCKET_LIST_TEMPLATE: string = 'templatesList';
         public static SOCKET_LIST_DIR: string = 'dirList';

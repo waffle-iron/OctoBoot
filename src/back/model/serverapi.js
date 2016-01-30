@@ -14,6 +14,7 @@ var OctoBoot;
             ServerAPI.TEMPLATE_REPO_NAME = 'OctoBoot-templates';
             ServerAPI.IS_LOGGED = '/api/isLogged/:sid';
             ServerAPI.GITHUB_LOGIN = '/api/GitHubApi/:sid';
+            ServerAPI.SOCKET_ID = 'sid';
             ServerAPI.SOCKET_COPY = 'cp';
             ServerAPI.SOCKET_LIST_TEMPLATE = 'templatesList';
             ServerAPI.SOCKET_LIST_DIR = 'dirList';
