@@ -6,20 +6,31 @@ module.exports = function(dir, sockets) {
     return function(data) {
         var dirToSave = dir + data._sid + "/temp_template"
         var baseUri = dir + data._sid + "/" + api.TEMPLATE_REPO_NAME
+        var _scbk = data._scbk
 
         data.template = ""
         data.project = api.TEMPLATE_REPO_NAME
-        copy(dir, dirToSave, null, null, function(error) {
+        data._scbk = ""
+
+        copy(dir, dirToSave, null, function(error) {
             if (!error) {
-                ghcli.add(baseUri, "-A", function() {
-                    ghcli.commit(baseUri, "Octoboot - " + new Date().toString(), function() {
-                        ghcli.push(sockets[data._sid].ghtoken, baseUri, data.repo_url, "master", function(push_error) {
-                            sockets[data._sid].s.emit(data._scbk, push_error)
+                ghcli.add(baseUri, "-A", function(error) {
+                    if (error) {
+                        sockets[data._sid].s.emit(_scbk, error)
+                    } else {
+                        ghcli.commit(baseUri, "Octoboot - " + new Date().toString(), function(error) {
+                            if (error) {
+                                sockets[data._sid].s.emit(_scbk, error)
+                            } else {
+                                ghcli.push(sockets[data._sid].ghtoken, baseUri, data.repo_url, "master", function(push_error) {
+                                    sockets[data._sid].s.emit(_scbk, push_error)
+                                })
+                            }
                         })
-                    })
+                    }
                 })
             } else {
-                sockets[data._sid].s.emit(data._scbk, error)
+                sockets[data._sid].s.emit(_scbk, error)
             }
         })(data)
     }

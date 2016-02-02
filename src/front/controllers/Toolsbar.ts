@@ -83,7 +83,7 @@ module OctoBoot.controllers {
                             new Alert({
                                 title: 'Publish success !',
                                 icon: 'checkmark',
-                                link: 'http://' + user.name.toLowerCase() + '.github.io/' + this.projectName,
+                                link: 'http://' + user.login.toLowerCase() + '.github.io/' + this.projectName,
                                 onApprove: () => {}
                             });
                         });

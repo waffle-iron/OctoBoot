@@ -51,7 +51,7 @@ module OctoBoot.controllers {
                         if (!error) {
                             this.fill_repo_template();
                         } else {
-                            new Alert({ title: 'Error during template creation', body: error, onApprove: () => {}})
+                            new Alert({ title: 'Error during template creation', body: error, onApprove: core.Socket.reset})
                         }
                     })
                 })
@@ -64,9 +64,10 @@ module OctoBoot.controllers {
 
         private fill_repo_template(): void {
             core.Socket.emit(model.ServerAPI.SOCKET_FILL_TEMPLATE, { file: this.alert.getInputValue(), repo_url: this.repo.clone_url }, (error: string) => {
-                this.alert.hide();
-
-                if (!error) {
+                if (error) {
+                    new Alert({ title: 'Error during template creation', body: error, onApprove: core.Socket.reset });
+                } else {
+                    this.alert.hide();
                     setTimeout(this.done, 1000); // wait a little for gh-api to be updated
                 }
             })

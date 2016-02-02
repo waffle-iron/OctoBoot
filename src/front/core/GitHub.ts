@@ -16,7 +16,7 @@ module OctoBoot.core {
         public static gat: string = '';
 
         public static getApiUrl(): string {
-            return this.ghapi + '/repos/' + this.user.name + '/';
+            return this.ghapi + '/repos/' + this.user.login + '/';
         }
 
         public static cloneOnServer(name: string, url: string, done: (error: string) => any): void {

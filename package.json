@@ -37,6 +37,7 @@
     "github-cli": "git+https://github.com/RonanDrouglazet/github-cli.git",
     "handlebars": "^3.0.3",
     "parallelshell": "latest",
+    "rimraf": "^2.5.1",
     "socket.io": "^1.3.5",
     "typescript": "^1.4.1",
     "watch": "latest",

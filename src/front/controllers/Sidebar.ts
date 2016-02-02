@@ -41,7 +41,7 @@ module OctoBoot.controllers {
                 titleHandlers: this.handlers_title(),
                 repoHandlers: this.handlers_repo(type),
                 newHandlers: this.handlers_new_repo(type),
-                repos: repos.filter((repo: model.GitHubRepo) => { return !!repo.owner.login.match(this.user.name) && !repo.name.match(model.ServerAPI.TEMPLATE_REPO_NAME) }), // filter by owner
+                repos: repos.filter((repo: model.GitHubRepo) => { return !!repo.owner.login.match(this.user.login) && !repo.name.match(model.ServerAPI.TEMPLATE_REPO_NAME) }), // filter by owner
                 title: formatedType
             }, 'Repos' + formatedType);
 
@@ -60,7 +60,7 @@ module OctoBoot.controllers {
 
         private check_for_template(repos: Array<model.GitHubRepo>): void {
             repos.forEach((repo: model.GitHubRepo) => {
-                if (repo.name === model.ServerAPI.TEMPLATE_REPO_NAME && !this.repo_template) {
+                if (repo.owner.login.match(this.user.login) && repo.name === model.ServerAPI.TEMPLATE_REPO_NAME && !this.repo_template) {
                     this.repo_template = repo;
                     core.GitHub.getTree(repo.name, (dir: model.GitHubTree) => this.update_view_template(dir));
                     core.GitHub.cloneOnServer(repo.name, repo.clone_url, (error: string) => {
