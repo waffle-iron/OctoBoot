@@ -15,6 +15,10 @@ module OctoBoot.controllers {
         public editingElement: HTMLElement;
         public editingDocument: HTMLDocument;
 
+        // text editor
+        public editor: CKEDITOR.editor;
+        public editor_dom: JQuery;
+
         // width and number of buttons on EditBar
         private buttonWidth: number = 35;
         private buttonNum: number = 8;
@@ -26,8 +30,6 @@ module OctoBoot.controllers {
 
         // lines who border the editing element
         private lines: { top: JQuery, bottom: JQuery, left: JQuery, right: JQuery };
-        // text editor
-        private editor: CKEDITOR.editor;
         // extended editable
         private editable_extended = { span: 1, strong: 1 };
         // interval positioning
@@ -194,18 +196,23 @@ module OctoBoot.controllers {
                 this.editor = CKEDITOR.inline(this.editingElement);
                 this.editingElement.focus();
 
-                // we need to manually positionning ckeditor instance
-                this.editor.once('instanceReady', () => {
-                    var dom: JQuery = $('.cke');
+                var position = (evt: CKEDITOR.eventInfo) => {
+                    this.editor_dom = $('.cke');
                     var rect: ClientRect = this.getRect(this.editingElement, document);
-                    var down: boolean = rect.top - dom.height() < 0;
+                    var down: boolean = rect.top - this.editor_dom.height() < 0;
 
-                    dom.css({
-                        'top': (down ? rect.bottom : rect.top - dom.height()) + 35,
-                        'left': Math.abs((rect.right - dom.width()) - 52),
-                        'position': 'absolute'
+                    this.editor_dom.css({
+                        'top': (down ? rect.bottom : rect.top - this.editor_dom.height()) + 35,
+                        'left': Math.abs((rect.right - this.editor_dom.width()) - 52),
+                        'position': 'absolute',
+                        'right': ''
                     }).show();
-                })
+                }
+
+                // we need to manually positionning ckeditor instance when ready
+                this.editor.on('instanceReady', position)
+                // we need to cancel the editor focus event because they re position editor and we don't want that :)
+                this.editor.on('focus', (evt: CKEDITOR.eventInfo) => evt.cancel())
             }
 
         }

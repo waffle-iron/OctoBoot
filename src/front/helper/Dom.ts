@@ -10,8 +10,10 @@ module OctoBoot.helper {
 				result = target === parent;
 				if (result) {
 					return true
-				} else {
+				} else if (target.parentElement) {
 					target = target.parentElement
+				} else {
+					return false
 				}
 			}
 

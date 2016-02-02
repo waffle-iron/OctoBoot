@@ -115,6 +115,7 @@ module OctoBoot.controllers {
             }
         }
 
+        // TODO SEE TO MOVE THIS ON EDIT BAR
         private bindEditionEvents(): void {
             if (this.stage.iframe.contentWindow['editing']) {
                 return
@@ -130,13 +131,17 @@ module OctoBoot.controllers {
 
             var click = (e: JQueryEventObject) => {
                 let element: HTMLElement = $(e.target).get(0);
-
                 if (this.editing && !this.editBarClick.editingElement) {
                     // if we are in editing mode, and nothing currently in edition, active edit bar
                     this.editBarClick.show(element, this.stage.iframe.contentDocument);
-                } else if (!helper.Dom.hasParent(element, this.editBarClick.editingElement) &&
+                } else if (
+                    // if we've not click on ckeditor
+                    !helper.Dom.hasParent(element, this.editBarClick.editor_dom.get(0)) &&
+                    // editing element either
+                    !helper.Dom.hasParent(element, this.editBarClick.editingElement) &&
+                    // and we click OUTSIDE our editing element
                     !helper.Dom.mouseIsOverElement(e.originalEvent as MouseEvent, this.editBarClick.editingElement)) {
-                    // else if the click append outside the editing zone, disable edit bar (so reactive on mousemove)
+                    // disable edit bar (so reactive on mousemove)
                     this.editBarClick.hide();
                     this.editBarHover.hide();
                 }
