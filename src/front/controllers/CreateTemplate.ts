@@ -22,9 +22,11 @@ module OctoBoot.controllers {
         private scrapp_template(): boolean {
             this.alert.setWait();
             core.Socket.emit(model.ServerAPI.SOCKET_SCRAPP, { url: this.alert.getInputValue() }, (data: string) => {
-                this.alert.hide();
                 if (data) {
                     this.preview_template(data);
+                    this.alert.hide();
+                } else {
+                    new Alert({ title: 'Error during template creation', body: 'error when scrapp the website', onApprove: () => {}})
                 }
             })
 

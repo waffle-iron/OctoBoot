@@ -1,4 +1,5 @@
 var fs = require("fs"),
+error = require("./error.js"),
 ghcli = require("github-cli")
 
 module.exports = function(dir, sockets) {
@@ -11,24 +12,18 @@ module.exports = function(dir, sockets) {
             version: "1"
         }))
 
-        ghcli.add(baseUri, baseUri + "/.octoboot", function() {
-            ghcli.commit(baseUri, "Octoboot - create ref file", function() {
-                ghcli.push(sockets[data._sid].ghtoken, baseUri, data.url, "master", function(pe, pstdout, pstderr) {
-                    if (!pe) {
-                        ghcli.branch(baseUri, "gh-pages", function(be, bstdout, bstderr) {
-                            if (!be) {
-                                ghcli.push(sockets[data._sid].ghtoken, baseUri, data.url, "gh-pages", function(pe2, pstdout2, pstderr2) {
-                                    sockets[data._sid].s.emit(data._scbk, pe2 ? pstderr2 : null)
-                                }, true)
-                            } else {
-                                sockets[data._sid].s.emit(data._scbk, be ? bstderr : null)
-                            }
-                        })
-                    } else {
-                        sockets[data._sid].s.emit(data._scbk, pe ? pstderr : null)
-                    }
-                })
-            })
-        })
+        error.init(sockets[data._sid].s, data._scbk)
+
+        ghcli.add(baseUri, baseUri + "/.octoboot", error.cbk(function() {
+            ghcli.commit(baseUri, "Octoboot - create ref file", error.cbk(function() {
+                ghcli.push(sockets[data._sid].ghtoken, baseUri, data.url, "master", error.cbk(function() {
+                    ghcli.branch(baseUri, "gh-pages", error.cbk(function() {
+                        ghcli.push(sockets[data._sid].ghtoken, baseUri, data.url, "gh-pages", error.cbk(function() {
+                            sockets[data._sid].s.emit(data._scbk)
+                        }), true)
+                    }))
+                }))
+            }))
+        }))
     }
 }

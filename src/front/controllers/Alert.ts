@@ -29,6 +29,10 @@ module OctoBoot.controllers {
                 this.options.icon = 'warning sign'; //default
             }
 
+            if (typeof options.body !== "string") {
+                this.options.body = JSON.stringify(options.body)
+            }
+
             this.onDeny = !!options.onDeny;
             this.onApprove = !!options.onApprove;
             this.buttonCount = options.onDeny && options.onApprove ? 'two' : 'one';

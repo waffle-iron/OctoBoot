@@ -61,9 +61,18 @@ module OctoBoot.controllers {
                 .replace(/(\sclass="")/, '') // clean html string from edition misc
                 .replace(/\n\n\n/ig, ''); // remove extras linebreak
 
-            core.Socket.emit(model.ServerAPI.SOCKET_SAVE, { name: this.projectName, url: this.repoUrl, content: content, file: this.stage.url.replace(/\/$/, '').split('/').pop() }, () => {
+            core.Socket.emit(model.ServerAPI.SOCKET_SAVE, {
+                name: this.projectName,
+                url: this.repoUrl,
+                content: content,
+                file: this.stage.url.replace(/\/$/, '').split('/').pop()
+            }, (error: string) => {
+                if (error) {
+                    new Alert({ title: 'Error on save', body: error, onApprove: () => {}})
+                } else {
+                    this.setItemActive('publish');
+                }
                 this.setIconLoading(['save'], false);
-                this.setItemActive('publish');
             });
         }
 

@@ -1,5 +1,6 @@
 var ghcli = require("github-cli")
 var fs = require("fs")
+var error = require("./error.js")
 
 module.exports = function(dir, sockets) {
     return function(data) {
@@ -8,16 +9,18 @@ module.exports = function(dir, sockets) {
         data.file = data.file.match(/index.html$/) ? data.file :
                     data.file.match(/\/$/) ? data.file + 'index.html' : data.file + '/index.html'
 
-        fs.writeFile(baseUri + "/" + data.file, data.content, function() {
-            ghcli.add(baseUri, "-A", function() {
-                ghcli.commit(baseUri, "Octoboot - " + new Date().toString(), function() {
-                    ghcli.push(sockets[data._sid].ghtoken, baseUri, data.url, "master", function(push_error) {
-                        if (!push_error) {
-                            sockets[data._sid].s.emit(data._scbk, !push_error)
-                        }
-                    })
-                })
-            })
-        })
+        error.init(sockets[data._sid].s, data._scbk)
+
+        fs.writeFile(baseUri + "/" + data.file, data.content, error.cbk(function() {
+            ghcli.add(baseUri, "-A", error.cbk(function() {
+                ghcli.commit(baseUri, "Octoboot - " + new Date().toString(), error.cbk(function() {
+                    ghcli.pull(baseUri, error.cbk(function() {
+                        ghcli.push(sockets[data._sid].ghtoken, baseUri, data.url, "master", error.cbk(function() {
+                            sockets[data._sid].s.emit(data._scbk)
+                        }))
+                    }))
+                }))
+            }))
+        }))
     }
 }
