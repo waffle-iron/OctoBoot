@@ -31,7 +31,7 @@ module OctoBoot.controllers {
         // lines who border the editing element
         private lines: { top: JQuery, bottom: JQuery, left: JQuery, right: JQuery };
         // extended editable
-        private editable_extended = { span: 1, strong: 1 };
+        private editable_extended = { span: 1, strong: 1, li: 1 };
         // interval positioning
         private interval: number;
         // current position
