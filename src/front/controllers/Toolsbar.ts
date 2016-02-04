@@ -145,7 +145,7 @@ module OctoBoot.controllers {
                     this.editBarClick.show(element, this.stage.iframe.contentDocument);
                 } else if (
                     // if we've not click on ckeditor
-                    !helper.Dom.hasParent(element, this.editBarClick.editor_dom.get(0)) &&
+                    (!this.editBarClick.editor_dom || !helper.Dom.hasParent(element, this.editBarClick.editor_dom.get(0))) &&
                     // editing element either
                     !helper.Dom.hasParent(element, this.editBarClick.editingElement) &&
                     // and we click OUTSIDE our editing element
