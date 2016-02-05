@@ -16,3 +16,7 @@
 .Templates .column > div:hover {
 	background: rgb(232, 232, 232);
 }
+
+input#upload {
+	display: none;
+}

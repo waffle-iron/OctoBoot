@@ -584,6 +584,7 @@ declare module CKEDITOR {
         readOnly?: boolean;
         skin?: string;
         width?: string | number;
+        removeFormatTags?: string;
     }
 
 
@@ -921,7 +922,11 @@ declare module CKEDITOR {
 
     class dtd {
         static $editable: { address: number, article: number, aside: number, blockquote: number, body: number, details: number, div: number, fieldset: number, figcaption: number, footer: number, form: number, h1: number, h2: number, h3: number, h4: number, h5: number, h6: number, header: number, hgroup: number, main: number, nav: number, p: number, pre: number, section: number}
-        static $removeEmpty: any;
+        static $removeEmpty: {
+            abbr: number, acronym: number, b: number, bdi: number, bdo: number, big: number, cite: number, code: number, del: number, dfn: number,
+            em: number, font: number, i: number, ins: number, label: number, kbd: number, mark: number, meter: number, output: number, q: number, ruby: number, s: number,
+            samp: number, small: number, span: number, strike: number, strong: number, sub: number, sup: number, time: number, tt: number, u: number, 'var': number
+        }
     }
 
 

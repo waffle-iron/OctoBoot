@@ -10,8 +10,7 @@ module OctoBoot.controllers {
 
         public showAdress: boolean;
         public iframe: HTMLIFrameElement;
-
-        private baseUrl: string;
+        public baseUrl: string;
 
         constructor(public url: string = '/logo.html') {
             super(model.UI.HB_STAGE);
@@ -36,11 +35,6 @@ module OctoBoot.controllers {
             url = url || this.jDom.find('.text').html();
             this.url = url.replace(/http(:?s)*:\/\/(:?\w+\.){1,}\w+\//ig, '/');
             this.iframe.src = this.baseUrl + this.url;
-            /*this.iframe.onload = () => {
-                //var toto: any = this.iframe.contentWindow
-                console.log('stage onload');
-                //$(this.iframe.contentDocument).on('a', false);
-            }*/
             this.jDom.find('.text').html(this.url);
             if (this.showAdress) {
                 this.refreshAndShowUrl(); 
@@ -56,10 +50,10 @@ module OctoBoot.controllers {
             this.jDom.find('.dropdown .menu').html('');
             // ask back for a list of dirs/files
             let dirToInspect = this.baseUrl.split('/').pop() + '/' + this.url.split('/')[1];
-            core.Socket.emit(model.ServerAPI.SOCKET_LIST_DIR, { dir: dirToInspect }, (data: string[]) => {
+            core.Socket.emit(model.ServerAPI.SOCKET_LIST_FILES, { dir: dirToInspect }, (data: string[]) => {
                 // filter files
-                let dirs: string[] = data.filter((value: string, i: number, a: string[]) => { return value === 'index.html' || !value.match(/(?:\.|bootstrap|assets)/) });
-                dirs.forEach((dir: string, i: number, a: string[]) => {
+                //let dirs: string[] = data.map((v: string) => { return v.split(dirToInspect).pop() }) //data.filter((value: string, i: number, a: string[]) => { return value === 'index.html' || !value.match(/(?:\.|bootstrap|assets)/) });
+                data.forEach((dir: string, i: number, a: string[]) => {
                     // and append it to dropdown
                     this.jDom.find('.dropdown .menu').append('<div class="item">/' + this.url.split('/')[1] + '/' + dir + '</div>');
                 })
