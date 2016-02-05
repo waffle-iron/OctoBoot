@@ -133,6 +133,7 @@ module OctoBoot.controllers {
         }
 
         private upload(): void {
+            this.setItemActive('upload');
             $(this.inputUpload).click();
             $(this.inputUpload).one('change', (e) => {
                 this.fileReader = new FileReader();
@@ -143,7 +144,9 @@ module OctoBoot.controllers {
                             .replace(/:sid/, core.Socket.sid.toString())
                             .replace(/:project/, this.projectName)
                             .replace(/:filename/, this.inputUpload.files[0].name))
-
+                    xhr.onloadend = () => {
+                        this.setItemActive('null');
+                    }
                     xhr.setRequestHeader('Content-Type', this.inputUpload.files[0].type);
                     xhr.send(e.target.result)
                 }
