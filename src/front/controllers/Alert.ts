@@ -11,6 +11,7 @@ module OctoBoot.controllers {
         image?: string;
         iframe?: string;
         input?: string;
+        dropdown?: string[];
         link?: string;
     }
 
@@ -43,6 +44,10 @@ module OctoBoot.controllers {
                 onDeny: options.onDeny
             })
             .modal('show');
+
+            if (options.dropdown) {
+                this.jDom.find('.dropdown').dropdown();
+            }
         }
 
         public getInputValue(): string {

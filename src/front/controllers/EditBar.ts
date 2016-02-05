@@ -39,7 +39,7 @@ module OctoBoot.controllers {
         // current position
         private rect: ClientRect;
 
-        constructor(public container: JQuery) {
+        constructor(public container: JQuery, public stage: Stage) {
             super(model.UI.HB_EDITBAR);
 
             this.iframe = new Handlebar(model.UI.HB_EDITBAR_FRAME);
@@ -50,8 +50,8 @@ module OctoBoot.controllers {
                 this.iframeBody = iframeDocument.find('body');
 
                 iframeDocument.find('head').append($.parseHTML(
-                    '<link rel=\"stylesheet\" type=\"text/css\" href=\"/lib/semantic/dist/semantic.css\">' +
-                    '<script src=\"lib/semantic/dist/semantic.min.js\"></script>'
+                    '<link rel=\"stylesheet\" type=\"text/css\" href=\"https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.7/semantic.min.css\">' +
+                    '<script src=\"https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.7/semantic.min.js\"></script>'
                 ));
 
                 this.initWithContext(this.HBHandlers(this.iframeBody), this.iframeBody);
@@ -186,6 +186,11 @@ module OctoBoot.controllers {
                 this.iframeBody.find('.special.ckeditor').show();
             }
 
+            // if it's an image, allow to swich src
+            if (element.tagName.toUpperCase() === 'IMG') {
+                this.iframeBody.find('.special.img').show();
+            }
+
             // fill tag button with element tag name
             this.fillTagButton(element);
         }
@@ -221,6 +226,23 @@ module OctoBoot.controllers {
 
         }
 
+        private update_img(url: string): void {
+            $(this.editingElement).attr('src', url);
+        }
+
+        private select_img(): void {
+            let dirToInspect = this.stage.baseUrl.split('/').pop() + '/' + this.stage.url.split('/')[1];
+            core.Socket.emit(model.ServerAPI.SOCKET_LIST_FILES, { dir: dirToInspect }, (data: string[]) => {
+                var alert: Alert = new Alert({
+                    title: 'Update image url',
+                    icon: 'file image outline',
+                    dropdown: data.filter((v: string) => { return !!v.match(/\.(JPG|JPEG|jpg|jpeg|png|gif)+$/) }),
+                    onApprove: () => $(this.editingElement).attr('src', alert.getInputValue()),
+                    onDeny: () => {}
+                })
+            })
+        }
+
         private HBHandlers(context: JQuery): any {
             return $.each({
                 duplicate : {
@@ -231,6 +253,9 @@ module OctoBoot.controllers {
                 },
                 ckeditor: {
                     click: () => this.ckeditor()
+                },
+                img: {
+                    click: () => this.select_img()
                 }
             }, (key: string, handlers: model.HTMLEvent) => handlers.context = context)
         }

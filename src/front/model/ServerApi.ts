@@ -12,6 +12,7 @@ module OctoBoot.model {
         public static SOCKET_COPY: string = 'cp';
         public static SOCKET_LIST_TEMPLATE: string = 'templatesList';
         public static SOCKET_LIST_DIR: string = 'dirList';
+        public static SOCKET_LIST_FILES: string = 'ls';
         public static SOCKET_SAVE: string = 'save';
         public static SOCKET_PUBLISH: string = 'publish';
         public static SOCKET_CLONE: string = 'clone';

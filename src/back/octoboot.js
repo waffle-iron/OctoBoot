@@ -9,6 +9,7 @@ buffer = require("buffer"),
 convert = require("./modules/convert.js"),
 clone = require("./modules/clone.js"),
 list = require("./modules/list.js"),
+ls = require("./modules/ls.js"),
 copy = require("./modules/copy.js"),
 save = require("./modules/save.js"),
 publish = require("./modules/publish.js"),
@@ -99,6 +100,7 @@ var octoboot = function(app, socketIo) {
         socket.on(modelApi.SOCKET_PUBLISH, publish(projectDir, sockets))
         socket.on(modelApi.SOCKET_CONVERT, convert(projectDir, sockets))
         socket.on(modelApi.SOCKET_LIST_DIR, list(projectDir, sockets))
+        socket.on(modelApi.SOCKET_LIST_FILES, ls(projectDir, sockets))
         socket.on(modelApi.SOCKET_LIST_TEMPLATE, list(templateDir, sockets))
         socket.on(modelApi.SOCKET_SCRAPP, scrapp(projectDir, sockets))
         socket.on(modelApi.SOCKET_FILL_TEMPLATE, fill(projectDir, sockets))

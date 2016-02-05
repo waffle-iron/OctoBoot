@@ -122,8 +122,8 @@ module OctoBoot.controllers {
             if (this.editing) {
                 // If editing, create or reset EditBar on click and hover (need two different EditBar)
                 this.setItemActive('edit');
-                this.editBarHover = new EditBar(container);
-                this.editBarClick = new EditBar(container);
+                this.editBarHover = new EditBar(container, this.stage);
+                this.editBarClick = new EditBar(container, this.stage);
             } else {
                 // If not editing, destroy EditBar
                 this.setItemActive('null');

@@ -19,6 +19,7 @@ var OctoBoot;
             ServerAPI.SOCKET_COPY = 'cp';
             ServerAPI.SOCKET_LIST_TEMPLATE = 'templatesList';
             ServerAPI.SOCKET_LIST_DIR = 'dirList';
+            ServerAPI.SOCKET_LIST_FILES = 'ls';
             ServerAPI.SOCKET_SAVE = 'save';
             ServerAPI.SOCKET_PUBLISH = 'publish';
             ServerAPI.SOCKET_CLONE = 'clone';
