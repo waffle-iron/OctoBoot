@@ -32,6 +32,8 @@ module OctoBoot.controllers {
         private lines: { top: JQuery, bottom: JQuery, left: JQuery, right: JQuery };
         // extended editable
         private editable_extended = { span: 1, strong: 1, li: 1, u: 1 };
+        // extended ignored element
+        private ignored_extended = { span: 0, strong: 0, b: 0, u: 0 };
         // interval positioning
         private interval: number;
         // current position
@@ -72,6 +74,8 @@ module OctoBoot.controllers {
 
             // extend ckeditor editable because we do the positioning manually ;)
             jQuery.extend(CKEDITOR.dtd.$editable, this.editable_extended)
+            jQuery.extend(CKEDITOR.dtd.$removeEmpty, this.ignored_extended)
+            CKEDITOR.config.allowedContent = true
         }
 
         public show(element: HTMLElement, document: Document): void {
