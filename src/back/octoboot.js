@@ -4,6 +4,7 @@ ghapi = require("github-api"),
 ghcli = require("github-cli"),
 fs = require("fs"),
 pa = require("path"),
+buffer = require("buffer"),
 // Internal module
 convert = require("./modules/convert.js"),
 clone = require("./modules/clone.js"),
@@ -54,9 +55,28 @@ function r404(req, res, next) {
     res.status(404).sendFile(pa.resolve(__dirname + "/../../static/404.html"))
 }
 
+function upload(req, res) {
+    var file, dir = projectDir + req.params.sid + "/" + req.params.project + "/uploads/";
+
+    req.on('data', function(chunk) {
+        file = file ? buffer.Buffer.concat([file, chunk]) : chunk
+    })
+
+    req.on('end', function() {
+        fs.mkdir(dir , function() {
+            fs.writeFile(dir + req.params.filename, file, function(error) {
+                res.status(error ? 503 : 200).send()
+            })
+        })
+    })
+}
+
 var octoboot = function(app, socketIo) {
     app.use(cookieParser("octoboot"))
     app.use(cookieSession({ secret: "octoboot"}))
+
+    app.post(modelApi.UPLOAD, upload)
+
     app.get(modelApi.IS_LOGGED, isLogged)
     app.get(modelApi.GITHUB_LOGIN, ghapi.oauth(oauth))
 

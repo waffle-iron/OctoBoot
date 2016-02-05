@@ -6,6 +6,7 @@ module OctoBoot.model {
 
         public static IS_LOGGED: string = '/api/isLogged/:sid';
         public static GITHUB_LOGIN: string = '/api/GitHubApi/:sid';
+        public static UPLOAD: string = '/api/upload/:sid/:project/:filename'
 
         public static SOCKET_ID: string = 'sid';
         public static SOCKET_COPY: string = 'cp';

@@ -30,8 +30,14 @@ module OctoBoot.controllers {
             click: () => this.edit()
         };
 
+        public uploadHandlers: model.HTMLEvent = {
+            click: () => this.upload()
+        };
+
         private editBarHover: EditBar;
         private editBarClick: EditBar;
+        private inputUpload: HTMLInputElement;
+        private fileReader: FileReader;
 
         constructor(public projectName: string, public stage: Stage, public repoUrl: string) {
             super(model.UI.HB_TOOLSBAR);
@@ -43,6 +49,8 @@ module OctoBoot.controllers {
 
             core.Socket.io.on('404', () => this.setItemActive('New'));
             core.Socket.io.on('save_available', () => this.setItemActive('save'));
+
+            this.inputUpload = $('input#upload').get(0) as HTMLInputElement;
         }
 
         private create(): void {
@@ -122,6 +130,24 @@ module OctoBoot.controllers {
                 this.editBarClick.destroy();
                 this.editBarHover.destroy();
             }
+        }
+
+        private upload(): void {
+            $(this.inputUpload).click();
+            $(this.inputUpload).one('change', (e) => {
+                this.fileReader = new FileReader();
+                this.fileReader.readAsArrayBuffer(this.inputUpload.files[0])
+                this.fileReader.onloadend = (e: any) => {
+                    var xhr: XMLHttpRequest = new XMLHttpRequest()
+                    xhr.open('POST', model.ServerAPI.UPLOAD
+                            .replace(/:sid/, core.Socket.sid.toString())
+                            .replace(/:project/, this.projectName)
+                            .replace(/:filename/, this.inputUpload.files[0].name))
+
+                    xhr.setRequestHeader('Content-Type', this.inputUpload.files[0].type);
+                    xhr.send(e.target.result)
+                }
+            })
         }
 
         // TODO SEE TO MOVE THIS ON EDIT BAR
