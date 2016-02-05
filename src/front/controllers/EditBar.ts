@@ -163,8 +163,11 @@ module OctoBoot.controllers {
         }
 
         private duplicate(): void {
-            var duplicateElement: JQuery = $(this.editingElement).clone();
-            duplicateElement.insertAfter(this.editingElement);
+            var duplicable_parents: JQuery = $(this.editingElement).parents('li');
+            console.log('duplicateparent', duplicable_parents)
+            var toDuplicate: JQuery = duplicable_parents.length ? duplicable_parents : $(this.editingElement);
+            var duplicateElement: JQuery = toDuplicate.clone();
+            duplicateElement.insertAfter(duplicable_parents.length ? duplicable_parents : this.editingElement);
         }
 
         private remove(): void {
