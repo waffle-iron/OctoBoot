@@ -921,6 +921,7 @@ declare module CKEDITOR {
 
     class dtd {
         static $editable: { address: number, article: number, aside: number, blockquote: number, body: number, details: number, div: number, fieldset: number, figcaption: number, footer: number, form: number, h1: number, h2: number, h3: number, h4: number, h5: number, h6: number, header: number, hgroup: number, main: number, nav: number, p: number, pre: number, section: number}
+        static $removeEmpty: any;
     }
 
 
