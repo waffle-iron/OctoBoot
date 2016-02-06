@@ -26,6 +26,7 @@ var OctoBoot;
             ServerAPI.SOCKET_CONVERT = 'convert';
             ServerAPI.SOCKET_SCRAPP = 'scrapp';
             ServerAPI.SOCKET_FILL_TEMPLATE = 'fill';
+            ServerAPI.SOCKET_REMOVE_FILE = 'rm';
             return ServerAPI;
         })();
         model.ServerAPI = ServerAPI;

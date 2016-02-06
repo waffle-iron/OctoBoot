@@ -10,8 +10,8 @@ module.exports = function(dir, sockets) {
 
         error.init(sockets[data._sid].s, data._scbk)
 
-        fs.writeFile(baseUri + "/" + data.file, data.content, error.cbk(function() {
-            ghcli.add(baseUri, "-A", error.cbk(function() {
+        var then = function() {
+           ghcli.add(baseUri, "-A", error.cbk(function() {
                 ghcli.commit(baseUri, "Octoboot - " + new Date().toString(), error.cbk(function() {
                     ghcli.pull(baseUri, error.cbk(function() {
                         ghcli.push(sockets[data._sid].ghtoken, baseUri, data.url, "master", error.cbk(function() {
@@ -19,7 +19,13 @@ module.exports = function(dir, sockets) {
                         }))
                     }))
                 }))
-            }))
-        }))
+            })) 
+        }
+
+        if (data.content) {
+            fs.writeFile(baseUri + "/" + data.file, data.content, error.cbk(then))
+        } else {
+            then()
+        }
     }
 }

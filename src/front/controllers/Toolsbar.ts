@@ -34,6 +34,10 @@ module OctoBoot.controllers {
             click: () => this.upload()
         };
 
+        public removeHandlers: model.HTMLEvent = {
+            click: () => this.remove()
+        };
+
         private editBarHover: EditBar;
         private editBarClick: EditBar;
         private inputUpload: HTMLInputElement;
@@ -66,11 +70,28 @@ module OctoBoot.controllers {
 
             var doc: Document = this.stage.iframe.contentDocument;
 
-            var content: string = 
-                doc.body.childElementCount === 1 && 
-                doc.body.children[0].tagName.toUpperCase() === 'PRE' ?
-                $(doc.body.children[0]).text() : new XMLSerializer().serializeToString(doc)
+            // convert iframe html to string
+            var content: string = new XMLSerializer().serializeToString(doc)
 
+            // manage special case (css / js / img editing)
+            if (doc.body.childElementCount === 1) {
+                switch (doc.body.children[0].tagName.toUpperCase()) {
+                    case 'PRE':
+                        // if body have just one child and it's a pre, we are editing a css / js file so select pre text()
+                        content = $(doc.body.children[0]).text()
+                    break;
+
+                    case 'IMG':
+                        // if body have just one child and it's a img, we are looking an image in iframe s don't save anything
+                        content = ''
+                    break;
+                }
+            } else if (content.match('<div class="octofont">404</div>')) {
+                // if current document is a 404 octoboot html file, don't save anything
+                content = ''
+            }
+
+            // clean
             content = content
                 .replace(/(\sclass="")/, '') // clean html string from edition misc
                 .replace(/\n\n\n/ig, ''); // remove extras linebreak
@@ -155,9 +176,9 @@ module OctoBoot.controllers {
         }
 
         private upload(): void {
-            this.setIconLoading(['upload'], true);
             $(this.inputUpload).click();
             $(this.inputUpload).one('change', (e) => {
+                this.setIconLoading(['upload'], true);
                 this.fileReader = new FileReader();
                 this.fileReader.readAsArrayBuffer(this.inputUpload.files[0])
                 this.fileReader.onloadend = (e: any) => {
@@ -168,10 +189,38 @@ module OctoBoot.controllers {
                             .replace(/:filename/, this.inputUpload.files[0].name))
                     xhr.onloadend = () => {
                         this.setIconLoading(['upload'], false);
+                        this.stage.refreshAndShowUrl();
+
+                        if (xhr.status !== 200) {
+                            new Alert({title: 'Upload error', onApprove: () => {}})
+                        }
                     }
                     xhr.setRequestHeader('Content-Type', this.inputUpload.files[0].type);
                     xhr.send(e.target.result)
                 }
+            })
+        }
+
+        private remove(): void {
+            var alert: Alert = new Alert({
+                title: model.UI.DELETE_FILE_ALERT_TITLE,
+                body: model.UI.DELETE_FILE_ALERT_BODY.replace('[FILE]', this.stage.url),
+                onApprove: () => {
+                    
+                    core.Socket.emit(model.ServerAPI.SOCKET_REMOVE_FILE, { uri: this.stage.url }, (error: string) => {
+                        if (!error) {
+                            alert.hide()
+                            this.stage.reload()
+                            this.stage.refreshAndShowUrl()
+                        } else {
+                            new Alert({title: 'Error when removing file', body: error, onApprove: () => {}})
+                        }
+                    })
+
+                    // prevent modal to close
+                    return false
+                }, 
+                onDeny: () => {}
             })
         }
 

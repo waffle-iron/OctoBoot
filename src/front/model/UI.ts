@@ -27,5 +27,8 @@ module OctoBoot.model {
 
         public static PUBLISH_ALERT_TITLE: string = 'Publish your website online';
         public static PUBLISH_ALERT_BODY: string = 'Are you sure ? This will update your website online with your current working version';
+
+        public static DELETE_FILE_ALERT_TITLE: string = 'Delete file';
+        public static DELETE_FILE_ALERT_BODY: string = 'you are going to remove [FILE] - Are you sure about this ?';
     }
 }
