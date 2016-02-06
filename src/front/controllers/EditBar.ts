@@ -33,7 +33,7 @@ module OctoBoot.controllers {
         // extended editable
         private editable_extended = { span: 1, strong: 1, li: 1, u: 1 };
         // extended ignored element
-        private ignored_extended = { span: 0, strong: 0, b: 0, u: 0 };
+        private ignored_extended = { span: 0, strong: 0, b: 0, u: 0, i: 0 };
         // interval positioning
         private interval: number;
         // current position
@@ -230,6 +230,12 @@ module OctoBoot.controllers {
         }
 
         private update_img(url: string): void {
+            var depth: number = this.stage.url.split('/').length - 3; // remove project and file name
+            
+            for (var i: number = 0; i < depth; i++) {
+                url = '../' + url
+            }
+
             $(this.editingElement).attr('src', url);
         }
 
@@ -240,7 +246,7 @@ module OctoBoot.controllers {
                     title: 'Update image url',
                     icon: 'file image outline',
                     dropdown: data.filter((v: string) => { return !!v.match(/\.(JPG|JPEG|jpg|jpeg|png|gif)+$/) }),
-                    onApprove: () => $(this.editingElement).attr('src', alert.getInputValue()),
+                    onApprove: () => this.update_img(alert.getInputValue()),
                     onDeny: () => {}
                 })
             })

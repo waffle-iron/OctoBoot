@@ -6,8 +6,7 @@ module.exports = function(dir, sockets) {
     return function(data) {
         var baseUri = dir + data._sid + "/" + data.name
 
-        data.file = data.file.match(/index.html$/) ? data.file :
-                    data.file.match(/\/$/) ? data.file + 'index.html' : data.file + '/index.html'
+        data.file = data.file || 'index.html';
 
         error.init(sockets[data._sid].s, data._scbk)
 

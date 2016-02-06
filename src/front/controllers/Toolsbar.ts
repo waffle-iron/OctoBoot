@@ -64,16 +64,25 @@ module OctoBoot.controllers {
 
             this.setIconLoading(['save']);
 
-            var content: string = new XMLSerializer()
-                .serializeToString(this.stage.iframe.contentDocument)
+            var doc: Document = this.stage.iframe.contentDocument;
+
+            var content: string = 
+                doc.body.childElementCount === 1 && 
+                doc.body.children[0].tagName.toUpperCase() === 'PRE' ?
+                $(doc.body.children[0]).text() : new XMLSerializer().serializeToString(doc)
+
+            content = content
                 .replace(/(\sclass="")/, '') // clean html string from edition misc
                 .replace(/\n\n\n/ig, ''); // remove extras linebreak
 
+            var uri: string[] = this.stage.url.split('/');
+            var file: string = uri.pop();
+
             core.Socket.emit(model.ServerAPI.SOCKET_SAVE, {
-                name: this.projectName,
+                name: uri.join('/'),
                 url: this.repoUrl,
                 content: content,
-                file: this.stage.url.replace(/\/$/, '').split('/').pop()
+                file: file
             }, (error: string) => {
                 if (error) {
                     new Alert({ title: 'Error on save', body: error, onApprove: () => {}})
