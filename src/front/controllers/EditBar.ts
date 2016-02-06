@@ -231,7 +231,7 @@ module OctoBoot.controllers {
 
         private update_img(url: string): void {
             var depth: number = this.stage.url.split('/').length - 3; // remove project and file name
-            
+
             for (var i: number = 0; i < depth; i++) {
                 url = '../' + url
             }

@@ -121,23 +121,36 @@ module OctoBoot.controllers {
 
         private edit(): void {
             var container: JQuery = $(this.stage.iframe.contentDocument.body);
+            // if we want to edit a js / css file, start editing in basic mode
+            var basicEdit: boolean = container.children().length === 1 && container.children().get(0).tagName.toUpperCase() === 'PRE';
 
             // Bind events on window if not already done for editing
-            this.bindEditionEvents();
+            if (!basicEdit) {
+                this.bindEditionEvents();
+            }
 
             // Editing flag
             this.editing = !this.editing;
 
             if (this.editing) {
-                // If editing, create or reset EditBar on click and hover (need two different EditBar)
                 this.setItemActive('edit');
-                this.editBarHover = new EditBar(container, this.stage);
-                this.editBarClick = new EditBar(container, this.stage);
+                if (basicEdit) {
+                    container.children().get(0).contentEditable = "true";
+                } else {
+                    // most case, inline editing full mode
+                    // create or reset EditBar on click and hover (need two different EditBar)
+                    this.editBarClick = new EditBar(container, this.stage);
+                    this.editBarHover = new EditBar(container, this.stage);
+                }
             } else {
                 // If not editing, destroy EditBar
                 this.setItemActive('null');
-                this.editBarClick.destroy();
-                this.editBarHover.destroy();
+                if (!basicEdit) {
+                    this.editBarClick.destroy();
+                    this.editBarHover.destroy();
+                } else {
+                    container.children().removeAttr('contentEditable');
+                }
             }
         }
 
