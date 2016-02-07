@@ -21,6 +21,7 @@ module OctoBoot.model {
         public static SOCKET_SCRAPP: string = 'scrapp';
         public static SOCKET_FILL_TEMPLATE: string = 'fill';
         public static SOCKET_REMOVE_FILE: string = 'rm';
+        public static SOCKET_REMOVE_DIR: string = 'rmdir';
 
         public static getProjectPath(sid: number, projectName: string): string {
 			return '/temp/' + sid + '/' + projectName + '/'

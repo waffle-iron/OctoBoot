@@ -28,6 +28,7 @@ var OctoBoot;
             ServerAPI.SOCKET_SCRAPP = 'scrapp';
             ServerAPI.SOCKET_FILL_TEMPLATE = 'fill';
             ServerAPI.SOCKET_REMOVE_FILE = 'rm';
+            ServerAPI.SOCKET_REMOVE_DIR = 'rmdir';
             return ServerAPI;
         })();
         model.ServerAPI = ServerAPI;

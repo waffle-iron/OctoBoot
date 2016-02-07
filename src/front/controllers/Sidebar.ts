@@ -23,6 +23,7 @@ module OctoBoot.controllers {
         }
 
         public update(): void {
+            this.repo_template = null;
             this.jDom.sidebar('show');
             core.GitHub.getUser((user: model.GitHubUser) => {
                 this.user = user;
@@ -112,20 +113,29 @@ module OctoBoot.controllers {
         }
 
         private select_repo(__this: Sidebar, button: HTMLElement, type: string, trash:boolean = false): void {
+            var project_name: string = button ? button.innerText || button.innerHTML.trim() : null;
+
             if (trash) {
                 // user click on trash icon
                 var trashAlert: Alert = new Alert({
                     title: model.UI.DELETE_PROJECT_ALERT_TITLE,
-                    body: model.UI.DELETE_PROJECT_ALERT_BODY.replace('[PROJECT]', button.innerText),
+                    body: model.UI.DELETE_PROJECT_ALERT_BODY.replace('[PROJECT]', project_name),
+                    input: 'project name to delete',
                     onApprove: () => {
-                        trashAlert.setWait()
-                        core.GitHub.deleteRepo(button.innerText, () => {
-                            // need to wait a little for ghapi to be updated
-                            setTimeout(() => {
-                                trashAlert.hide();
-                                this.update();
-                            }, 3000)
-                        })
+                        if (trashAlert.getInputValue() === project_name) {
+                            trashAlert.setWait()
+                            // remove github remote repository
+                            core.GitHub.deleteRepo(project_name, () => {
+                                // remove local folder
+                                core.Socket.emit(model.ServerAPI.SOCKET_REMOVE_DIR, { name: project_name }, () => {
+                                    // need to wait a little for ghapi to be updated
+                                    setTimeout(() => {
+                                        trashAlert.hide();
+                                        this.update();
+                                    }, 3000)
+                                })
+                            })
+                        }
                         // prevent alert closing on button click
                         return false;
                     },
@@ -137,7 +147,7 @@ module OctoBoot.controllers {
                 __this.clean_selected();
 
                 __this.selected = new core.Repos(
-                    button ? button.innerText || button.innerHTML.trim() : null,
+                    project_name,
                     button ? button.getAttribute('data-url') : null,
                     type,
                     button ? button : null)

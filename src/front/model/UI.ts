@@ -32,6 +32,6 @@ module OctoBoot.model {
         public static DELETE_FILE_ALERT_BODY: string = 'you are going to remove [FILE] - Are you sure about this ?';
 
         public static DELETE_PROJECT_ALERT_TITLE: string = 'Delete project';
-        public static DELETE_PROJECT_ALERT_BODY: string = 'Delete [PROJECT] - Are you sure about this ?';
+        public static DELETE_PROJECT_ALERT_BODY: string = 'Delete [PROJECT] - Are you sure about this ? please type the project name to confirm the deletion';
     }
 }
