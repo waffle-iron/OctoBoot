@@ -79,16 +79,16 @@ module OctoBoot.controllers {
 
         private handlers_repo(type: string): model.HTMLEvent {
             var __this = this;
-            return { click: function(e: MouseEvent) { __this.select_repo(__this, this, type, $(e.target).hasClass('trash')) } }
+            return { click: function(e: MouseEvent) { __this.select_repo.bind(__this)(this, type, $(e.target).hasClass('trash')) } }
         }
 
         private handlers_new_repo(type: string): model.HTMLEvent {
-            return { click: () => { this.select_repo(this, null, type) } }
+            return { click: () => { this.select_repo(null, type) } }
         }
 
         private handlers_template(): model.HTMLEvent {
             var __this = this;
-            return { click: function() { __this.select_template(__this, this) } }
+            return { click: function(e: MouseEvent) { __this.select_template.bind(__this)(this, $(e.target).hasClass('trash')) } }
         }
 
         private handler_new_template(): model.HTMLEvent {
@@ -105,48 +105,82 @@ module OctoBoot.controllers {
             }
         }
 
-        private select_template(__this: Sidebar, button: HTMLElement): void {
-            __this.jDom.sidebar({ closable: true });
-            __this.clean_selected();
-
-            __this.template = new core.Template(button.innerText || button.innerHTML.trim(), this.repo_template.clone_url, button);
+        private delete_alert(delete_name: string, done: (trashAlert: Alert) => any): void {
+            // user click on trash icon
+            var trashAlert: Alert = new Alert({
+                title: model.UI.DELETE_PROJECT_ALERT_TITLE,
+                body: model.UI.DELETE_PROJECT_ALERT_BODY.replace('[PROJECT]', delete_name),
+                input: 'project name to delete',
+                onApprove: () => {
+                    if (trashAlert.getInputValue() === delete_name) {
+                        trashAlert.setWait()
+                        done(trashAlert)
+                    }
+                    // prevent alert closing on button click
+                    return false;
+                },
+                onDeny: () => { }
+            })
         }
 
-        private select_repo(__this: Sidebar, button: HTMLElement, type: string, trash:boolean = false): void {
+        private delete_template(template_name: string): void {
+            this.delete_alert(template_name, (trashAlert: Alert) => {
+                core.Socket.emit(model.ServerAPI.SOCKET_REMOVE_DIR, { name: model.ServerAPI.TEMPLATE_REPO_NAME + '/' + template_name }, () => {
+                    core.Socket.emit(model.ServerAPI.SOCKET_SAVE, {
+                        name: model.ServerAPI.TEMPLATE_REPO_NAME,
+                        url: this.repo_template.clone_url,
+                        content: '',
+                    }, (error: string) => {
+                        trashAlert.hide();
+                        this.update();
+                    })
+                })
+            })
+        }
+
+        private select_template(button: HTMLElement, trash: boolean = false): void {
+            var template_name: string = button.innerText || button.innerHTML.trim();
+
+            if (trash) {
+                // user click on trash icon
+                this.delete_template(template_name);
+            } else {
+                // else user click on template, so select it
+                this.jDom.sidebar({ closable: true });
+                this.clean_selected();
+
+                this.template = new core.Template(template_name, this.repo_template.clone_url, button);
+            }
+        }
+
+        private delete_repo(project_name: string): void {
+            this.delete_alert(project_name, (trashAlert: Alert) => {
+                // remove github remote repository
+                core.GitHub.deleteRepo(project_name, () => {
+                    // remove local folder
+                    core.Socket.emit(model.ServerAPI.SOCKET_REMOVE_DIR, { name: project_name }, () => {
+                        // need to wait a little for ghapi to be updated
+                        setTimeout(() => {
+                            trashAlert.hide();
+                            this.update();
+                        }, 3000)
+                    })
+                })
+            })
+        }
+
+        private select_repo(button: HTMLElement, type: string, trash:boolean = false): void {
             var project_name: string = button ? button.innerText || button.innerHTML.trim() : null;
 
             if (trash) {
                 // user click on trash icon
-                var trashAlert: Alert = new Alert({
-                    title: model.UI.DELETE_PROJECT_ALERT_TITLE,
-                    body: model.UI.DELETE_PROJECT_ALERT_BODY.replace('[PROJECT]', project_name),
-                    input: 'project name to delete',
-                    onApprove: () => {
-                        if (trashAlert.getInputValue() === project_name) {
-                            trashAlert.setWait()
-                            // remove github remote repository
-                            core.GitHub.deleteRepo(project_name, () => {
-                                // remove local folder
-                                core.Socket.emit(model.ServerAPI.SOCKET_REMOVE_DIR, { name: project_name }, () => {
-                                    // need to wait a little for ghapi to be updated
-                                    setTimeout(() => {
-                                        trashAlert.hide();
-                                        this.update();
-                                    }, 3000)
-                                })
-                            })
-                        }
-                        // prevent alert closing on button click
-                        return false;
-                    },
-                    onDeny: () => {}
-                })
+                this.delete_repo(project_name);
             } else {
                 // else user click on repo, so select it
-                __this.jDom.sidebar({ closable: true });
-                __this.clean_selected();
+                this.jDom.sidebar({ closable: true });
+                this.clean_selected();
 
-                __this.selected = new core.Repos(
+                this.selected = new core.Repos(
                     project_name,
                     button ? button.getAttribute('data-url') : null,
                     type,
@@ -154,14 +188,14 @@ module OctoBoot.controllers {
 
                 // if no button, it's a repo creation
                 if (!button) {
-                    __this.selected.onCreate = (name: string, url: string) => {
+                    this.selected.onCreate = (name: string, url: string) => {
                         // update sideBar repo on new project
                         this.update();
 
                         // fill missing sidebarButton to change button state
                         // ugly timeout .. 
                         setTimeout(() => {
-                            __this.selected.sidebarButton = $('.Repos' + type.charAt(0).toUpperCase() + type.slice(1)).find('.repo' + name).get(0);
+                            this.selected.sidebarButton = $('.Repos' + type.charAt(0).toUpperCase() + type.slice(1)).find('.repo' + name).get(0);
                         }, 3000)
                     }
                 }   
