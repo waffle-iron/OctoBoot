@@ -15,6 +15,7 @@ var OctoBoot;
             ServerAPI.IS_LOGGED = '/api/isLogged/:sid';
             ServerAPI.GITHUB_LOGIN = '/api/GitHubApi/:sid';
             ServerAPI.UPLOAD = '/api/upload/:sid/:project/:filename';
+            ServerAPI.SOCKET_BIND = 'bind';
             ServerAPI.SOCKET_ID = 'sid';
             ServerAPI.SOCKET_COPY = 'cp';
             ServerAPI.SOCKET_LIST_TEMPLATE = 'templatesList';

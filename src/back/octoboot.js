@@ -89,23 +89,28 @@ var octoboot = function(app, socketIo) {
 
     socketIo.on("connection", function(socket) {
 
-        socket.on(modelApi.SOCKET_ID, function(data) {
-            var sid = data._sid || Date.now()
-            sockets[sid] = {s: socket}
-            socket.emit(data._scbk, sid)
-        })
+        socket.on(modelApi.SOCKET_BIND, function(data) {
+            
+            socket.on(modelApi.SOCKET_ID, function(data) {
+                var sid = data._sid || Date.now()
+                sockets[sid] = {s: socket}
+                socket.emit(data._scbk, sid)
+            })
 
-        socket.on(modelApi.SOCKET_SAVE, save(projectDir, sockets))
-        socket.on(modelApi.SOCKET_COPY, copy(projectDir, templateDir, sockets))
-        socket.on(modelApi.SOCKET_CLONE, clone(projectDir, sockets))
-        socket.on(modelApi.SOCKET_PUBLISH, publish(projectDir, sockets))
-        socket.on(modelApi.SOCKET_CONVERT, convert(projectDir, sockets))
-        socket.on(modelApi.SOCKET_LIST_DIR, list(projectDir, sockets))
-        socket.on(modelApi.SOCKET_LIST_FILES, ls(projectDir, sockets))
-        socket.on(modelApi.SOCKET_LIST_TEMPLATE, list(templateDir, sockets))
-        socket.on(modelApi.SOCKET_SCRAPP, scrapp(projectDir, sockets))
-        socket.on(modelApi.SOCKET_FILL_TEMPLATE, fill(projectDir, sockets))
-        socket.on(modelApi.SOCKET_REMOVE_FILE, rm(projectDir, sockets))
+            socket.on(modelApi.SOCKET_SAVE, save(projectDir, sockets))
+            socket.on(modelApi.SOCKET_COPY, copy(projectDir, templateDir, sockets))
+            socket.on(modelApi.SOCKET_CLONE, clone(projectDir, sockets))
+            socket.on(modelApi.SOCKET_PUBLISH, publish(projectDir, sockets))
+            socket.on(modelApi.SOCKET_CONVERT, convert(projectDir, sockets))
+            socket.on(modelApi.SOCKET_LIST_DIR, list(projectDir, sockets))
+            socket.on(modelApi.SOCKET_LIST_FILES, ls(projectDir, sockets))
+            socket.on(modelApi.SOCKET_LIST_TEMPLATE, list(templateDir, sockets))
+            socket.on(modelApi.SOCKET_SCRAPP, scrapp(projectDir, sockets))
+            socket.on(modelApi.SOCKET_FILL_TEMPLATE, fill(projectDir, sockets))
+            socket.on(modelApi.SOCKET_REMOVE_FILE, rm(projectDir, sockets))
+
+            socket.emit(data._scbk)
+        })
     })
 
     return function(req, res, next) {

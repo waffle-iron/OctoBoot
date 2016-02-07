@@ -8,6 +8,7 @@ module OctoBoot.model {
         public static GITHUB_LOGIN: string = '/api/GitHubApi/:sid';
         public static UPLOAD: string = '/api/upload/:sid/:project/:filename'
 
+        public static SOCKET_BIND: string = 'bind';
         public static SOCKET_ID: string = 'sid';
         public static SOCKET_COPY: string = 'cp';
         public static SOCKET_LIST_TEMPLATE: string = 'templatesList';

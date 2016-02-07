@@ -15,10 +15,12 @@ module OctoBoot.core {
 
             return {
                 then: (done: (sid: number) => any) => {
-                    this.emit(model.ServerAPI.SOCKET_ID, {}, (sid: number) => {
-                        this.sid = sid;
-                        localStorage.setItem(model.ServerAPI.SOCKET_ID, sid.toString());
-                        done(sid);
+                    this.emit(model.ServerAPI.SOCKET_BIND, {}, () => {
+                        this.emit(model.ServerAPI.SOCKET_ID, {}, (sid: number) => {
+                            this.sid = sid;
+                            localStorage.setItem(model.ServerAPI.SOCKET_ID, sid.toString());
+                            done(sid);
+                        })
                     })
                 }
             }
