@@ -42,6 +42,15 @@ module OctoBoot.core {
             .fail(this.throwError);
         }
 
+        public static deleteRepo(name: string, done: () => any): void {
+            $.ajax(this.getApiUrl() + name, {
+                type: 'DELETE',
+                headers: { 'Authorization': 'token ' + this.gat }
+            })
+            .done(done)
+            .fail(this.throwError);
+        }
+
         public static getBranch(repo: string, done: (branche: model.GitHubBranch) => any, branche: string = 'master'): void {
             $.getJSON(this.getApiUrl() + repo + '/branches/' + branche, { access_token: this.gat })
             .done(done)
@@ -84,7 +93,11 @@ module OctoBoot.core {
         }
 
         private static throwError(jqxhr: JQueryXHR, status: string, error: any): void {
-            console.error(error);
+            new controllers.Alert({
+                title: 'GitHub API Error',
+                body: error,
+                onApprove: () => {}
+            })
         }
 
         /*

@@ -80,7 +80,7 @@ var octoboot = function(app, socketIo) {
     app.post(modelApi.UPLOAD, upload)
 
     app.get(modelApi.IS_LOGGED, isLogged)
-    app.get(modelApi.GITHUB_LOGIN, ghapi.oauth(oauth))
+    app.get(modelApi.GITHUB_LOGIN, ghapi.oauth(oauth, 'repo,delete_repo'))
 
     // 404
     app.use(r404)
@@ -90,7 +90,7 @@ var octoboot = function(app, socketIo) {
     socketIo.on("connection", function(socket) {
 
         socket.on(modelApi.SOCKET_BIND, function(data) {
-            
+
             socket.on(modelApi.SOCKET_ID, function(data) {
                 var sid = data._sid || Date.now()
                 sockets[sid] = {s: socket}

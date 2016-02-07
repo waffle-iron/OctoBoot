@@ -159,7 +159,7 @@ module OctoBoot.core {
                     break;
 
                 case REPO_STATE.UNSELECT:
-                    if (this.sidebarButton) this.sidebarButton.innerHTML = this.name;
+                    if (this.sidebarButton) this.sidebarButton.innerHTML = this.name + ' <i class="trash icon" > </i>';
                     break;
             }
         }

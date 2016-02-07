@@ -78,7 +78,7 @@ module OctoBoot.controllers {
 
         private handlers_repo(type: string): model.HTMLEvent {
             var __this = this;
-            return { click: function() { __this.select_repo(__this, this, type) } }
+            return { click: function(e: MouseEvent) { __this.select_repo(__this, this, type, $(e.target).hasClass('trash')) } }
         }
 
         private handlers_new_repo(type: string): model.HTMLEvent {
@@ -111,26 +111,50 @@ module OctoBoot.controllers {
             __this.template = new core.Template(button.innerText || button.innerHTML.trim(), this.repo_template.clone_url, button);
         }
 
-        private select_repo(__this: Sidebar, button: HTMLElement, type: string): void {
-            __this.jDom.sidebar({ closable: true });
-            __this.clean_selected();
+        private select_repo(__this: Sidebar, button: HTMLElement, type: string, trash:boolean = false): void {
+            if (trash) {
+                // user click on trash icon
+                var trashAlert: Alert = new Alert({
+                    title: model.UI.DELETE_PROJECT_ALERT_TITLE,
+                    body: model.UI.DELETE_PROJECT_ALERT_BODY.replace('[PROJECT]', button.innerText),
+                    onApprove: () => {
+                        trashAlert.setWait()
+                        core.GitHub.deleteRepo(button.innerText, () => {
+                            // need to wait a little for ghapi to be updated
+                            setTimeout(() => {
+                                trashAlert.hide();
+                                this.update();
+                            }, 3000)
+                        })
+                        // prevent alert closing on button click
+                        return false;
+                    },
+                    onDeny: () => {}
+                })
+            } else {
+                // else user click on repo, so select it
+                __this.jDom.sidebar({ closable: true });
+                __this.clean_selected();
 
-            __this.selected = new core.Repos(
-                button ? button.innerText || button.innerHTML.trim() : null,
-                button ? button.getAttribute('data-url') : null,
-                type,
-                button ? button : null)
+                __this.selected = new core.Repos(
+                    button ? button.innerText || button.innerHTML.trim() : null,
+                    button ? button.getAttribute('data-url') : null,
+                    type,
+                    button ? button : null)
 
-            // if no button, it's a repo creation
-            if (!button) {
-                __this.selected.onCreate = (name: string, url: string) => {
-                    var repos: Array<model.GitHubRepo> = type === model.RepoType.PUBLIC ? this.repos_public : this.repos_private;
-                    // push a fake|temp repo on sidebar (GitHub api has some delay)
-                    repos.unshift(model.GitHubRepoTemplate({ name: name, clone_url: url }));
-                    this.update_view_repo(type, repos);
-                    // fill missing sidebarButton to change button state
-                    __this.selected.sidebarButton = $('.Repos' + type.charAt(0).toUpperCase() + type.slice(1)).find('.repo' + name).get(0);
-                }
+                // if no button, it's a repo creation
+                if (!button) {
+                    __this.selected.onCreate = (name: string, url: string) => {
+                        // update sideBar repo on new project
+                        this.update();
+
+                        // fill missing sidebarButton to change button state
+                        // ugly timeout .. 
+                        setTimeout(() => {
+                            __this.selected.sidebarButton = $('.Repos' + type.charAt(0).toUpperCase() + type.slice(1)).find('.repo' + name).get(0);
+                        }, 3000)
+                    }
+                }   
             }
         }
 

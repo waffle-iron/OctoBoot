@@ -5,6 +5,7 @@
         <a class="item {{bind newHandlers}}">NEW <i class="add circle icon"></i></a>
         {{#each repos}}
             <a class="item {{bind ../repoHandlers}} repo{{name}}" data-url="{{clone_url}}">
+            	<i class="trash icon"></i>
                 {{name}}
             </a>
         {{/each}}
