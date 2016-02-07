@@ -12,6 +12,7 @@ module OctoBoot.controllers {
         constructor(public repo: model.GitHubRepo, private done: () => any) {
             this.alert = new Alert({
                 title: 'Template url',
+                body: 'Give me a webiste url to scrapp',
                 onApprove: () => this.scrapp_template(),
                 onDeny: () => { return true },
                 icon: 'world',

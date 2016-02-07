@@ -10,7 +10,9 @@ module.exports = function(dir, sockets) {
         ghcli.checkout(baseUri, "gh-pages", error.cbk(function() {
             ghcli.reset(baseUri, "master", error.cbk(function() {
                 ghcli.push(sockets[data._sid].ghtoken, baseUri, data.url, "gh-pages", error.cbk(function() {
-                    sockets[data._sid].s.emit(data._scbk)
+                    ghcli.checkout(baseUri, "master", error.cbk(function() {
+                        sockets[data._sid].s.emit(data._scbk)
+                    }))
                 }), true)
             }))
         }))

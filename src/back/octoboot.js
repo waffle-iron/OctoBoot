@@ -41,7 +41,7 @@ function isLogged(req, res) {
 function oauth(req, res, access_token) {
     sockets[req.params.sid].s.emit("connected", req.signedCookies.gat)
     sockets[req.params.sid].ghtoken = access_token
-    res.cookie("gat", access_token, {signed: true}).redirect("/")
+    res.cookie("gat", access_token, {signed: true, maxAge: 30 * 24 * 60 * 60 * 1000}).redirect("/")
 }
 
 function r404(req, res, next) {
