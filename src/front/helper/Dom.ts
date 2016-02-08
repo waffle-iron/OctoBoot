@@ -32,5 +32,16 @@ module OctoBoot.helper {
 			}
 			
 		}
+
+		static setItemActive(jDom: JQuery, wich: string): void {
+            jDom.children('.item.active').removeClass('active');
+            jDom.children('.item.' + wich).addClass('active');
+        }
+
+        static setIconLoading(jDom: JQuery, wich: Array<string>, loading: boolean = true): void {
+            jDom.find((loading ? '.' + wich.join('.') : '.spinner.loading') + '.icon')
+                .removeClass(loading ? wich.join(' ') : 'spinner loading')
+                .addClass(loading ? 'spinner loading' : wich.join(' '));
+        }
 	}
 }

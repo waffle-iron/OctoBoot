@@ -6,6 +6,7 @@
 /// <reference path="../model/UI.ts" />
 /// <reference path="../core/Socket.ts" />
 /// <reference path="../helper/Dom.ts" />
+/// <reference path="../plugins/Plugins.ts" />
 
 module OctoBoot.controllers {
 
@@ -38,6 +39,10 @@ module OctoBoot.controllers {
             click: () => this.remove()
         };
 
+        public pluginsHandlers: model.HTMLEvent = {
+            click: () => this.plugins()
+        };
+
         private editBarHover: EditBar;
         private editBarClick: EditBar;
         private inputUpload: HTMLInputElement;
@@ -51,10 +56,23 @@ module OctoBoot.controllers {
 
             $('.Sidebar').sidebar('attach events', this.jDom.children('.settings'));
 
-            core.Socket.io.on('404', () => this.setItemActive('New'));
-            core.Socket.io.on('save_available', () => this.setItemActive('save'));
+            core.Socket.io.on('404', () => helper.Dom.setItemActive(this.jDom, 'New'));
+            core.Socket.io.on('save_available', () => helper.Dom.setItemActive(this.jDom, 'save'));
 
             this.inputUpload = $('input#upload').get(0) as HTMLInputElement;
+
+            this.initPlugins();
+        }
+
+        private initPlugins(): void {
+            let container: JQuery = this.jDom.find('.menu.plugins')
+            for (var name in OctoBoot.plugins) {
+                new OctoBoot.plugins[name](container).jDom.hide();
+            }
+        }
+
+        private plugins(): void {
+            this.jDom.find('.menu.plugins .item').toggle();
         }
 
         private create(): void {
@@ -66,7 +84,7 @@ module OctoBoot.controllers {
                 this.edit();
             }
 
-            this.setIconLoading(['save']);
+            helper.Dom.setIconLoading(this.jDom, ['save']);
 
             var doc: Document = this.stage.iframe.contentDocument;
 
@@ -108,10 +126,10 @@ module OctoBoot.controllers {
                 if (error) {
                     new Alert({ title: 'Error on save', body: error, onApprove: () => {}})
                 } else {
-                    this.setItemActive('publish');
+                    helper.Dom.setItemActive(this.jDom, 'publish');
                     this.stage.reload();
                 }
-                this.setIconLoading(['save'], false);
+                helper.Dom.setIconLoading(this.jDom, ['save'], false);
             });
         }
 
@@ -121,11 +139,11 @@ module OctoBoot.controllers {
                 body: model.UI.PUBLISH_ALERT_BODY,
                 onApprove: () => {
 
-                    this.setIconLoading(['cloud', 'upload']);
+                    helper.Dom.setIconLoading(this.jDom, ['cloud', 'upload']);
 
                     core.Socket.emit(model.ServerAPI.SOCKET_PUBLISH, { name: this.projectName, url: this.repoUrl }, () => {
 
-                        this.setIconLoading(['cloud', 'upload'], false);
+                        helper.Dom.setIconLoading(this.jDom, ['cloud', 'upload'], false);
 
                         core.GitHub.getUser((user: model.GitHubUser) => {
                             new Alert({
@@ -155,7 +173,7 @@ module OctoBoot.controllers {
             this.editing = !this.editing;
 
             if (this.editing) {
-                this.setItemActive('edit');
+                helper.Dom.setItemActive(this.jDom, 'edit');
                 if (basicEdit) {
                     container.children().get(0).contentEditable = "true";
                 } else {
@@ -166,7 +184,7 @@ module OctoBoot.controllers {
                 }
             } else {
                 // If not editing, destroy EditBar
-                this.setItemActive('null');
+                helper.Dom.setItemActive(this.jDom, 'null');
                 if (!basicEdit) {
                     this.editBarClick.destroy();
                     this.editBarHover.destroy();
@@ -179,7 +197,7 @@ module OctoBoot.controllers {
         private upload(): void {
             $(this.inputUpload).click();
             $(this.inputUpload).one('change', (e) => {
-                this.setIconLoading(['upload'], true);
+                helper.Dom.setIconLoading(this.jDom, ['upload'], true);
                 this.fileReader = new FileReader();
                 this.fileReader.readAsArrayBuffer(this.inputUpload.files[0])
                 this.fileReader.onloadend = (e: any) => {
@@ -189,7 +207,7 @@ module OctoBoot.controllers {
                             .replace(/:project/, this.projectName)
                             .replace(/:filename/, this.inputUpload.files[0].name))
                     xhr.onloadend = () => {
-                        this.setIconLoading(['upload'], false);
+                        helper.Dom.setIconLoading(this.jDom, ['upload'], false);
                         this.stage.refreshAndShowUrl();
 
                         if (xhr.status !== 200) {
@@ -268,18 +286,6 @@ module OctoBoot.controllers {
 
             // Editing flag for binded event
             this.stage.iframe.contentWindow['editing'] = true;
-        }
-
-        private setItemActive(wich: string): void {
-            this.jDom.children('.item.active').removeClass('active');
-            this.jDom.children('.item.' + wich).addClass('active');
-        }
-
-        private setIconLoading(wich: Array<string>, loading: boolean = true): void {
-            this.jDom
-                .find((loading ? '.' + wich.join('.') : '.spinner.loading') + '.icon')
-                .removeClass(loading ? wich.join(' ') : 'spinner loading')
-                .addClass(loading ? 'spinner loading' : wich.join(' '));
         }
 
     }

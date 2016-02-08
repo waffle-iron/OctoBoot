@@ -1,0 +1,78 @@
+<html>
+<head>
+	<title>Instagram</title>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<style type="text/css">
+		body {
+			margin: 0 8px 8px 0;
+		}
+	</style>
+</head>
+<body>
+	<div id="placeholder"></div>
+	<script type="text/javascript">
+		var previous_width
+		var parse_instagram_response = function(resp) {
+			$("#placeholder").html(resp.html)
+			resize()
+		}
+
+		var resize = function() {
+			var current_width = document.body.offsetWidth
+			if (previous_width !== current_width) {
+				window.parent.document.getElementsByTagName('iframe')[0].style.height = (document.body.offsetHeight + 20) + 'px'
+				previous_width = current_width
+			}
+		}
+
+		var get_instagram_data = function(done) {
+			if (location.search) {
+				$.get(
+					'http://octoboot.soizen.ovh/stringfromurl/https%3A%2F%2Fwww.instagram.com%2F' +
+					location.search.replace('?', '') + '%2F', function(html) {
+						var obj = html.match(/(window\._sharedData.*);</)
+						if (obj.length && obj.length === 2) {
+							eval(obj[1])
+							done()
+						}
+
+				})
+			} else {
+				console.error('instagram module error: user name missing on location')
+			}
+		}
+
+		var get_instagram_media = function(id) {
+			try {
+				var code = window._sharedData.entry_data.ProfilePage[0].user.media.nodes[id].code;
+
+				$.ajax({
+				    url: 'https://api.instagram.com/oembed/?url=https://www.instagram.com/p/' + code,
+
+				    // The name of the callback parameter, as specified by the YQL service
+				    jsonp: "callback",
+
+				    // Tell jQuery we're expecting JSONP
+				    dataType: "jsonp",
+
+
+				    // Work with the response
+				    success: function( response ) {
+				        parse_instagram_response(response)
+				    }
+				});
+			} catch (e) {
+				console.error('get instagram media fail', e)
+			}
+		}
+
+		window.addEventListener('resize', resize)
+
+		get_instagram_data(function() {
+			get_instagram_media(0)
+		})
+
+	</script>
+
+</body>
+</html>

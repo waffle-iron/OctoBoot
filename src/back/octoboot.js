@@ -18,6 +18,7 @@ fill = require("./modules/fill.js"),
 rm = require("./modules/rm.js"),
 rmdir = require("./modules/rmdir.js"),
 sfu = require("./modules/string_from_url.js"),
+upload = require("./modules/upload.js"),
 // Model API share with front
 modelApi = require("./model/serverapi.js"),
 // GitHub conf
@@ -59,27 +60,11 @@ function r404(req, res, next) {
     res.status(404).sendFile(pa.resolve(__dirname + "/../../static/404.html"))
 }
 
-function upload(req, res) {
-    var file, dir = projectDir + req.params.sid + "/" + req.params.project + "/uploads/";
-
-    req.on('data', function(chunk) {
-        file = file ? buffer.Buffer.concat([file, chunk]) : chunk
-    })
-
-    req.on('end', function() {
-        fs.mkdir(dir , function() {
-            fs.writeFile(dir + req.params.filename, file, function(error) {
-                res.status(error ? 503 : 200).send()
-            })
-        })
-    })
-}
-
 var octoboot = function(app, socketIo) {
     app.use(cookieParser("octoboot"))
     app.use(cookieSession({ secret: "octoboot"}))
 
-    app.post(modelApi.UPLOAD, upload)
+    app.post(modelApi.UPLOAD, upload(projectDir))
 
     app.get(modelApi.IS_LOGGED, isLogged)
     app.get(modelApi.GITHUB_LOGIN, ghapi.oauth(oauth, 'repo,delete_repo'))
