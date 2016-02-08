@@ -17,6 +17,7 @@ scrapp = require("./modules/scrapp.js"),
 fill = require("./modules/fill.js"),
 rm = require("./modules/rm.js"),
 rmdir = require("./modules/rmdir.js"),
+sfu = require("./modules/string_from_url.js"),
 // Model API share with front
 modelApi = require("./model/serverapi.js"),
 // GitHub conf
@@ -82,6 +83,9 @@ var octoboot = function(app, socketIo) {
 
     app.get(modelApi.IS_LOGGED, isLogged)
     app.get(modelApi.GITHUB_LOGIN, ghapi.oauth(oauth, 'repo,delete_repo'))
+
+    // custom module utilities (instagram / etc..)
+    app.get("/stringfromurl/:url", sfu)
 
     // 404
     app.use(r404)
