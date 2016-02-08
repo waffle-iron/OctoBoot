@@ -13,7 +13,7 @@ module.exports = function(req, res) {
 	    });
 
 	    getres.on("end", function () {
-	        res.send(data)
+	        res.set('Access-Control-Allow-Origin', '*').send(data)
 	    });
 	})
 }
