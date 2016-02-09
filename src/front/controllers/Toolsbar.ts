@@ -6,7 +6,7 @@
 /// <reference path="../model/UI.ts" />
 /// <reference path="../core/Socket.ts" />
 /// <reference path="../helper/Dom.ts" />
-/// <reference path="../plugins/Plugins.ts" />
+/// <reference path="../plugins/Ref.ts" />
 
 module OctoBoot.controllers {
 
@@ -67,7 +67,7 @@ module OctoBoot.controllers {
         private initPlugins(): void {
             let container: JQuery = this.jDom.find('.menu.plugins')
             for (var name in OctoBoot.plugins) {
-                new OctoBoot.plugins[name](container).jDom.hide();
+                new OctoBoot.plugins[name]().init(container, this.stage).hide();
             }
         }
 

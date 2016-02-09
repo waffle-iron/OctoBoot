@@ -2,12 +2,11 @@
 
 module OctoBoot.plugins {
 
-    export class Instagram extends controllers.Handlebar implements Plugin {
+    export class Instagram extends Plugin {
 
-    	constructor(public container: JQuery) {
-    		super('InstagramButton.hbs')
-    		this.initWithContext(this, container)
-    	}
+        constructor() {
+            super('InstagramButton.hbs')
+        }
 
     }
 }
