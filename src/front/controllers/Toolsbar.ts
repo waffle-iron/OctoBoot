@@ -109,6 +109,7 @@ module OctoBoot.controllers {
                     new Alert({ title: 'Error on save', body: error, onApprove: () => {}})
                 } else {
                     this.setItemActive('publish');
+                    this.stage.reload();
                 }
                 this.setIconLoading(['save'], false);
             });
@@ -206,7 +207,7 @@ module OctoBoot.controllers {
                 title: model.UI.DELETE_FILE_ALERT_TITLE,
                 body: model.UI.DELETE_FILE_ALERT_BODY.replace('[FILE]', this.stage.url),
                 onApprove: () => {
-                    
+
                     core.Socket.emit(model.ServerAPI.SOCKET_REMOVE_FILE, { uri: this.stage.url }, (error: string) => {
                         if (!error) {
                             alert.hide()
@@ -219,7 +220,7 @@ module OctoBoot.controllers {
 
                     // prevent modal to close
                     return false
-                }, 
+                },
                 onDeny: () => {}
             })
         }
