@@ -149,7 +149,7 @@ module OctoBoot.controllers {
                 this.jDom.sidebar({ closable: true });
                 this.clean_selected();
 
-                this.template = new core.Template(template_name, this.repo_template.clone_url, button);
+                this.template = new core.Template(template_name, this.repo_template.clone_url, this.jDom, button);
             }
         }
 
@@ -184,6 +184,7 @@ module OctoBoot.controllers {
                     project_name,
                     button ? button.getAttribute('data-url') : null,
                     type,
+                    this.jDom,
                     button ? button : null)
 
                 // if no button, it's a repo creation

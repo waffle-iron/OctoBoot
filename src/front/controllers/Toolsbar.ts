@@ -48,13 +48,13 @@ module OctoBoot.controllers {
         private inputUpload: HTMLInputElement;
         private fileReader: FileReader;
 
-        constructor(public projectName: string, public stage: Stage, public repoUrl: string) {
+        constructor(public projectName: string, public stage: Stage, public repoUrl: string, public sidebar: JQuery) {
             super(model.UI.HB_TOOLSBAR);
             this.initWithContext(this, this.stage.jDom);
 
             this.templates = new Templates(this.projectName, this.stage);
 
-            $('.Sidebar').sidebar('attach events', this.jDom.children('.settings'));
+            this.sidebar.sidebar('attach events', this.jDom.children('.settings'));
 
             core.Socket.io.on('404', () => helper.Dom.setItemActive(this.jDom, 'New'));
             core.Socket.io.on('save_available', () => helper.Dom.setItemActive(this.jDom, 'save'));

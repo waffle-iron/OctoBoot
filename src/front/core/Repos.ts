@@ -24,7 +24,7 @@ module OctoBoot.core {
         private alertConvert: controllers.Alert;
         private alertCreate: controllers.Alert;
 
-        constructor (public name: string, public url: string, public type: string, public sidebarButton?: HTMLElement) {
+        constructor (public name: string, public url: string, public type: string, public sidebar: JQuery, public sidebarButton?: HTMLElement) {
             if (!name) {
                 this.create(type);
             } else {
@@ -70,7 +70,7 @@ module OctoBoot.core {
 
             this.setState(REPO_STATE.SELECT);
             this.stage = new controllers.Stage(url);
-            this.toolsbar = new controllers.Toolsbar(this.name, this.stage, this.url);
+            this.toolsbar = new controllers.Toolsbar(this.name, this.stage, this.url, this.sidebar);
         }
 
         private didConvertRepoToOctoBoot(done: (convert: boolean) => any): void {
@@ -155,7 +155,7 @@ module OctoBoot.core {
 
                 case REPO_STATE.SELECT:
                     if (this.sidebarButton) this.sidebarButton.innerHTML = this.name + ' <i class="checkmark icon" > </i>';
-                    $(helper.HandlebarHelper.formatId(model.UI.HB_SIDEBAR, '.')).sidebar('toggle');
+                    this.sidebar.sidebar('toggle');
                     break;
 
                 case REPO_STATE.UNSELECT:
