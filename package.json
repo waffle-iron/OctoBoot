@@ -10,7 +10,7 @@
     "build:ts": "tsc src/front/OctoBoot.ts --removeComments --sourceMap --out dist/octoboot.js && uglifyjs dist/octoboot.js -o dist/octoboot.js --mangle --compress",
     "build:model": "tsc src/front/model/ServerApi.ts --out src/back/model/serverapi.js && echo 'module.exports = OctoBoot.model.ServerAPI' >> src/back/model/serverapi.js",
     "watch:ts": "watch 'date +\"%m-%d-%Y %T\" && npm run build:ts' src/front/",
-    "build:handlebars": "handlebars src/front/view/*.hbs src/front/plugins/**/*.hbs -f dist/handlebars_templates.min.js",
+    "build:handlebars": "handlebars src/front/view/*.hbs src/front/plugins/*.hbs src/front/plugins/**/*.hbs -f dist/handlebars_templates.min.js",
     "watch:handlebars": "watch 'date +\"%m-%d-%Y %T\" && npm run build:handlebars' src/front/view/ src/front/plugins/"
   },
   "repository": {

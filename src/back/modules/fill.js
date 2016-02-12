@@ -1,4 +1,4 @@
-var copy = require("./copy.js")
+var copy_template = require("./copy_template.js")
 var error = require("./error.js")
 var api = require("../model/serverapi.js")
 var ghcli = require("github-cli")
@@ -15,7 +15,7 @@ module.exports = function(dir, sockets) {
 
         error.init(sockets[data._sid].s, _scbk)
 
-        copy(dir, dirToSave, null, error.cbk(function() {
+        copy_template(dir, dirToSave, null, error.cbk(function() {
             ghcli.add(baseUri, "-A", error.cbk(function() {
                 ghcli.commit(baseUri, "Octoboot - " + new Date().toString(), error.cbk(function() {
                     ghcli.pull(baseUri, error.cbk(function() {

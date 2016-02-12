@@ -11,7 +11,7 @@
 <body>
     <div id="placeholder"></div>
     <script type="text/javascript">
-        var previous_width
+        var previous_width, iframe_data = []
         var parse_instagram_response = function(resp) {
             $("#placeholder").html(resp.html)
             resize()
@@ -20,16 +20,17 @@
         var resize = function() {
             var current_width = document.body.offsetWidth
             if (previous_width !== current_width) {
-                window.parent.document.getElementsByTagName('iframe')[0].style.height = (document.body.offsetHeight + 20) + 'px'
+                $(window.parent.document).find('iframe.' + iframe_data[1]).css('height', (document.body.offsetHeight + 20) + 'px')
                 previous_width = current_width
             }
         }
 
         var get_instagram_data = function(done) {
             if (location.search) {
+                iframe_data = location.search.replace('?', '').split('|')
                 $.get(
                     'http://octoboot.soizen.ovh/stringfromurl/https%3A%2F%2Fwww.instagram.com%2F' +
-                    location.search.replace('?', '') + '%2F', function(html) {
+                    iframe_data[0] + '%2F', function(html) {
                         var obj = html.match(/(window\._sharedData.*);</)
                         if (obj.length && obj.length === 2) {
                             eval(obj[1])

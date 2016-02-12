@@ -7,6 +7,7 @@ module OctoBoot.model {
         focus?: (e: FocusEvent) => any;
         mouseover?: (e: MouseEvent) => any;
         dragstart?: (e: DragEvent) => any;
+        dragend?: (e: DragEvent) => any;
         // TODO ADD MORE :)
     }
 }
