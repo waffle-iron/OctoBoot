@@ -38,6 +38,8 @@ module OctoBoot.controllers {
         private interval: number;
         // current position
         private rect: ClientRect;
+        // iframe edition overlay
+        private iframes_overlay: JQuery[];
 
         constructor(public container: JQuery, public stage: Stage) {
             super(model.UI.HB_EDITBAR);
@@ -78,7 +80,25 @@ module OctoBoot.controllers {
             CKEDITOR.config.allowedContent = true
         }
 
+        // we can't handle mouseover and click on iframe, and subframe etc.. 
+        // so put an overlay over it with related iframe on overlay's data to handle properly
+        public init_iframes_overlay(): void {
+            this.remove_iframe_overlay();
+            
+            this.iframes_overlay = [];
+            this.container.find('iframe').each((i: number, iframe: HTMLIFrameElement) => {
+                this.iframes_overlay.push(
+                    new Handlebar(model.UI.HB_EDITBAR_IFRAME_OVERLAY)
+                    .initWithContext(this.getRect(iframe), this.container)
+                    .data('referer', iframe)
+                )
+            })
+        }
+
         public show(element: HTMLElement, document: Document): void {
+            // if we are over iframe_overlay, get related iframe element, else keep it
+            element = this.is_iframe_overlay(element)
+
             if (element.getBoundingClientRect) {
                 this.editingElement = element;
                 this.editingDocument = document;
@@ -117,10 +137,21 @@ module OctoBoot.controllers {
         public destroy(): void {
             this.hide();
             this.iframe.jDom.remove();
+            this.remove_iframe_overlay();
+        }
+
+        private remove_iframe_overlay(): void {
+            if (this.iframes_overlay && this.iframes_overlay.length) {
+                this.iframes_overlay.forEach((io: JQuery) => io.remove())
+            }
+        }
+
+        private is_iframe_overlay(element: HTMLElement): HTMLElement {
+            return element.className === 'iframeoverlay' ? $(element).data('referer') as any : element
         }
 
         private position(element: HTMLElement, document: Document): void {
-            var rect: ClientRect = this.getRect(element, document);
+            var rect: ClientRect = this.getRect(element);
 
             if (JSON.stringify(this.rect) !== JSON.stringify(rect)) {
                 var down: boolean = rect.top - this.height < 0;
@@ -150,12 +181,12 @@ module OctoBoot.controllers {
             }
         }
 
-        private getRect(element: Element, document: Document): ClientRect {
+        private getRect(element: Element): ClientRect {
             var rect: ClientRect = element.getBoundingClientRect();
             return {
-                top: rect.top + $(document).scrollTop() - this.margin,
+                top: rect.top + $(element.ownerDocument).scrollTop() - this.margin,
                 left: rect.left - this.margin,
-                bottom: rect.bottom + $(document).scrollTop() + this.margin,
+                bottom: rect.bottom + $(element.ownerDocument).scrollTop() + this.margin,
                 right: rect.right + this.margin,
                 width: rect.width + (this.margin * 2),
                 height: rect.height + (this.margin * 2)
@@ -164,7 +195,6 @@ module OctoBoot.controllers {
 
         private duplicate(): void {
             var duplicable_parents: JQuery = $(this.editingElement).parents('li');
-            console.log('duplicateparent', duplicable_parents)
             var toDuplicate: JQuery = duplicable_parents.length ? duplicable_parents : $(this.editingElement);
             var duplicateElement: JQuery = toDuplicate.clone();
             duplicateElement.insertAfter(duplicable_parents.length ? duplicable_parents : this.editingElement);
@@ -172,6 +202,7 @@ module OctoBoot.controllers {
 
         private remove(): void {
             $(this.editingElement).remove();
+            this.editingElement = null;
             this.hide();
         }
 
@@ -183,15 +214,17 @@ module OctoBoot.controllers {
 
         private appendSpecialButton(element: Element): void {
             this.iframeBody.find('.button.special').hide();
+            let tag: string = element.tagName.toLowerCase();
 
             // if it's an CKEDITOR editable element (text/div/etc)
-            if (CKEDITOR.dtd.$editable[element.tagName.toLowerCase()]) {
+            if (CKEDITOR.dtd.$editable[tag]) {
                 this.iframeBody.find('.special.ckeditor').show();
             }
 
-            // if it's an image, allow to swich src
-            if (element.tagName.toUpperCase() === 'IMG') {
-                this.iframeBody.find('.special.img').show();
+            switch (tag) {
+                case 'img':
+                    this.iframeBody.find('.special.img').show();
+                    break
             }
 
             // fill tag button with element tag name
@@ -210,7 +243,7 @@ module OctoBoot.controllers {
 
                 var position = (evt: CKEDITOR.eventInfo) => {
                     this.editor_dom = $('.cke');
-                    var rect: ClientRect = this.getRect(this.editingElement, document);
+                    var rect: ClientRect = this.getRect(this.editingElement);
                     var down: boolean = rect.top - this.editor_dom.height() < 0;
 
                     this.editor_dom.css({

@@ -181,6 +181,7 @@ module OctoBoot.controllers {
                     // create or reset EditBar on click and hover (need two different EditBar)
                     this.editBarClick = new EditBar(container, this.stage);
                     this.editBarHover = new EditBar(container, this.stage);
+                    this.editBarHover.init_iframes_overlay();
                 }
             } else {
                 // If not editing, destroy EditBar
