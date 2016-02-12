@@ -12,7 +12,14 @@ module.exports = function(dir, sockets) {
             if (err && stderr.indexOf("already exists") !== -1) {
                 // Project already cloned, just refresh it
                 ghcli.pull(baseUri + "/" + data.name, function(perr, pstdout, pstderr) {
-                    sockets[data._sid].s.emit(data._scbk, perr ? pstderr : null)
+                    if (perr) {
+                        // WARN TODO pull error, generally change not saved before, erase for now, but TODO alert and give user choice to comit change
+                        ghcli.reset(baseUri + "/" + data.name, 'master', function(perr, pstdout, pstderr) {
+                            sockets[data._sid].s.emit(data._scbk, perr ? pstderr : null)
+                        })
+                    } else {
+                        sockets[data._sid].s.emit(data._scbk, null)
+                    }
                 })
             } else {
                 sockets[data._sid].s.emit(data._scbk, null)
