@@ -12,6 +12,14 @@ module OctoBoot.controllers {
         public iframe: HTMLIFrameElement;
         public baseUrl: string;
 
+        private files_weight_order = {
+            html: 6,
+            png: 5,
+            jpg: 4,
+            css: 3,
+            js: 2
+        };
+
         constructor(public url: string = '/logo.html') {
             super(model.UI.HB_STAGE);
             this.showAdress = url !== '/logo.html';
@@ -53,6 +61,12 @@ module OctoBoot.controllers {
             core.Socket.emit(model.ServerAPI.SOCKET_LIST_FILES, { dir: dirToInspect }, (data: string[]) => {
                 // filter files
                 //let dirs: string[] = data.map((v: string) => { return v.split(dirToInspect).pop() }) //data.filter((value: string, i: number, a: string[]) => { return value === 'index.html' || !value.match(/(?:\.|bootstrap|assets)/) });
+                data.sort((a: string, b: string) => {
+                    let aw: number = this.files_weight_order[a.split('.').pop()] || 1
+                    let bw: number = this.files_weight_order[b.split('.').pop()] || 1
+                    return bw - aw
+                })
+                
                 data.forEach((dir: string, i: number, a: string[]) => {
                     // and append it to dropdown
                     this.jDom.find('.dropdown .menu').append('<div class="item">/' + this.url.split('/')[1] + '/' + dir + '</div>');

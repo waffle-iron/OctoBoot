@@ -67,7 +67,9 @@ module OctoBoot.controllers {
         private initPlugins(): void {
             let container: JQuery = this.jDom.find('.menu.plugins')
             for (var name in OctoBoot.plugins) {
-                new OctoBoot.plugins[name]().init(container, this.stage, this.projectName).hide();
+                new OctoBoot.plugins[name]()
+                .init(container, this.stage, this.projectName)
+                .hide();
             }
         }
 
