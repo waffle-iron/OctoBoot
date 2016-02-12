@@ -10,7 +10,8 @@ module OctoBoot.model {
 
         public static SOCKET_BIND: string = 'bind';
         public static SOCKET_ID: string = 'sid';
-        public static SOCKET_COPY: string = 'cp';
+        public static SOCKET_COPY_TEMPLATE: string = 'cpTemplate';
+        public static SOCKET_COPY_PLUGIN: string = 'cpPlugin';
         public static SOCKET_LIST_TEMPLATE: string = 'templatesList';
         public static SOCKET_LIST_DIR: string = 'dirList';
         public static SOCKET_LIST_FILES: string = 'ls';

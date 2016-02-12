@@ -13,7 +13,7 @@ module OctoBoot.core {
 
         private toolsbar: controllers.Toolsbar;
 
-        constructor(public name: string, public repo_url: string, public sidebarButton?: HTMLElement) {
+        constructor(public name: string, public repo_url: string, public sidebar: JQuery, public sidebarButton?: HTMLElement) {
             this.setState(REPO_STATE.LOADING);
             this.open(model.ServerAPI.getProjectPath(Socket.sid, model.ServerAPI.TEMPLATE_REPO_NAME) + name);
         }
@@ -28,7 +28,7 @@ module OctoBoot.core {
         private open(url: string): void {
             this.setState(REPO_STATE.SELECT);
             this.stage = new controllers.Stage(url);
-            this.toolsbar = new controllers.Toolsbar(model.ServerAPI.TEMPLATE_REPO_NAME, this.stage, this.repo_url);
+            this.toolsbar = new controllers.Toolsbar(model.ServerAPI.TEMPLATE_REPO_NAME, this.stage, this.repo_url, this.sidebar);
         }
 
         private setState(state: REPO_STATE): void {

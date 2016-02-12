@@ -5,6 +5,9 @@ module OctoBoot.model {
         keyup?: (e: KeyboardEvent) => any;
         context?: JQuery;
         focus?: (e: FocusEvent) => any;
+        mouseover?: (e: MouseEvent) => any;
+        dragstart?: (e: DragEvent) => any;
+        dragend?: (e: DragEvent) => any;
         // TODO ADD MORE :)
     }
 }

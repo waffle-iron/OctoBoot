@@ -13,12 +13,21 @@ module OctoBoot.controllers {
             this.hbClassName = helper.HandlebarHelper.formatId(hbTemplate, '.');
         }
 
-        initWithContext(context: any, customContainer?: JQuery): JQuery {
+        public getHtml(context: any): string {
+            if (Handlebars.templates[this.hbTemplate]) {
+                return Handlebars.templates[this.hbTemplate](context)
+            } else {
+                console.error('Handlebar error for', this.hbTemplate, 'template not found')
+                return ''
+            }
+        }
+
+        public initWithContext(context: any, customContainer?: JQuery): JQuery {
             // If main container are not ready yet, append on body, sidebar pusher will take everything in body and put in on pusher
             var container: JQuery = customContainer ? customContainer : $(model.UI.MAIN_CONTAINER).length ? $(model.UI.MAIN_CONTAINER) : $(document.body)
-            container.append(Handlebars.templates[this.hbTemplate](context));
+            container.append(this.getHtml(context));
 
-            this.jDom = container.find(this.hbClassName).last();
+            this.jDom = container.children().last()
 
             return this.jDom;
         }

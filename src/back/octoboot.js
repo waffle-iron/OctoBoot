@@ -10,7 +10,8 @@ convert = require("./modules/convert.js"),
 clone = require("./modules/clone.js"),
 list = require("./modules/list.js"),
 ls = require("./modules/ls.js"),
-copy = require("./modules/copy.js"),
+copy_template = require("./modules/copy_template.js"),
+copy_plugin = require("./modules/copy_plugin.js"),
 save = require("./modules/save.js"),
 publish = require("./modules/publish.js"),
 scrapp = require("./modules/scrapp.js"),
@@ -18,6 +19,7 @@ fill = require("./modules/fill.js"),
 rm = require("./modules/rm.js"),
 rmdir = require("./modules/rmdir.js"),
 sfu = require("./modules/string_from_url.js"),
+upload = require("./modules/upload.js"),
 // Model API share with front
 modelApi = require("./model/serverapi.js"),
 // GitHub conf
@@ -29,7 +31,8 @@ ghcli.debug = true
 
 var sockets = []
 var projectDir = __dirname + "/../../temp/"
-var templateDir = __dirname + "/../../static/templates"
+var templateDir = __dirname + "/../../static/templates/"
+var pluginDir = __dirname + "/../front/plugins/"
 
 function isLogged(req, res) {
     if (!req.signedCookies.gat) {
@@ -59,27 +62,11 @@ function r404(req, res, next) {
     res.status(404).sendFile(pa.resolve(__dirname + "/../../static/404.html"))
 }
 
-function upload(req, res) {
-    var file, dir = projectDir + req.params.sid + "/" + req.params.project + "/uploads/";
-
-    req.on('data', function(chunk) {
-        file = file ? buffer.Buffer.concat([file, chunk]) : chunk
-    })
-
-    req.on('end', function() {
-        fs.mkdir(dir , function() {
-            fs.writeFile(dir + req.params.filename, file, function(error) {
-                res.status(error ? 503 : 200).send()
-            })
-        })
-    })
-}
-
 var octoboot = function(app, socketIo) {
     app.use(cookieParser("octoboot"))
     app.use(cookieSession({ secret: "octoboot"}))
 
-    app.post(modelApi.UPLOAD, upload)
+    app.post(modelApi.UPLOAD, upload(projectDir))
 
     app.get(modelApi.IS_LOGGED, isLogged)
     app.get(modelApi.GITHUB_LOGIN, ghapi.oauth(oauth, 'repo,delete_repo'))
@@ -103,7 +90,8 @@ var octoboot = function(app, socketIo) {
             })
 
             socket.on(modelApi.SOCKET_SAVE, save(projectDir, sockets))
-            socket.on(modelApi.SOCKET_COPY, copy(projectDir, templateDir, sockets))
+            socket.on(modelApi.SOCKET_COPY_TEMPLATE, copy_template(projectDir, templateDir, sockets))
+            socket.on(modelApi.SOCKET_COPY_PLUGIN, copy_plugin(projectDir, pluginDir, sockets))
             socket.on(modelApi.SOCKET_CLONE, clone(projectDir, sockets))
             socket.on(modelApi.SOCKET_PUBLISH, publish(projectDir, sockets))
             socket.on(modelApi.SOCKET_CONVERT, convert(projectDir, sockets))
