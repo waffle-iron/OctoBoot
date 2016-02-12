@@ -17,7 +17,7 @@ module OctoBoot.plugins {
                 onApprove: () => {
                     let account_name: string = alert.getInputValue();
                     let html: string = new controllers.Handlebar('InstagramInline.hbs').getHtml({ account_name: account_name, iframe_id: Date.now() });
-                    this.copyFileInProject('instagram/instagram.html', (error: string) => {
+                    this.copyFileInProject('instagram/instagram.html', () => {
                         cbk(html);
                     })
                 }, 

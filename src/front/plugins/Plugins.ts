@@ -41,11 +41,17 @@ module OctoBoot {
             cbk('')
         }
 
-        public copyFileInProject(uri: string, done: (error: string) => any): void {
+        public copyFileInProject(uri: string, done: () => any): void {
             core.Socket.emit(model.ServerAPI.SOCKET_COPY_PLUGIN, {
                 file: uri,
                 project: this.projectName
-            }, done)
+            }, (error: string) => {
+                if (error) {
+                    new controllers.Alert({title: 'Error on plugin creation', body: error, onApprove: () => {}})
+                } else {
+                    done()
+                }
+            })
         }
 
         private stick(): void {
