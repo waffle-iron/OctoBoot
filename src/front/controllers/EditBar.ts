@@ -61,7 +61,7 @@ module OctoBoot.controllers {
 
                 // activate popup on edit button
                 this.iframeBody.find('.button.topleft').popup({ inline: true, position: 'top left' });
-                this.iframeBody.find('.button.topright').popup({ inline: true, position: 'top left' });
+                this.iframeBody.find('.button.topright').popup({ inline: true, position: 'top right' });
 
                 this.iframeBody.css('background', 'none'); // semantic-ui put a *** background on body
 
@@ -125,6 +125,7 @@ module OctoBoot.controllers {
         public hide(): void {
             clearInterval(this.interval);
             this.interval = null;
+            this.rect = null;
 
             this.iframe.jDom.hide();
             this.border(null);
@@ -247,9 +248,9 @@ module OctoBoot.controllers {
         */
 
         private fillTagButton(element: Element): void {
-            let button: JQuery = this.iframeBody.find('.button').last();
             // Fill button with current tag name
-            button.html(element.tagName);
+            this.iframeBody.find('.button.tag .visible.content').html(element.tagName);
+            this.iframeBody.find('.button.tag').next().html('select parent > ' + element.parentElement.tagName.toLowerCase());
         }
 
         /**
@@ -298,7 +299,7 @@ module OctoBoot.controllers {
                     this.editor_dom = $('.cke');
                     var rect: ClientRect = this.getRect(this.editingElement);
                     var down: boolean = rect.top - this.editor_dom.height() < 0;
-                    
+
                     this.editor_dom.css({
                         'top': (down ? rect.bottom : rect.top - this.editor_dom.height()) + 35,
                         'left': Math.abs((rect.right - this.editor_dom.width()) - this.jDom.width() + 84),
@@ -411,6 +412,11 @@ module OctoBoot.controllers {
                 },
                 move: {
                     click: () => this.move()
+                },
+                parent: {
+                    mouseover: () => this.border(this.getRect(this.editingElement.parentElement)),
+                    mouseout: () => this.border(this.getRect(this.editingElement)),
+                    click: () => this.show(this.editingElement.parentElement)
                 }
             }, (key: string, handlers: model.HTMLEvent) => handlers.context = context)
         }

@@ -265,6 +265,7 @@ module OctoBoot.controllers {
                 if (this.editing && !this.editBarClick.editingElement) {
                     // if we are in editing mode, and nothing currently in edition, active edit bar
                     this.editBarClick.show(element);
+                    this.editBarHover.hide();
                 } else if (
                     // if we've not click on ckeditor
                     (!this.editBarClick.editor_dom || !helper.Dom.hasParent(element, this.editBarClick.editor_dom.get(0))) &&
@@ -274,7 +275,6 @@ module OctoBoot.controllers {
                     !helper.Dom.mouseIsOverElement(e.originalEvent as MouseEvent, this.editBarClick.editingElement)) {
                     // disable edit bar (so reactive on mousemove)
                     this.editBarClick.hide();
-                    this.editBarHover.hide();
                 }
             }
 
