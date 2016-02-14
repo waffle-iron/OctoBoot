@@ -1,4 +1,6 @@
 /// <reference path="Handlebar.ts" />
+/// <reference path="Alert.ts" />
+/// <reference path="Stage.ts" />
 /// <reference path="../model/UI.ts" />
 /// <reference path="../model/HTMLEvent.ts" />
 /// <reference path="../definition/ckeditor.d.ts" />
@@ -13,7 +15,6 @@ module OctoBoot.controllers {
 
         // current editing element
         public editingElement: HTMLElement;
-        public editingDocument: HTMLDocument;
 
         // text editor
         public editor: CKEDITOR.editor;
@@ -25,7 +26,7 @@ module OctoBoot.controllers {
 
         // width / height and margin of global EditBar
         private width: number = (this.buttonWidth * this.buttonNum) + (this.buttonNum  * 2); // give some extra space for targeted tag (can be one letter like A but also SPAN etc..)
-        private height: number = 150;
+        private height: number = 80;
         private margin: number = 5;
 
         // lines who border the editing element
@@ -95,24 +96,31 @@ module OctoBoot.controllers {
             })
         }
 
-        public show(element: HTMLElement, document: Document): void {
+        /**
+        *    Show EditBar
+        */
+
+        public show(element: HTMLElement): void {
             // if we are over iframe_overlay, get related iframe element, else keep it
             element = this.is_iframe_overlay(element)
 
             if (element.getBoundingClientRect) {
                 this.editingElement = element;
-                this.editingDocument = document;
 
                 // clean interval if already existing on other element
                 // create interval and make manually the first call
                 clearInterval(this.interval);
                 this.interval = null;
-                this.interval = setInterval(() => this.position(element, document), 500)
-                this.position(element, document)
+                this.interval = setInterval(() => this.position(element), 100)
+                this.position(element)
 
                 this.appendSpecialButton(element);
             }
         }
+
+        /**
+        *    Hide EditBar
+        */
 
         public hide(): void {
             clearInterval(this.interval);
@@ -123,10 +131,10 @@ module OctoBoot.controllers {
 
             if (this.editingElement) {
                 this.editingElement.removeAttribute('contentEditable');
+                $(this.stage.iframe.contentDocument).off('keydown');
             }
 
             this.editingElement = null;
-            this.editingDocument = null;
 
             if (this.editor) {
                 this.editor.destroy();
@@ -134,11 +142,19 @@ module OctoBoot.controllers {
             }
         }
 
+        /**
+        *    Destroy EditBar
+        */
+
         public destroy(): void {
             this.hide();
             this.iframe.jDom.remove();
             this.remove_iframe_overlay();
         }
+
+        /**
+        *    Iframe overlay for edition
+        */
 
         private remove_iframe_overlay(): void {
             if (this.iframes_overlay && this.iframes_overlay.length) {
@@ -150,7 +166,11 @@ module OctoBoot.controllers {
             return element.className === 'iframeoverlay' ? $(element).data('referer') as any : element
         }
 
-        private position(element: HTMLElement, document: Document): void {
+        /**
+        *    EditBar positionning
+        */
+
+        private position(element: HTMLElement): void {
             var rect: ClientRect = this.getRect(element);
 
             if (JSON.stringify(this.rect) !== JSON.stringify(rect)) {
@@ -165,6 +185,10 @@ module OctoBoot.controllers {
                 this.rect = rect;
             }
         }
+
+        /**
+        *    Create border around editing element
+        */
 
         private border(rect: ClientRect): void {
             if (this.lines) {
@@ -181,6 +205,10 @@ module OctoBoot.controllers {
             }
         }
 
+        /**
+        *    Get absolute position of current editing element
+        */
+
         private getRect(element: Element): ClientRect {
             var rect: ClientRect = element.getBoundingClientRect();
             return {
@@ -193,6 +221,10 @@ module OctoBoot.controllers {
             }
         }
 
+        /**
+        *    Duplicate current editing element
+        */
+
         private duplicate(): void {
             var duplicable_parents: JQuery = $(this.editingElement).parents('li');
             var toDuplicate: JQuery = duplicable_parents.length ? duplicable_parents : $(this.editingElement);
@@ -200,17 +232,29 @@ module OctoBoot.controllers {
             duplicateElement.insertAfter(duplicable_parents.length ? duplicable_parents : this.editingElement);
         }
 
+        /**
+        *    Remove current editing element
+        */
+
         private remove(): void {
             $(this.editingElement).remove();
             this.editingElement = null;
             this.hide();
         }
 
+        /**
+        *    Fill the last edit bar button with current editing element tag name
+        */
+
         private fillTagButton(element: Element): void {
             let button: JQuery = this.iframeBody.find('.button').last();
             // Fill button with current tag name
             button.html(element.tagName);
         }
+
+        /**
+        *    Show special button from element's tag name
+        */
 
         private appendSpecialButton(element: Element): void {
             this.iframeBody.find('.button.special').hide();
@@ -219,6 +263,11 @@ module OctoBoot.controllers {
             // if it's an CKEDITOR editable element (text/div/etc)
             if (CKEDITOR.dtd.$editable[tag]) {
                 this.iframeBody.find('.special.ckeditor').show();
+            }
+
+            // if the parent of current editing element as more than one child, show "move" button
+            if ($(element).parent().children().length > 1) {
+                this.iframeBody.find('.special.move').show();
             }
 
             switch (tag) {
@@ -230,6 +279,10 @@ module OctoBoot.controllers {
             // fill tag button with element tag name
             this.fillTagButton(element);
         }
+
+        /**
+        *    CKEditor, text editor http://ckeditor.com/
+        */
 
         private ckeditor(): void {
             if (this.editor) {
@@ -245,10 +298,10 @@ module OctoBoot.controllers {
                     this.editor_dom = $('.cke');
                     var rect: ClientRect = this.getRect(this.editingElement);
                     var down: boolean = rect.top - this.editor_dom.height() < 0;
-
+                    
                     this.editor_dom.css({
                         'top': (down ? rect.bottom : rect.top - this.editor_dom.height()) + 35,
-                        'left': Math.abs((rect.right - this.editor_dom.width()) - 52),
+                        'left': Math.abs((rect.right - this.editor_dom.width()) - this.jDom.width() + 84),
                         'position': 'absolute',
                         'right': ''
                     }).show();
@@ -258,10 +311,16 @@ module OctoBoot.controllers {
                 this.editor.on('instanceReady', position)
                 // we need to cancel the editor focus event because they re position editor and we don't want that :)
                 this.editor.on('focus', (evt: CKEDITOR.eventInfo) => evt.cancel())
+                // remove potential binding on key (with move etc..)
+                $(this.stage.iframe.contentDocument).off('keydown')
             }
 
         }
 
+        /**
+        *    Image Edition
+        */
+        
         private update_img(url: string): void {
             var depth: number = this.stage.url.split('/').length - 3; // remove project and file name
 
@@ -285,6 +344,57 @@ module OctoBoot.controllers {
             })
         }
 
+        /**
+        *    Move element in his parent
+        */
+
+        private move(): void {
+            let do_move = (e: JQueryKeyEventObject) => {
+                e.originalEvent.preventDefault()
+
+                if (!this.editingElement) {
+                    return $(this.stage.iframe.contentDocument).off('keydown')
+                }
+
+                switch (e.keyCode) {
+                    // up
+                    case 38:
+                        if (this.editingElement !== this.editingElement.parentElement.firstChild) {
+                            $(this.editingElement).insertBefore(this.editingElement.previousSibling as Element)
+                        }
+                        break;
+
+                    // down
+                    case 40:
+                        if (this.editingElement !== this.editingElement.parentElement.lastChild) {
+                            $(this.editingElement).insertAfter(this.editingElement.nextSibling as Element)
+                        }
+                        break;
+                }
+
+                this.position(this.editingElement)
+            }
+            
+            let events = $._data(this.stage.iframe.contentDocument as any, 'events')
+            if (events && events.keydown) {
+                $(this.stage.iframe.contentDocument).off('keydown')
+            } else {
+                new controllers.Alert({
+                    title: model.UI.EDIT_MOVE_TITLE,
+                    body: model.UI.EDIT_MOVE_BODY,
+                    icon: 'keyboard',
+                    onApprove: () => {
+                        $(this.stage.iframe.contentDocument).keydown(do_move)
+                    },
+                    onDeny: () => { }
+                })
+            }
+        }
+
+        /**
+        *    Handlebars handler for edit bar buttons
+        */
+
         private HBHandlers(context: JQuery): any {
             return $.each({
                 duplicate : {
@@ -298,6 +408,9 @@ module OctoBoot.controllers {
                 },
                 img: {
                     click: () => this.select_img()
+                },
+                move: {
+                    click: () => this.move()
                 }
             }, (key: string, handlers: model.HTMLEvent) => handlers.context = context)
         }

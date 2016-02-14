@@ -823,6 +823,7 @@ interface JQueryStatic {
      * @param element The DOM element to associate with the data.
      */
     data(element: Element): any;
+    _data(element: Element, key: string): any;
 
     /**
      * Execute the next function on the queue for the matched element.

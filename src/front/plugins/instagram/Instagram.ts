@@ -14,6 +14,7 @@ module OctoBoot.plugins {
                 title: 'Instagram account name',
                 body: 'Fill with your instagram account name, you can find it on you profile url https://www.instagram.com/[ACCOUNT_NAME]/',
                 input: 'Account name',
+                icon: 'instagram',
                 onApprove: () => {
                     let account_name: string = alert.getInputValue();
                     let html: string = new controllers.Handlebar('InstagramInline.hbs').getHtml({ account_name: account_name, iframe_id: Date.now() });

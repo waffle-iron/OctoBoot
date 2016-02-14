@@ -34,5 +34,8 @@ module OctoBoot.model {
 
         public static DELETE_PROJECT_ALERT_TITLE: string = 'Delete website';
         public static DELETE_PROJECT_ALERT_BODY: string = 'Delete [PROJECT] - Are you sure about this ? please type the website name to confirm the deletion';
+
+        public static EDIT_MOVE_TITLE: string = 'Move element';
+        public static EDIT_MOVE_BODY: string = 'Press you keyboard UP and DOWN button to move your element in his parent';
     }
 }

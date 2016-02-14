@@ -1,27 +1,39 @@
 <div class="ui small icon buttons" style="position:absolute;bottom:0;right:0;">
-  <button class="ui button {{bind img}} topright special img">
+  
+  <button class="ui button topright special img {{bind img}}">
     <i class="file image outline icon"></i>
   </button>
   <div class="ui popup inverted tiny">
     image url
   </div>
-  <button class="ui button {{bind ckeditor}} topright special ckeditor">
+  
+  <button class="ui button topright special ckeditor {{bind ckeditor}}">
     <i class="font icon"></i>
   </button>
   <div class="ui popup inverted tiny">
     text-edition
   </div>
-  <button class="ui button {{bind duplicate}} topleft">
+
+  <button class="ui button topleft special move {{bind move}}">
+    <i class="move icon"></i>
+  </button>
+  <div class="ui popup inverted tiny">
+    move
+  </div>
+  
+  <button class="ui button topleft {{bind duplicate}}">
   	<i class="plus icon"></i>
   </button>
   <div class="ui popup inverted tiny">
     duplicate
   </div>
+  
   <button class="ui button topleft {{bind remove}}">
   	<i class="remove icon"></i>
   </button>
   <div class="ui popup inverted tiny">
     remove
   </div>
+  
   <button class="ui button"></button>
 </div>

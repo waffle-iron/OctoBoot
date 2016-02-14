@@ -256,7 +256,7 @@ module OctoBoot.controllers {
                 let element: HTMLElement = $(e.target).get(0);
                 if (this.editing && !this.editBarClick.editingElement) {
                     // if we are in editing mode AND nothing currently editing
-                    this.editBarHover.show(element, this.stage.iframe.contentDocument);
+                    this.editBarHover.show(element);
                 }
             });
 
@@ -264,7 +264,7 @@ module OctoBoot.controllers {
                 let element: HTMLElement = $(e.target).get(0);
                 if (this.editing && !this.editBarClick.editingElement) {
                     // if we are in editing mode, and nothing currently in edition, active edit bar
-                    this.editBarClick.show(element, this.stage.iframe.contentDocument);
+                    this.editBarClick.show(element);
                 } else if (
                     // if we've not click on ckeditor
                     (!this.editBarClick.editor_dom || !helper.Dom.hasParent(element, this.editBarClick.editor_dom.get(0))) &&
