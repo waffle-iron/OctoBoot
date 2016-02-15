@@ -4,7 +4,6 @@ ghapi = require("github-api"),
 ghcli = require("github-cli"),
 fs = require("fs"),
 pa = require("path"),
-buffer = require("buffer"),
 // Internal module
 convert = require("./modules/convert.js"),
 clone = require("./modules/clone.js"),

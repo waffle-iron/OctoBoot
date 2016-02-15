@@ -1,4 +1,5 @@
-var fs = require("fs");
+var fs = require("fs")
+var buffer = require("buffer")
 
 module.exports = function(projectDir) {
 	return function(req, res) {
