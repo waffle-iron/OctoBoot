@@ -81,11 +81,11 @@ module OctoBoot.controllers {
             CKEDITOR.config.allowedContent = true
         }
 
-        // we can't handle mouseover and click on iframe, and subframe etc.. 
+        // we can't handle mouseover and click on iframe, and subframe etc..
         // so put an overlay over it with related iframe on overlay's data to handle properly
         public init_iframes_overlay(): void {
             this.remove_iframe_overlay();
-            
+
             this.iframes_overlay = [];
             this.container.find('iframe').each((i: number, iframe: HTMLIFrameElement) => {
                 this.iframes_overlay.push(
@@ -210,12 +210,12 @@ module OctoBoot.controllers {
         *    Get absolute position of current editing element
         */
 
-        private getRect(element: Element): ClientRect {
+        private getRect(element: Element, document?: Document): ClientRect {
             var rect: ClientRect = element.getBoundingClientRect();
             return {
-                top: rect.top + $(element.ownerDocument).scrollTop() - this.margin,
+                top: rect.top + $(document || element.ownerDocument).scrollTop() - this.margin,
                 left: rect.left - this.margin,
-                bottom: rect.bottom + $(element.ownerDocument).scrollTop() + this.margin,
+                bottom: rect.bottom + $(document || element.ownerDocument).scrollTop() + this.margin,
                 right: rect.right + this.margin,
                 width: rect.width + (this.margin * 2),
                 height: rect.height + (this.margin * 2)
@@ -297,7 +297,9 @@ module OctoBoot.controllers {
 
                 var position = (evt: CKEDITOR.eventInfo) => {
                     this.editor_dom = $('.cke');
-                    var rect: ClientRect = this.getRect(this.editingElement);
+                    // we have to do the positionning of ckeditor relative to the top document,
+                    // not the editingElement.ownerDocument because ckeditor is appended on the main document
+                    var rect: ClientRect = this.getRect(this.editingElement, document);
                     var down: boolean = rect.top - this.editor_dom.height() < 0;
 
                     this.editor_dom.css({
@@ -321,7 +323,7 @@ module OctoBoot.controllers {
         /**
         *    Image Edition
         */
-        
+
         private update_img(url: string): void {
             var depth: number = this.stage.url.split('/').length - 3; // remove project and file name
 
@@ -375,7 +377,7 @@ module OctoBoot.controllers {
 
                 this.position(this.editingElement)
             }
-            
+
             let events = $._data(this.stage.iframe.contentDocument as any, 'events')
             if (events && events.keydown) {
                 $(this.stage.iframe.contentDocument).off('keydown')
