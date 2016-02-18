@@ -37,5 +37,8 @@ module OctoBoot.model {
 
         public static EDIT_MOVE_TITLE: string = 'Move element';
         public static EDIT_MOVE_BODY: string = 'Press you keyboard UP and DOWN button to move your element in his parent';
+
+        public static EDIT_IMG_TITLE: string = 'Update image url and alternate text';
+        public static EDIT_IMG_BODY: string = 'You can select an image from your project OR type an external http url OR leave blank if you just want to update alternate text (usefull for referencement)';
     }
 }

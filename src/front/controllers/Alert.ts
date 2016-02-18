@@ -51,7 +51,11 @@ module OctoBoot.controllers {
         }
 
         public getInputValue(): string {
-            return this.jDom.find('input').val();
+            return this.jDom.find('.input input').val();
+        }
+
+        public getDropdownValue(): string {
+            return this.jDom.find('.dropdown input').val();
         }
 
         public setWait(replace: string = 'checkmark'): void {

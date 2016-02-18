@@ -22,7 +22,7 @@ module OctoBoot.plugins {
                         cbk(html);
                     })
                 }, 
-                onDeny: () => {}
+                onDeny: () => {this.placeholder.remove()}
             })
         }
 

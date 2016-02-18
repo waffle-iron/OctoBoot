@@ -303,8 +303,9 @@ module OctoBoot.controllers {
                     var down: boolean = rect.top - this.editor_dom.height() < 0;
 
                     this.editor_dom.css({
-                        'top': (down ? rect.bottom : rect.top - this.editor_dom.height()) + 35,
-                        'left': Math.abs((rect.right - this.editor_dom.width()) - this.jDom.width() + 84),
+                        'top': 0,
+                        'left': 0,
+                        'width': '93px',
                         'position': 'absolute',
                         'right': ''
                     }).show();
@@ -323,25 +324,31 @@ module OctoBoot.controllers {
         /**
         *    Image Edition
         */
-
-        private update_img(url: string): void {
+        private update_img(url: string, alt: string): void {
             var depth: number = this.stage.url.split('/').length - 3; // remove project and file name
 
             for (var i: number = 0; i < depth; i++) {
                 url = '../' + url
             }
 
-            $(this.editingElement).attr('src', url);
+            if (url) {
+                $(this.editingElement).attr('src', url);
+            }
+
+            $(this.editingElement).attr('alt', alt)
+            $(this.editingElement).attr('title', alt)
         }
 
         private select_img(): void {
             let dirToInspect = this.stage.baseUrl.split('/').pop() + '/' + this.stage.url.split('/')[1];
             core.Socket.emit(model.ServerAPI.SOCKET_LIST_FILES, { dir: dirToInspect }, (data: string[]) => {
                 var alert: Alert = new Alert({
-                    title: 'Update image url',
+                    title: model.UI.EDIT_IMG_TITLE,
+                    body: model.UI.EDIT_IMG_BODY,
                     icon: 'file image outline',
+                    input: $(this.editingElement).attr('alt') || 'alternate text',
                     dropdown: data.filter((v: string) => { return !!v.match(/\.(JPG|JPEG|jpg|jpeg|png|gif)+$/) }),
-                    onApprove: () => this.update_img(alert.getInputValue()),
+                    onApprove: () => this.update_img(alert.getDropdownValue(), alert.getInputValue()),
                     onDeny: () => {}
                 })
             })

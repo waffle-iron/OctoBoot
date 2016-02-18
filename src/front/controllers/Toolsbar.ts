@@ -74,7 +74,7 @@ module OctoBoot.controllers {
         }
 
         private plugins(): void {
-            this.jDom.find('.menu.plugins .item').toggle();
+            this.jDom.find('.menu.plugins .item').slideToggle()
         }
 
         private create(): void {

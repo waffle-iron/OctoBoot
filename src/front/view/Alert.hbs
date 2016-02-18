@@ -35,15 +35,6 @@
             <a href="{{options.link}}" target="_blank">{{options.link}}</a>
             {{/if}}
 
-            {{#if options.input}}
-            <div class="ui small corner labeled input">
-                <input type="text" placeholder="{{options.input}}">
-                <div class="ui corner label">
-                    <i class="add circle icon"></i>
-                </div>
-            </div>
-            {{/if}}
-
             {{#if options.dropdown}}
             <div class="ui fluid search selection dropdown">
                 <input type="hidden" name="file">
@@ -56,6 +47,16 @@
                 </div>
             </div>
             {{/if}}
+
+            {{#if options.input}}
+            <div class="ui small corner labeled input">
+                <input type="text" placeholder="{{options.input}}">
+                <div class="ui corner label">
+                    <i class="add circle icon"></i>
+                </div>
+            </div>
+            {{/if}}
+            
         </div>
     </div>
 

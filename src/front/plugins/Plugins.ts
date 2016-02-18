@@ -5,6 +5,11 @@
 
 module OctoBoot {
 
+    export enum PluginDragOverAction {
+        APPEND,
+        OVER
+    }
+
     export class Plugin extends controllers.Handlebar {
 
         public handlers: model.HTMLEvent = {
@@ -19,8 +24,9 @@ module OctoBoot {
 
         // to override if needed
         public allowedTag: string = 'ARTICLE|DIV';
+        public dragOverAction: PluginDragOverAction = PluginDragOverAction.APPEND;
 
-        private placeholder: JQuery;
+        public placeholder: JQuery;
         
         constructor(public name: string) {
             super(name)
@@ -54,14 +60,75 @@ module OctoBoot {
             })
         }
 
+        public checkForLib(name: string, propToCheck: any, libToAppend: string[], done: () => any, deny: () => any): void {
+            if (propToCheck) {
+                done()
+            } else {
+                new controllers.Alert({
+                    title: name + ' library needed',
+                    body: name + ' library are not present in your template and this plugin need it, allow Octoboot to add ' + name + ' in your template ?',
+                    onApprove: () => {
+                        libToAppend.forEach((lib: string) => {
+                            var type: string = lib.split('.').pop(), sr: any;
+
+                            switch (type) {
+                                case 'js':
+                                    sr = document.createElement('script')
+                                    sr.src = lib
+                                    this.stage.iframe.contentDocument.head.appendChild(sr)
+                                    break
+
+                                case 'css':
+                                    sr = document.createElement('link')
+                                    sr.href = lib
+                                    sr.rel = 'stylesheet'
+                                    sr.type = 'text/css'
+                                    this.stage.iframe.contentDocument.head.appendChild(sr)
+                                    break
+                            }
+                        })
+                        done()
+                    },
+                    onDeny: deny
+                })
+            }
+        }
+
         private stick(): void {
             this.stage.iframe.contentWindow.ondragover = (e: DragEvent) => {
-                var el: HTMLElement = e.target as HTMLElement;
-                if (this.allowedTag.match(el.tagName.toUpperCase())) {
-                    this.placeholder.appendTo(el)
-                } else if (this.allowedTag.match(el.parentElement.tagName.toUpperCase())) {
-                    this.placeholder.insertBefore(el)
+                switch (this.dragOverAction) {
+                    case PluginDragOverAction.APPEND:
+                        this.append(e)
+                        break
+
+                    case PluginDragOverAction.OVER:
+                        this.over(e)
+                        break
                 }
+            }
+        }
+
+        private append(e: DragEvent): void {
+            var el: HTMLElement = e.target as HTMLElement;
+            if (this.allowedTag.match(el.tagName.toUpperCase())) {
+                this.placeholder.appendTo(el)
+            } else if (this.allowedTag.match(el.parentElement.tagName.toUpperCase())) {
+                this.placeholder.insertBefore(el)
+            }
+        }
+
+        private over(e: DragEvent): void {
+            var el: HTMLElement = e.target as HTMLElement;
+            if (this.allowedTag.match(el.tagName.toUpperCase())) {
+                var rect = el.getBoundingClientRect()
+                var top = rect.top + $(document).scrollTop()
+                this.placeholder
+                    .css(rect)
+                    .css({
+                        top: top,
+                        position: 'absolute'
+                    })
+                    .appendTo(this.stage.iframe.contentDocument.body)
             }
         }
 
