@@ -210,12 +210,12 @@ module OctoBoot.controllers {
         *    Get absolute position of current editing element
         */
 
-        private getRect(element: Element, document?: Document): ClientRect {
+        private getRect(element: Element, doc?: Document): ClientRect {
             var rect: ClientRect = element.getBoundingClientRect();
             return {
-                top: rect.top + $(document || element.ownerDocument).scrollTop() - this.margin,
+                top: rect.top + $(doc || element.ownerDocument).scrollTop() - this.margin,
                 left: rect.left - this.margin,
-                bottom: rect.bottom + $(document || element.ownerDocument).scrollTop() + this.margin,
+                bottom: rect.bottom + $(doc || element.ownerDocument).scrollTop() + this.margin,
                 right: rect.right + this.margin,
                 width: rect.width + (this.margin * 2),
                 height: rect.height + (this.margin * 2)

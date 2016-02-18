@@ -25,7 +25,7 @@ var imagezoom = function(elm, title, optional_src) {
     var top = rect.top + $(document).scrollTop()
     $('.imagezoom_overlay')
         .css(rect)
-        .css('top', top - 5)
+        .css('top', top)
         .fadeIn(200)
         .click(imagezoom_click)
         .mouseleave(hide)
