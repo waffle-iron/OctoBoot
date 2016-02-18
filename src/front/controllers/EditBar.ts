@@ -249,8 +249,10 @@ module OctoBoot.controllers {
 
         private fillTagButton(element: Element): void {
             // Fill button with current tag name
-            this.iframeBody.find('.button.tag .visible.content').html(element.tagName);
-            this.iframeBody.find('.button.tag').next().html('select parent > ' + element.parentElement.tagName.toLowerCase());
+            if (element.tagName) {
+                this.iframeBody.find('.button.tag .visible.content').html(element.tagName);
+                this.iframeBody.find('.button.tag').next().html('select parent > ' + element.parentElement.tagName.toLowerCase()); 
+            }
         }
 
         /**
@@ -297,11 +299,6 @@ module OctoBoot.controllers {
 
                 var position = (evt: CKEDITOR.eventInfo) => {
                     this.editor_dom = $('.cke');
-                    // we have to do the positionning of ckeditor relative to the top document,
-                    // not the editingElement.ownerDocument because ckeditor is appended on the main document
-                    var rect: ClientRect = this.getRect(this.editingElement, document);
-                    var down: boolean = rect.top - this.editor_dom.height() < 0;
-
                     this.editor_dom.css({
                         'top': 0,
                         'left': 0,

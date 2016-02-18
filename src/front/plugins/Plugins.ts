@@ -27,6 +27,7 @@ module OctoBoot {
         public dragOverAction: PluginDragOverAction = PluginDragOverAction.APPEND;
 
         public placeholder: JQuery;
+        public currentElement: HTMLElement;
         
         constructor(public name: string) {
             super(name)
@@ -68,25 +69,7 @@ module OctoBoot {
                     title: name + ' library needed',
                     body: name + ' library are not present in your template and this plugin need it, allow Octoboot to add ' + name + ' in your template ?',
                     onApprove: () => {
-                        libToAppend.forEach((lib: string) => {
-                            var type: string = lib.split('.').pop(), sr: any;
-
-                            switch (type) {
-                                case 'js':
-                                    sr = document.createElement('script')
-                                    sr.src = lib
-                                    this.stage.iframe.contentDocument.head.appendChild(sr)
-                                    break
-
-                                case 'css':
-                                    sr = document.createElement('link')
-                                    sr.href = lib
-                                    sr.rel = 'stylesheet'
-                                    sr.type = 'text/css'
-                                    this.stage.iframe.contentDocument.head.appendChild(sr)
-                                    break
-                            }
-                        })
+                        libToAppend.forEach((lib: string) => this.appendLib(lib))
                         done()
                     },
                     onDeny: deny
@@ -94,34 +77,60 @@ module OctoBoot {
             }
         }
 
+        public appendLib(lib: string): void {
+            let type: string = lib.split('.').pop(), sr: any;
+
+            switch (type) {
+                case 'js':
+                    sr = document.createElement('script')
+                    sr.src = lib
+                    this.stage.iframe.contentDocument.head.appendChild(sr)
+                    break
+
+                case 'css':
+                    sr = document.createElement('link')
+                    sr.href = lib
+                    sr.rel = 'stylesheet'
+                    sr.type = 'text/css'
+                    this.stage.iframe.contentDocument.head.appendChild(sr)
+                    break
+            }
+        }
+
         private stick(): void {
             this.stage.iframe.contentWindow.ondragover = (e: DragEvent) => {
-                switch (this.dragOverAction) {
-                    case PluginDragOverAction.APPEND:
-                        this.append(e)
-                        break
+                if (e.target !== this.placeholder.get(0)) {
+                    switch (this.dragOverAction) {
+                        case PluginDragOverAction.APPEND:
+                            this.append(e)
+                            break
 
-                    case PluginDragOverAction.OVER:
-                        this.over(e)
-                        break
+                        case PluginDragOverAction.OVER:
+                            this.over(e)
+                            break
+                    }
                 }
             }
         }
 
         private append(e: DragEvent): void {
-            var el: HTMLElement = e.target as HTMLElement;
+            let el: HTMLElement = e.target as HTMLElement;
             if (this.allowedTag.match(el.tagName.toUpperCase())) {
+                this.currentElement = el;
                 this.placeholder.appendTo(el)
             } else if (this.allowedTag.match(el.parentElement.tagName.toUpperCase())) {
+                this.currentElement = el;
                 this.placeholder.insertBefore(el)
             }
         }
 
         private over(e: DragEvent): void {
-            var el: HTMLElement = e.target as HTMLElement;
+            let el: HTMLElement  = e.target as HTMLElement;
             if (this.allowedTag.match(el.tagName.toUpperCase())) {
-                var rect = el.getBoundingClientRect()
-                var top = rect.top + $(document).scrollTop()
+                this.currentElement = el;
+
+                let rect = el.getBoundingClientRect()
+                let top = rect.top + $(this.stage.iframe.contentDocument).scrollTop()
                 this.placeholder
                     .css(rect)
                     .css({

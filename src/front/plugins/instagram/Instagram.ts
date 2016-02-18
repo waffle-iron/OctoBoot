@@ -11,7 +11,7 @@ module OctoBoot.plugins {
 
         public getInline(cbk: (plugin_html: string) => any): void {
             let alert: controllers.Alert = new controllers.Alert({
-                title: 'Instagram account name',
+                title: 'Plugin Instagram - account name',
                 body: 'Fill with your instagram account name, you can find it on you profile url https://www.instagram.com/[ACCOUNT_NAME]/',
                 input: 'Account name',
                 icon: 'instagram',
