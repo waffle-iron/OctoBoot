@@ -12,7 +12,7 @@ var imagezoom_click = function() {
     var args = $(this).data('args')
     imagezoom_load(function(img, ratio) {
         $('.imagezoom.modal img').replaceWith(img)
-        $('.imagezoom.modal .header').html(args.title || '&nbsp;')
+        $('.imagezoom.modal .header').html(args.title)
         $('.imagezoom.modal').modal('show')
         $('.imagezoom.modal img').height(($('.imagezoom.modal img').width() / ratio) + 'px')
         $('.imagezoom.modal').modal('refresh')

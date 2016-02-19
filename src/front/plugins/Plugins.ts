@@ -98,7 +98,12 @@ module OctoBoot {
         }
 
         private stick(): void {
+            var prev: HTMLElement;
             this.stage.iframe.contentWindow.ondragover = (e: DragEvent) => {
+                if (e.target === prev) {
+                    return
+                }
+                prev = e.target as HTMLElement
                 if (e.target !== this.placeholder.get(0)) {
                     switch (this.dragOverAction) {
                         case PluginDragOverAction.APPEND:

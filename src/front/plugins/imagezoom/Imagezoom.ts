@@ -47,6 +47,7 @@ module OctoBoot.plugins {
                 input: 'Title',
                 dropdown: fileList.filter((v: string) => { return !!v.match(/\.(JPG|JPEG|jpg|jpeg|png|gif)+$/) }),
                 icon: 'zoom',
+                closable: false,
                 onApprove: () => {
 
                     let title: string = alert.getInputValue();

@@ -1,10 +1,15 @@
 <div class="imagezoom_overlay" style="position:absolute;z-index: 100000;background: black;cursor: pointer;text-align: center;opacity: .5">
 	<i class="inverted huge zoom icon"></i>
 </div>
-<div class="ui basic fullscreen modal imagezoom">
+<div class="ui basic fullscreen modal imagezoom" onclick="$(this).modal('hide')">
   <i class="inverted close icon" style="color:white"></i>
   <div class="header"></div>
   <div class="image content">
       <img class="ui fluid image">
   </div>
 </div>
+<style type="text/css">
+	.dimmable {
+		position: inherit !important;
+	}
+</style>

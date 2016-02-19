@@ -13,11 +13,13 @@ module OctoBoot.controllers {
         input?: string;
         dropdown?: string[];
         link?: string;
+        closable?: boolean;
     }
 
     export class Alert extends Handlebar {
 
         public onDeny: boolean;
+        public closable: boolean;
         public onApprove: boolean;
         public buttonCount: string;
 
@@ -37,9 +39,10 @@ module OctoBoot.controllers {
             this.onDeny = !!options.onDeny;
             this.onApprove = !!options.onApprove;
             this.buttonCount = options.onDeny && options.onApprove ? 'two' : 'one';
+            this.closable = typeof options.closable === "boolean" ? options.closable : !!options.onDeny;
 
             this.initWithContext(this).modal({
-                closable: this.onDeny,
+                closable: this.closable,
                 onApprove: options.onApprove,
                 onDeny: options.onDeny
             })
