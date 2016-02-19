@@ -1,5 +1,6 @@
 /// <reference path="../Plugins.ts" />
 /// <reference path="../../controllers/Alert.ts" />
+/// <reference path="../../helper/Dom.ts" />
 
 interface Window {
     $: JQueryStatic;
@@ -50,7 +51,7 @@ module OctoBoot.plugins {
                 closable: false,
                 onApprove: () => {
 
-                    let title: string = alert.getInputValue();
+                    let title: string = helper.Dom.encodeString(alert.getInputValue());
                     let url: string = alert.getDropdownValue();
                     let html: string = $(this.stage.iframe.contentDocument).find('.modal.imagezoom').length ? '' : new controllers.Handlebar('ImagezoomInline.hbs').getHtml({});
 

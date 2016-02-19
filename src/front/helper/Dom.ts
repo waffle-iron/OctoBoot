@@ -1,39 +1,39 @@
 module OctoBoot.helper {
 
-	export class Dom {
+    export class Dom {
 
-		static hasParent(child: Element, parent: Element): boolean {
-			let result: boolean;
-			let target: Element = child;
-			
-			if (parent) {
-				while (parent && target !== parent.ownerDocument.body) {
-					result = target === parent;
-					if (result) {
-						return true
-					} else if (target.parentElement) {
-						target = target.parentElement
-					} else {
-						return false
-					}
-				}
-			}
-			
+        static hasParent(child: Element, parent: Element): boolean {
+            let result: boolean;
+            let target: Element = child;
+            
+            if (parent) {
+                while (parent && target !== parent.ownerDocument.body) {
+                    result = target === parent;
+                    if (result) {
+                        return true
+                    } else if (target.parentElement) {
+                        target = target.parentElement
+                    } else {
+                        return false
+                    }
+                }
+            }
+            
 
-			return false
-		}
+            return false
+        }
 
-		static mouseIsOverElement(event: MouseEvent, element: Element): boolean {
-			if (element) {
-				var rect: ClientRect = element.getBoundingClientRect();
-				return event.x >= rect.left && event.x <= rect.right && event.y >= rect.top && event.y <= rect.bottom
-			} else {
-				return false
-			}
-			
-		}
+        static mouseIsOverElement(event: MouseEvent, element: Element): boolean {
+            if (element) {
+                var rect: ClientRect = element.getBoundingClientRect();
+                return event.x >= rect.left && event.x <= rect.right && event.y >= rect.top && event.y <= rect.bottom
+            } else {
+                return false
+            }
+            
+        }
 
-		static setItemActive(jDom: JQuery, wich: string): void {
+        static setItemActive(jDom: JQuery, wich: string): void {
             jDom.children('.item.active').removeClass('active');
             jDom.children('.item.' + wich).addClass('active');
         }
@@ -43,5 +43,9 @@ module OctoBoot.helper {
                 .removeClass(loading ? wich.join(' ') : 'spinner loading')
                 .addClass(loading ? 'spinner loading' : wich.join(' '));
         }
-	}
+
+        static encodeString(str: string): string {
+            return str.replace(/"/g, '&#34;').replace(/'/g, '&#39;');
+        }
+    }
 }
