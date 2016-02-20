@@ -1,6 +1,7 @@
 /// <reference path="Handlebar.ts" />
 /// <reference path="Alert.ts" />
 /// <reference path="Stage.ts" />
+/// <reference path="Borders.ts" />
 /// <reference path="../model/UI.ts" />
 /// <reference path="../model/HTMLEvent.ts" />
 /// <reference path="../definition/ckeditor.d.ts" />
@@ -30,7 +31,7 @@ module OctoBoot.controllers {
         private margin: number = 5;
 
         // lines who border the editing element
-        private lines: { top: JQuery, bottom: JQuery, left: JQuery, right: JQuery };
+        private borders: Borders;
         // extended editable
         private editable_extended = { span: 1, strong: 1, li: 1, u: 1 };
         // extended ignored element
@@ -90,7 +91,7 @@ module OctoBoot.controllers {
             this.container.find('iframe').each((i: number, iframe: HTMLIFrameElement) => {
                 this.iframes_overlay.push(
                     new Handlebar(model.UI.HB_EDITBAR_IFRAME_OVERLAY)
-                    .initWithContext(this.getRect(iframe), this.container)
+                    .initWithContext(Borders.rect(iframe), this.container)
                     .data('referer', iframe)
                 )
             })
@@ -128,7 +129,10 @@ module OctoBoot.controllers {
             this.rect = null;
 
             this.iframe.jDom.hide();
-            this.border(null);
+            
+            if (this.borders) {
+                this.borders.destroy();
+            }
 
             if (this.editingElement) {
                 this.editingElement.removeAttribute('contentEditable');
@@ -172,7 +176,7 @@ module OctoBoot.controllers {
         */
 
         private position(element: HTMLElement): void {
-            var rect: ClientRect = this.getRect(element);
+            var rect: ClientRect = Borders.rect(element);
 
             if (JSON.stringify(this.rect) !== JSON.stringify(rect)) {
                 var down: boolean = rect.top - this.height < 0;
@@ -182,43 +186,13 @@ module OctoBoot.controllers {
                     'left': rect.right - this.width
                 }).show();
 
-                this.border(rect);
-                this.rect = rect;
-            }
-        }
-
-        /**
-        *    Create border around editing element
-        */
-
-        private border(rect: ClientRect): void {
-            if (this.lines) {
-                jQuery.each(this.lines, (i: number, elm: JQuery) => elm.remove());
-            }
-
-            if (rect) {
-                this.lines = {
-                    top: new Handlebar(model.UI.HB_HORIZONTAL_LINE).initWithContext(rect, this.container),
-                    bottom: new Handlebar(model.UI.HB_HORIZONTAL_LINE).initWithContext({ top: rect.bottom, left: rect.left, width: rect.width }, this.container),
-                    left: new Handlebar(model.UI.HB_VERTICAL_LINE).initWithContext(rect, this.container),
-                    right: new Handlebar(model.UI.HB_VERTICAL_LINE).initWithContext({ left: rect.right, top: rect.top, height: rect.height }, this.container)
+                if (this.borders) {
+                    this.borders.border(rect);
+                } else {
+                    this.borders = new Borders(element);
                 }
-            }
-        }
-
-        /**
-        *    Get absolute position of current editing element
-        */
-
-        private getRect(element: Element, doc?: Document): ClientRect {
-            var rect: ClientRect = element.getBoundingClientRect();
-            return {
-                top: rect.top + $(doc || element.ownerDocument).scrollTop() - this.margin,
-                left: rect.left - this.margin,
-                bottom: rect.bottom + $(doc || element.ownerDocument).scrollTop() + this.margin,
-                right: rect.right + this.margin,
-                width: rect.width + (this.margin * 2),
-                height: rect.height + (this.margin * 2)
+                
+                this.rect = rect;
             }
         }
 
@@ -249,7 +223,7 @@ module OctoBoot.controllers {
 
         private fillTagButton(element: Element): void {
             // Fill button with current tag name
-            if (element.tagName) {
+            if (element && element.tagName) {
                 this.iframeBody.find('.button.tag .visible.content').html(element.tagName);
                 this.iframeBody.find('.button.tag').next().html('select parent > ' + element.parentElement.tagName.toLowerCase()); 
             }
@@ -421,8 +395,8 @@ module OctoBoot.controllers {
                     click: () => this.move()
                 },
                 parent: {
-                    mouseover: () => this.border(this.getRect(this.editingElement.parentElement)),
-                    mouseout: () => this.border(this.getRect(this.editingElement)),
+                    mouseover: () => this.borders.border(Borders.rect(this.editingElement.parentElement)),
+                    mouseout: () => this.borders.border(Borders.rect(this.editingElement)),
                     click: () => this.show(this.editingElement.parentElement)
                 }
             }, (key: string, handlers: model.HTMLEvent) => handlers.context = context)

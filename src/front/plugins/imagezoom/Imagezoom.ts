@@ -26,9 +26,12 @@ module OctoBoot.plugins {
         }
 
         public getInline(cbk: (plugin_html: string) => any): void {
-            this.checkForLib('jQuery', this.stage.iframe.contentWindow.$, this.libJQuery, () => {
+            let w: Window = this.stage.iframe.contentWindow;
+            let d: Document = this.stage.iframe.contentDocument;
+            
+            this.checkForLib('jQuery', w.$, this.libJQuery, () => {
 
-                this.checkForLib('Semantic', this.stage.iframe.contentWindow.$(this.stage.iframe.contentDocument.body).accordion, this.libSemantic, () => {
+                this.checkForLib('Semantic', w.$(d.body).accordion, this.libSemantic, () => {
                     
                     let dirToInspect = this.stage.baseUrl.split('/').pop() + '/' + this.stage.url.split('/')[1];
                     core.Socket.emit(model.ServerAPI.SOCKET_LIST_FILES, { dir: dirToInspect }, (data: string[]) => {
@@ -57,17 +60,7 @@ module OctoBoot.plugins {
 
                     this.copyFileInProject('imagezoom/image.zoom.js', () => {
 
-                        var depth: number = this.stage.url.split('/').length - 3; // remove project and file name
-                        var lib: string = this.libImageZoom;
-
-                        for (var i: number = 0; i < depth; i++) {
-                            lib = '../' + lib
-                            if (url) {
-                                url = '../' + url 
-                            }
-                        }
-
-                        this.checkForLib('Plugin Image Zoom', this.stage.iframe.contentWindow.imagezoom, [lib], () => {
+                        this.checkForLib('Plugin Image Zoom', this.stage.iframe.contentWindow.imagezoom, [this.libImageZoom], () => {
 
                             $(this.currentElement).attr('onmouseover', "imagezoom(this,'" + title + "','" + url + "')");
                             cbk(html);
@@ -78,6 +71,22 @@ module OctoBoot.plugins {
                 },
                 onDeny: () => { this.placeholder.remove() }
             })
+        }
+
+        public filterElement(el: HTMLElement, cbk: () => any): void {
+            if ($(el).attr('onmouseover') && $(el).attr('onmouseover').indexOf('imagezoom') === 0) {
+                new controllers.Alert({
+                    title: 'Plugin Image Zoom - Already Exist!',
+                    body: 'Plugin Image Zoom already exist on this element, click on OK to REMOVE it, or click on CANCEL to MODIFY it',
+                    onApprove: () => {
+                        $(el).removeAttr('onmouseover');
+                        this.placeholder.remove();
+                    }, 
+                    onDeny: () => cbk()
+                })
+            } else {
+                cbk()
+            }
         }
 
     }
