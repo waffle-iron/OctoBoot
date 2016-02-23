@@ -1,4 +1,4 @@
-var showmore = function(el, forceClose) {
+(window.OctoBoot_plugins = window.OctoBoot_plugins || {}).showmore = function(el, forceClose) {
     var button = $(el);
     var open = typeof forceClose !== "undefined" ? !forceClose : !button.find('i').hasClass('flipped');
     var mask = button.prev();
@@ -22,6 +22,6 @@ var showmore = function(el, forceClose) {
 
 $(document).ready(function() {
     $('.showmore.sm_button').each(function() {
-        showmore(this, true)
+        OctoBoot_plugins.showmore(this, true)
     })
 })

@@ -4,6 +4,10 @@
 /// <reference path="../model/HTMLEvent.ts" />
 /// <reference path="../core/Socket.ts" />
 
+interface Window {
+    OctoBoot_plugins: any;
+}
+
 module OctoBoot {
 
     export enum PluginDragOverAction {
@@ -77,18 +81,34 @@ module OctoBoot {
 
         // CHECK IF A PARTICULAR LIBRARY ARE ON USER PAGE
         // AND IF NOT, GIVE USER CHOICE TO APPEND IT
-        public checkForLib(name: string, propToCheck: any, libToAppend: string[], done: () => any, deny: () => any): void {
-            if (propToCheck) {
-                done()
+        public checkForLib(options: { name: string, propToCheck: string | boolean, libToAppend: string[], done: () => any, deny: () => any, copyFilesInProject?: string[]}): void {
+            if (typeof options.propToCheck === "boolean" && options.propToCheck) {
+                options.done()
+            } else if (this.stage.iframe.contentWindow.OctoBoot_plugins && 
+                this.stage.iframe.contentWindow.OctoBoot_plugins[options.propToCheck as string]) {
+                options.done()
             } else {
                 new controllers.Alert({
                     title: name + ' library needed',
                     body: name + ' library are not present in your template and this plugin need it, allow Octoboot to add ' + name + ' in your template ?',
+                    icon: 'book',
                     onApprove: () => {
-                        libToAppend.forEach((lib: string) => this.appendLib(lib))
-                        done()
+                        if (options.copyFilesInProject) {
+                            let tocopie: number = options.copyFilesInProject.length;
+                            options.copyFilesInProject.forEach((file: string) => {
+                                this.copyFileInProject(file, () => {
+                                    tocopie--;
+                                    if (!tocopie) {
+                                        options.libToAppend.forEach((lib: string) => this.appendLib(lib))
+                                        options.done()
+                                    }
+                                })
+                            })
+                        } else {
+                            options.libToAppend.forEach((lib: string) => this.appendLib(lib))
+                        }
                     },
-                    onDeny: deny
+                    onDeny: options.deny
                 })
             }
         }

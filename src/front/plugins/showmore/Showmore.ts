@@ -2,10 +2,6 @@
 /// <reference path="../../controllers/Alert.ts" />
 /// <reference path="../../helper/Dom.ts" />
 
-interface Window {
-    showmore?: (el: HTMLElement) => any;
-}
-
 module OctoBoot.plugins {
 
     export class Showmore extends Plugin {
@@ -15,10 +11,6 @@ module OctoBoot.plugins {
 
         private libShowmore: string = 'module/show.more.js';
         private libJQuery: string[] = ['https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js'];
-        private libSemantic: string[] = [
-            'https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.7/semantic.min.js',
-            'https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.7/semantic.min.css'
-        ]
 
         private mask: JQuery;
         private content: JQuery;
@@ -35,15 +27,13 @@ module OctoBoot.plugins {
             let w: Window = this.stage.iframe.contentWindow;
             let d: Document = this.stage.iframe.contentDocument;
 
-            this.checkForLib('jQuery', w.$, this.libJQuery, () => {
-
-                this.checkForLib('Semantic', w.$(d.body).accordion, this.libSemantic, () => {
-                    
-                    this.addPlugin(cbk)
-
-                }, () => cbk(''))
-
-            }, () => cbk(''))
+            this.checkForLib({
+                name: 'jQuery', 
+                propToCheck: !!w['$'], 
+                libToAppend: this.libJQuery, 
+                done: () => this.addPlugin(cbk), 
+                deny: () => cbk('')
+            })
         }
 
         public filterElement(el: HTMLElement, cbk: () => any): void {
@@ -115,12 +105,11 @@ module OctoBoot.plugins {
 
         private resize(e: JQueryKeyEventObject): void {
             e.originalEvent.preventDefault()
-            console.log(e.keyCode)
 
             this.coef++;
             clearTimeout(this.timeoutCoef);
             this.timeoutCoef = setTimeout(() => this.coef = 0, 200);
-            console.log(this.coef)
+
             switch (e.keyCode) {
 
                 case 38: case 40:
@@ -132,15 +121,20 @@ module OctoBoot.plugins {
                     break
 
                 case 13:
-                    this.copyFileInProject('showmore/show.more.js', () => {
-                        this.checkForLib('Show More', this.stage.iframe.contentWindow.showmore, [this.libShowmore], () => {
-                            this.button.attr('onclick', 'showmore(this)');
+                    this.checkForLib({
+                        name: 'Show More',
+                        propToCheck: 'showmore',
+                        libToAppend: [this.libShowmore],
+                        done: () => {
+                            this.button.attr('onclick', 'OctoBoot_plugins.showmore(this)');
                             $(this.currentElement).css('min-height', $(this.currentElement).css('height'));
                             $(this.currentElement).css('transition', 'height 1s ease-in-out');
                             this.mask.css('transition', 'height 1s ease-in-out');
                             this.borders.destroy();
                             $(this.stage.iframe.contentDocument).off('keydown');
-                        }, () => this.cancel())
+                        },
+                        deny: () => this.cancel(),
+                        copyFilesInProject: ['showmore/show.more.js']
                     });
                     break
 
