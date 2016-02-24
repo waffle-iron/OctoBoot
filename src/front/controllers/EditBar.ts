@@ -427,11 +427,8 @@ module OctoBoot.controllers {
                         case actions[3]:
                             EditBarCopiedElement.insertBefore(this.editingElement)
                             break
-
-                        default:
-                            return false
-                            break
                     }
+                    
                     EditBarCopiedElement = null;
                     this.iframeBody.find('.special.paste').hide();
                 }, 
