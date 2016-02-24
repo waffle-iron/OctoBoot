@@ -10,7 +10,7 @@ module OctoBoot.plugins {
 
     export class Facebook extends Plugin {
 
-        private libFacebook: string = 'facebook.plugin.js';
+        private libFacebook: string = 'facebook.html';
         private libJQuery: string[] = ['https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js'];
         private modify: boolean = false;
 
@@ -26,16 +26,12 @@ module OctoBoot.plugins {
                 
                     this.appendLibs(() => {
                 
-                        this.waitForPlugin(() => {
-                
-                            let id: number = Date.now();
-                            let html: string = new controllers.Handlebar('FacebookInline.hbs').getHtml({
-                                id: id,
-                                pid: fid,
-                                nbr: nbr || 1
-                            });
-                            cbk(html);
-                        })
+                        let html: string = new controllers.Handlebar('FacebookInline.hbs').getHtml({
+                            pid: fid,
+                            nbr: nbr || 1,
+                            url: this.applyRelativeDepthOnUrl('module/' + this.libFacebook)
+                        });
+                        cbk(html);
                     })
                 })
             })
@@ -74,7 +70,7 @@ module OctoBoot.plugins {
                     alert.setWait()
 
                     this.getFacebookId(alert.getInputValue(), (fid: number) => {
-                        $.get('/facebook/' + fid + '/feed', function(feeds) {
+                        $.get('/facebook/' + fid + '/feed', (feeds: any[]) => {
                             if (feeds.length) {
                                 done(alert.getInputValue(), fid)
                             } else {
@@ -114,20 +110,11 @@ module OctoBoot.plugins {
 
         private appendLibs(done: () => any): void {
             this.checkForLib({
-                name: 'Facebook library',
-                propToCheck: !!this.stage.iframe.contentWindow.FB,
-                libToAppend: ['module/' + this.libFacebook],
-                done: () => {
-                    this.checkForLib({
-                        name: 'jQuery library',
-                        propToCheck: !!this.stage.iframe.contentWindow.$,
-                        libToAppend: this.libJQuery,
-                        done: done,
-                        deny: () => { this.placeholder.remove() }
-                    })
-                },
-                deny: () => { this.placeholder.remove() },
-                copyFilesInProject: ['facebook/' + this.libFacebook]
+                name: 'jQuery library',
+                propToCheck: !!this.stage.iframe.contentWindow.$,
+                libToAppend: this.libJQuery,
+                done: () => this.copyFileInProject('facebook/' + this.libFacebook, done),
+                deny: () => this.placeholder.remove()
             })
         }
 
@@ -146,15 +133,6 @@ module OctoBoot.plugins {
                     })
                 }
             })
-        }
-
-        private waitForPlugin(done: () => any): void {
-            let inter: number = setInterval(() => {
-                if (this.stage.iframe.contentWindow.OctoBoot_plugins && this.stage.iframe.contentWindow.OctoBoot_plugins.facebook_plugin) {
-                    clearInterval(inter);
-                    done()
-                }
-            }, 10);
         }
 
     }
