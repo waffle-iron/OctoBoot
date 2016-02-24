@@ -7,28 +7,45 @@
 
     var ids, post_url;
     var appendPost = function(url) {
+        var width = $(container).width() > 750 ? 750 : $(container).width();
         var dom = document.createElement('div');
         dom.className = 'fb-post';
         dom.setAttribute('data-href', url);
+        dom.setAttribute('data-width', width)
+        
+        if (width > 750) {
+            container.style.width = width + 'px';
+        }
+        
         container.appendChild(dom); 
     };
 
-    FB.api(
-        '/' + pid + '/feed',
-        function (response) {
-          if (response && !response.error) {
-            console.log(response);
-            response.data.forEach(function(post) {
-                if (nbr) {
-                    console.log(post);
-                    ids = post.id.split('_');
-                    post_url = 'https://www.facebook.com/' + ids[0] + '/posts/' + ids[1];
-                    appendPost(post_url);
-                }
-            })
-          } else {
-            console.error('Facebook Plugin error on page feed call', '/' + pid + '/feed', response.error)
-          }
+    $.get('http://octoboot.soizen.ovh/facebook/' + pid + '/feed', function(feeds) {
+        feeds.forEach(function(post_id) {
+            if (nbr) {
+                ids = post_id.split('_');
+                post_url = 'https://www.facebook.com/' + ids[0] + '/posts/' + ids[1];
+                appendPost(post_url);
+                nbr--
+            }
+        })
+        if (FB) {
+            FB.XFBML.parse()
         }
-    );
+    });
 }
+
+window.fbAsyncInit = function() {
+  FB.init({
+    xfbml      : true,
+    version    : 'v2.5'
+  });
+};
+
+(function(d, s, id){
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));

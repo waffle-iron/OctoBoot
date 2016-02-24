@@ -6,9 +6,12 @@
 
 interface Window {
     OctoBoot_plugins: any;
+    eval: (str: string) => any;
 }
 
 module OctoBoot {
+
+    interface CheckForLibOptions { name: string, propToCheck: string | boolean, libToAppend: string[], done: () => any, deny: () => any, copyFilesInProject?: string[] }
 
     export enum PluginDragOverAction {
         APPEND,
@@ -36,6 +39,10 @@ module OctoBoot {
         public borders: controllers.Borders;
         public currentElement: HTMLElement;
         
+        // current edited iframe
+        public win: Window;
+        public doc: Document;
+        
         constructor(public name: string) {
             super(name)
         }
@@ -43,6 +50,8 @@ module OctoBoot {
         public init(container: JQuery, stage: controllers.Stage, projectName: string) {
             this.container = container;
             this.stage = stage;
+            this.win = this.stage.iframe.contentWindow;
+            this.doc = this.stage.iframe.contentDocument;
             this.projectName = projectName;
             this.placeholder = new controllers.Handlebar('Placeholder.hbs').initWithContext(null);
             this.placeholder.remove();
@@ -81,7 +90,7 @@ module OctoBoot {
 
         // CHECK IF A PARTICULAR LIBRARY ARE ON USER PAGE
         // AND IF NOT, GIVE USER CHOICE TO APPEND IT
-        public checkForLib(options: { name: string, propToCheck: string | boolean, libToAppend: string[], done: () => any, deny: () => any, copyFilesInProject?: string[]}): void {
+        public checkForLib(options: CheckForLibOptions): void {
             if (typeof options.propToCheck === "boolean" && options.propToCheck) {
                 options.done()
             } else if (this.stage.iframe.contentWindow.OctoBoot_plugins && 
@@ -89,8 +98,8 @@ module OctoBoot {
                 options.done()
             } else {
                 new controllers.Alert({
-                    title: name + ' library needed',
-                    body: name + ' library are not present in your template and this plugin need it, allow Octoboot to add ' + name + ' in your template ?',
+                    title: options.name + ' library needed',
+                    body: options.name + ' library are not present in your template and this plugin need it, allow Octoboot to add ' + options.name + ' in your template ?',
                     icon: 'book',
                     onApprove: () => {
                         if (options.copyFilesInProject) {
@@ -216,7 +225,12 @@ module OctoBoot {
                         if (this.dragOverAction === PluginDragOverAction.BORDER) {
                             $(this.currentElement).append(plugin_html)
                         } else {
+                            /** PROXY EVAL - If not, jquery will eval script on top window context, **/
+                            let old_eval = eval;
+                            window.eval = this.stage.iframe.contentWindow.eval;
+
                             this.placeholder.replaceWith(plugin_html)
+                            window.eval = old_eval;
                         }
                     })
                 })

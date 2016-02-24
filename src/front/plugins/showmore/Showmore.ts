@@ -24,12 +24,9 @@ module OctoBoot.plugins {
         }
 
         public getInline(cbk: (plugin_html: string) => any): void {
-            let w: Window = this.stage.iframe.contentWindow;
-            let d: Document = this.stage.iframe.contentDocument;
-
             this.checkForLib({
                 name: 'jQuery', 
-                propToCheck: !!w['$'], 
+                propToCheck: !!this.win['$'], 
                 libToAppend: this.libJQuery, 
                 done: () => this.addPlugin(cbk), 
                 deny: () => cbk('')
@@ -92,8 +89,8 @@ module OctoBoot.plugins {
         }
 
         private bindKeydown(): void {
-            $(this.stage.iframe.contentDocument).keydown((e: JQueryKeyEventObject) => this.resize(e))
-            $(this.stage.iframe.contentWindow).focus();
+            $(this.doc).keydown((e: JQueryKeyEventObject) => this.resize(e))
+            $(this.win).focus();
             this.borders.refresh();
         }
 
@@ -131,7 +128,7 @@ module OctoBoot.plugins {
                             $(this.currentElement).css('transition', 'height 1s ease-in-out');
                             this.mask.css('transition', 'height 1s ease-in-out');
                             this.borders.destroy();
-                            $(this.stage.iframe.contentDocument).off('keydown');
+                            $(this.doc).off('keydown');
                         },
                         deny: () => this.cancel(),
                         copyFilesInProject: ['showmore/show.more.js']
@@ -153,7 +150,7 @@ module OctoBoot.plugins {
         }
 
         private cancel(): void {
-            $(this.stage.iframe.contentDocument).off('keydown');
+            $(this.doc).off('keydown');
             this.borders.destroy();
             $(this.currentElement).append(this.content.contents());
             $(this.currentElement).css('height', '');

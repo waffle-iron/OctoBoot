@@ -3,14 +3,15 @@
 
 interface Window {
     FB: any;
+    $: any;
 }
 
 module OctoBoot.plugins {
 
     export class Facebook extends Plugin {
 
-        private tagFacebook: string = 'facebook.app.tag.js';
         private libFacebook: string = 'facebook.plugin.js';
+        private libJQuery: string[] = ['https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js'];
         private modify: boolean = false;
 
         constructor() {
@@ -19,60 +20,114 @@ module OctoBoot.plugins {
 
         public getInline(cbk: (plugin_html: string) => any): void {
 
-
-            let alert: controllers.Alert = new controllers.Alert({
-                title: 'Plugin Facebook - account name',
-                body: 'Fill with your facebook account name, you can find it on you profile url https://www.facebook.com/[ACCOUNT_NAME]/',
-                input: 'Account name',
-                icon: 'facebook',
-                closable: false,
-                onApprove: () => {
-                    let account_name: string = alert.getInputValue();
-                    
-                    this.getFacebookId(account_name, (fid: number) => {
-                    
-                        this.appendLibs(() => {
+            this.accountName((name: string, fid: number) => {
+                
+                this.postNumbers((nbr: number) => {
+                
+                    this.appendLibs(() => {
+                
+                        this.waitForPlugin(() => {
+                
                             let id: number = Date.now();
                             let html: string = new controllers.Handlebar('FacebookInline.hbs').getHtml({
                                 id: id,
                                 pid: fid,
-                                nbr: 1
+                                nbr: nbr || 1
                             });
                             cbk(html);
-                            this.stage.iframe.contentWindow.OctoBoot_plugins.facebook_plugin(fid, this.stage.iframe.contentDocument.getElementsByClassName(id.toString())[0], 1)
-                        }, () => { this.placeholder.remove() })
-                    
+                        })
+                    })
+                })
+            })
+        }
+
+        public filterElement(el: HTMLElement, cbk: () => any): void {
+            if ($(el).hasClass('ob_facebook')) {
+                new controllers.Alert({
+                    title: 'Plugin Facebook - Already Exist!',
+                    body: 'Plugin Facebook already exist on this element, click on OK to REMOVE it, or CANCEL',
+                    onApprove: () => {
+                        this.currentElement.remove();
+                        this.placeholder.remove();
+                    },
+                    onDeny: () => {}
+                })
+            } else if ($(el).width() < 300) {
+                new controllers.Alert({
+                    title: 'Plugin Facebook error - your container is to tiny !!',
+                    body: 'Plugin Facebook needs more than 300px',
+                    onApprove: () => this.placeholder.remove()
+                })
+            } else {
+                cbk();
+            }
+        }
+
+        private accountName(done: (name: string, fid: number) => any): void {
+            let alert: controllers.Alert = new controllers.Alert({
+                title: 'Plugin Facebook - account name',
+                body: 'Please fill with your facebook account name, you can find it on you profile url https://www.facebook.com/[ACCOUNT_NAME]/',
+                input: 'Account name',
+                icon: 'facebook',
+                closable: false,
+                onApprove: () => {
+                    alert.setWait()
+
+                    this.getFacebookId(alert.getInputValue(), (fid: number) => {
+                        $.get('/facebook/' + fid + '/feed', function(feeds) {
+                            if (feeds.length) {
+                                done(alert.getInputValue(), fid)
+                            } else {
+                                new controllers.Alert({
+                                    title: 'Facebook plugin error - you have no public posts !',
+                                    body: 'Please check on your facebook account the access policy of your post',
+                                    onApprove: () => this.placeholder.remove()
+                                })
+                            }
+                        });
                     }, () => { this.placeholder.remove() })
 
+                    return false;
                 },
                 onDeny: () => { this.placeholder.remove() }
             })
         }
 
-        /*public filterElement(el: HTMLElement, cbk: () => any): void {
-            if ($(el).attr('src') && $(el).attr('src').indexOf('module/instagram.html') !== -1) {
-                new controllers.Alert({
-                    title: 'Plugin Instagram - Already Exist!',
-                    body: 'Plugin Instagram already exist on this element, click on OK to MODIFY it, or click on CANCEL to APPEND NEW ONE after it',
-                    onApprove: () => {
-                        this.modify = true;
-                        cbk();
-                    },
-                    onDeny: () => cbk()
-                })
-            } else {
-                cbk();
-            }
-        }*/
+        private postNumbers(done: (nbr: number) => any): void {
+            let list_post_number: number[] = [];
+            for (var i = 1; i <= 25; i++) {
+                list_post_number.push(i)
+            } 
 
-        private appendLibs(done: () => any, deny: () => any): void {
+            let alert: controllers.Alert = new controllers.Alert({
+                title: 'Plugin Facebook - Posts numbers',
+                body: 'Please choose how much posts you want to display',
+                dropdown: list_post_number,
+                icon: 'facebook',
+                closable: false,
+                onApprove: () => {
+                    done(parseInt(alert.getDropdownValue()))
+                },
+                onDeny: () => { this.placeholder.remove() }
+            })
+        }
+
+        private appendLibs(done: () => any): void {
             this.checkForLib({
                 name: 'Facebook library',
-                propToCheck: !!this.stage.iframe.contentWindow.FB,
-                libToAppend: ['module/' + this.tagFacebook, 'module/' + this.libFacebook],
-                done: done,
-                deny: deny,
-                copyFilesInProject: ['facebook/' + this.tagFacebook, 'facebook/' + this.libFacebook]
+                propToCheck: !!this.win.FB,
+                libToAppend: ['module/' + this.libFacebook],
+                done: () => {
+                    this.checkForLib({
+                        name: 'jQuery library',
+                        propToCheck: !!this.win.$,
+                        libToAppend: this.libJQuery,
+                        done: done,
+                        deny: () => { this.placeholder.remove() }
+                    })
+                },
+                deny: () => { this.placeholder.remove() },
+                copyFilesInProject: ['facebook/' + this.libFacebook]
             })
         }
 
@@ -91,6 +146,15 @@ module OctoBoot.plugins {
                     })
                 }
             })
+        }
+
+        private waitForPlugin(done: () => any): void {
+            let inter: number = setInterval(() => {
+                if (this.win.OctoBoot_plugins && this.win.OctoBoot_plugins.facebook_plugin) {
+                    clearInterval(inter);
+                    done()
+                }
+            }, 10);
         }
 
     }

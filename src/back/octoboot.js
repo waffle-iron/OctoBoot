@@ -19,6 +19,7 @@ rm = require("./modules/rm.js"),
 rmdir = require("./modules/rmdir.js"),
 sfu = require("./modules/string_from_url.js"),
 upload = require("./modules/upload.js"),
+facebook = require("./modules/facebook.js"),
 // Model API share with front
 modelApi = require("./model/serverapi.js"),
 // GitHub conf
@@ -72,6 +73,7 @@ var octoboot = function(app, socketIo) {
 
     // custom module utilities (instagram / etc..)
     app.get("/stringfromurl/:url", sfu)
+    app.get("/facebook/:pageid/feed", facebook.feed)
 
     // 404
     app.use(r404)

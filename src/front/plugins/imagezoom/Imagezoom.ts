@@ -21,18 +21,15 @@ module OctoBoot.plugins {
         }
 
         public getInline(cbk: (plugin_html: string) => any): void {
-            let w: Window = this.stage.iframe.contentWindow;
-            let d: Document = this.stage.iframe.contentDocument;
-            
             this.checkForLib({
                 name: 'jQuery',
-                propToCheck: !!w['$'],
+                propToCheck: !!this.win['$'],
                 libToAppend: this.libJQuery,
                 done: () => {
 
                     this.checkForLib({
                         name: 'Semantic',
-                        propToCheck: !!w['$'](d.body).accordion,
+                        propToCheck: !!this.win['$'](this.doc.body).accordion,
                         libToAppend: this.libSemantic,
                         done: () => {
                             
@@ -62,7 +59,7 @@ module OctoBoot.plugins {
 
                     let title: string = helper.Dom.encodeString(alert.getInputValue());
                     let url: string = alert.getDropdownValue();
-                    let html: string = $(this.stage.iframe.contentDocument).find('.modal.imagezoom').length ? '' : new controllers.Handlebar('ImagezoomInline.hbs').getHtml({});
+                    let html: string = $(this.doc).find('.modal.imagezoom').length ? '' : new controllers.Handlebar('ImagezoomInline.hbs').getHtml({});
 
                     this.checkForLib({
                         name: 'Plugin Image Zoom',
