@@ -68,11 +68,11 @@ module OctoBoot.plugins {
                 closable: false,
                 onApprove: () => {
                     alert.setWait()
-
-                    this.getFacebookId(alert.getInputValue(), (fid: number) => {
+                    var name: string = alert.getInputValue().replace('https://www.facebook.com/', '')
+                    this.getFacebookId(name, (fid: number) => {
                         $.get('/facebook/' + fid + '/feed', (feeds: any[]) => {
                             if (feeds.length) {
-                                done(alert.getInputValue(), fid)
+                                done(name, fid)
                             } else {
                                 new controllers.Alert({
                                     title: 'Facebook plugin error - you have no public posts !',
