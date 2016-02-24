@@ -11,7 +11,7 @@ module OctoBoot.controllers {
         image?: string;
         iframe?: string;
         input?: string;
-        dropdown?: string[];
+        dropdown?: string[] | number[];
         link?: string;
         closable?: boolean;
     }
@@ -39,7 +39,7 @@ module OctoBoot.controllers {
             this.onDeny = !!options.onDeny;
             this.onApprove = !!options.onApprove;
             this.buttonCount = options.onDeny && options.onApprove ? 'two' : 'one';
-            this.closable = typeof options.closable === "boolean" ? options.closable : !!options.onDeny;
+            this.closable = typeof options.closable === "boolean" ? options.closable : false;
 
             this.initWithContext(this).modal({
                 closable: this.closable,

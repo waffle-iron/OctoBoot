@@ -6,3 +6,4 @@ temp/*
 !temp/.gitkeep
 
 githubconf.json
+facebook.app.login.json
