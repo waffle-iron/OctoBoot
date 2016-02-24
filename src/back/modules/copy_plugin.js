@@ -1,19 +1,10 @@
-var cp = require("child_process")
-var fs = require("fs")
+var copy = require("./copy.js")
 
-module.exports = function(dirProject, dirPlugin, sockets, done) {
+module.exports = function(dirRoot, sockets, done) {
     return function(data) {
-        var dest = dirProject + data._sid + "/" + data.project + '/module/';
-        var src = dirPlugin + data.file
-        fs.mkdir(dest, function(){
-            dest += data.file.split('/').pop();
-            cp.exec("cp -rf " + src + " " + dest, function(error, stdout, stderr) {
-                if (sockets && data._scbk) {
-                    sockets[data._sid].s.emit(data._scbk, error)
-                } else if (done) {
-                    done(error)
-                }
-            })
-        })
+        data.src = 'src/front/plugins/' + data.file
+        data.dest = 'temp/' + data._sid + '/' + data.project + '/module/'
+        data.file = data.file.split('/').pop()
+        copy(dirRoot, sockets, done)(data)
     }
 }

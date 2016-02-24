@@ -9,6 +9,7 @@ convert = require("./modules/convert.js"),
 clone = require("./modules/clone.js"),
 list = require("./modules/list.js"),
 ls = require("./modules/ls.js"),
+copy = require("./modules/copy.js"),
 copy_template = require("./modules/copy_template.js"),
 copy_plugin = require("./modules/copy_plugin.js"),
 save = require("./modules/save.js"),
@@ -30,9 +31,10 @@ ghcli.debug = true
 // ####
 
 var sockets = []
-var projectDir = __dirname + "/../../temp/"
-var templateDir = __dirname + "/../../static/templates/"
-var pluginDir = __dirname + "/../front/plugins/"
+var rootDir = __dirname + "/../../"
+var projectDir = rootDir + "temp/"
+var templateDir = rootDir + "static/templates/"
+
 
 function isLogged(req, res) {
     if (!req.signedCookies.gat) {
@@ -91,8 +93,9 @@ var octoboot = function(app, socketIo) {
             })
 
             socket.on(modelApi.SOCKET_SAVE, save(projectDir, sockets))
-            socket.on(modelApi.SOCKET_COPY_TEMPLATE, copy_template(projectDir, templateDir, sockets))
-            socket.on(modelApi.SOCKET_COPY_PLUGIN, copy_plugin(projectDir, pluginDir, sockets))
+            socket.on(modelApi.SOCKET_COPY_TEMPLATE, copy_template(rootDir, sockets))
+            socket.on(modelApi.SOCKET_COPY_PLUGIN, copy_plugin(rootDir, sockets))
+            socket.on(modelApi.SOCKET_COPY, copy(rootDir, sockets))
             socket.on(modelApi.SOCKET_CLONE, clone(projectDir, sockets))
             socket.on(modelApi.SOCKET_PUBLISH, publish(projectDir, sockets))
             socket.on(modelApi.SOCKET_CONVERT, convert(projectDir, sockets))

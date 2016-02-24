@@ -1,16 +1,12 @@
-var cp = require("child_process")
+var copy = require("./copy.js")
 
-module.exports = function(dirP, dirT, sockets, done) {
+module.exports = function(dirRoot, sockets, done) {
     return function(data) {
-        var template = data.template.replace(/\[|\]|\s/ig, "\\$&")
-        var dest = dirP + data._sid + "/" + data.project + (data.file === "index" ? "/" : "/" + data.file + "/")
-        var src = dirT + template + (data.file === "index" ? "/*" : "")
-        cp.exec("cp -rf " + src + " " + dest, function(error, stdout, stderr) {
-            if (sockets && data._scbk) {
-            	sockets[data._sid].s.emit(data._scbk, !error)
-            } else if (done) {
-            	done(error)
-            }
-        })
+        var template = data.template.replace(/\[|\]|\s/ig, "\\$&") + "/*"
+        data.src = 'static/templates/' + template
+        data.dest = 'temp/' + data._sid + '/' + data.project + "/" + (data.file === "index" ? "" : data.file)
+        data.file = ''
+        console.log(data.project, data.file,data.dest,  template)
+        copy(dirRoot, sockets, done)(data)
     }
 }

@@ -109,6 +109,7 @@ module OctoBoot {
                             })
                         } else {
                             options.libToAppend.forEach((lib: string) => this.appendLib(lib))
+                            options.done()
                         }
                     },
                     onDeny: options.deny

@@ -43,7 +43,7 @@ module OctoBoot.controllers {
             url = url || this.jDom.find('.text').html();
             this.url = url.replace(/http(:?s)*:\/\/(:?\w+\.){1,}\w+\//ig, '/');
             this.iframe.src = this.baseUrl + this.url;
-            this.jDom.find('.text').html(this.url);
+            
             if (this.showAdress) {
                 this.refreshAndShowUrl(); 
             }
@@ -73,6 +73,7 @@ module OctoBoot.controllers {
                 })
                 // active dropdown
                 this.jDom.find('.dropdown').dropdown({ onChange: (value: string, text: string) => this.load(text) });
+                this.jDom.find('.text').html(this.url);
             })
         }
     }

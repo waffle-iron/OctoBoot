@@ -17,6 +17,7 @@ var OctoBoot;
             ServerAPI.UPLOAD = '/api/upload/:sid/:project/:filename';
             ServerAPI.SOCKET_BIND = 'bind';
             ServerAPI.SOCKET_ID = 'sid';
+            ServerAPI.SOCKET_COPY = 'cp';
             ServerAPI.SOCKET_COPY_TEMPLATE = 'cpTemplate';
             ServerAPI.SOCKET_COPY_PLUGIN = 'cpPlugin';
             ServerAPI.SOCKET_LIST_TEMPLATE = 'templatesList';

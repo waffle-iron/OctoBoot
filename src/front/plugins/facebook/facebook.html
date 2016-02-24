@@ -47,7 +47,6 @@
             var previous_width;
             var resize = function() {
                 var current_width = document.body.offsetWidth
-                console.log(this, 'resize', previous_width !== current_width, previous_width , current_width, 'iframe.' + pid + nbr)
                 if (previous_width !== current_width) {
                     $(parent.document).find('iframe.' + pid + nbr).css('height', document.body.offsetHeight + 'px')
                     previous_width = current_width
@@ -70,9 +69,7 @@
                 if (FB) {
                     FB.XFBML.parse()
                     var inter = setInterval(function() {
-                        console.log('check rendered')
                         if ($('.fb-post').length === $('[fb-xfbml-state="rendered"]').length) {
-                            console.log('rendered ok -> resize')
                             clearInterval(inter);
                             resize(); 
                         }
