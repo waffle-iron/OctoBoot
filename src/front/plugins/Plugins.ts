@@ -39,10 +39,6 @@ module OctoBoot {
         public borders: controllers.Borders;
         public currentElement: HTMLElement;
         
-        // current edited iframe
-        public win: Window;
-        public doc: Document;
-        
         constructor(public name: string) {
             super(name)
         }
@@ -50,8 +46,6 @@ module OctoBoot {
         public init(container: JQuery, stage: controllers.Stage, projectName: string) {
             this.container = container;
             this.stage = stage;
-            this.win = this.stage.iframe.contentWindow;
-            this.doc = this.stage.iframe.contentDocument;
             this.projectName = projectName;
             this.placeholder = new controllers.Handlebar('Placeholder.hbs').initWithContext(null);
             this.placeholder.remove();

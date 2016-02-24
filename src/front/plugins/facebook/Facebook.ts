@@ -115,12 +115,12 @@ module OctoBoot.plugins {
         private appendLibs(done: () => any): void {
             this.checkForLib({
                 name: 'Facebook library',
-                propToCheck: !!this.win.FB,
+                propToCheck: !!this.stage.iframe.contentWindow.FB,
                 libToAppend: ['module/' + this.libFacebook],
                 done: () => {
                     this.checkForLib({
                         name: 'jQuery library',
-                        propToCheck: !!this.win.$,
+                        propToCheck: !!this.stage.iframe.contentWindow.$,
                         libToAppend: this.libJQuery,
                         done: done,
                         deny: () => { this.placeholder.remove() }
@@ -150,7 +150,7 @@ module OctoBoot.plugins {
 
         private waitForPlugin(done: () => any): void {
             let inter: number = setInterval(() => {
-                if (this.win.OctoBoot_plugins && this.win.OctoBoot_plugins.facebook_plugin) {
+                if (this.stage.iframe.contentWindow.OctoBoot_plugins && this.stage.iframe.contentWindow.OctoBoot_plugins.facebook_plugin) {
                     clearInterval(inter);
                     done()
                 }
