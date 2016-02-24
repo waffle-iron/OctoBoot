@@ -8,6 +8,8 @@
 
 module OctoBoot.controllers {
 
+    export var EditBarCopiedElement: JQuery;
+
     export class EditBar extends Handlebar {
 
         // iframe container of EditingBar
@@ -23,7 +25,7 @@ module OctoBoot.controllers {
 
         // width and number of buttons on EditBar
         private buttonWidth: number = 35;
-        private buttonNum: number = 8;
+        private buttonNum: number = 10;
 
         // width / height and margin of global EditBar
         private width: number = (this.buttonWidth * this.buttonNum) + (this.buttonNum  * 2); // give some extra space for targeted tag (can be one letter like A but also SPAN etc..)
@@ -247,6 +249,11 @@ module OctoBoot.controllers {
                 this.iframeBody.find('.special.move').show();
             }
 
+            // if we have a copied element in storage, show paste button
+            if (EditBarCopiedElement) {
+                this.iframeBody.find('.special.paste').show();
+            }
+
             switch (tag) {
                 case 'img':
                     this.iframeBody.find('.special.img').show();
@@ -374,6 +381,65 @@ module OctoBoot.controllers {
         }
 
         /**
+        *    Copy current element to EditBarCopiedElement
+        */
+
+        private copy(): void {
+            EditBarCopiedElement = $(this.editingElement).clone();
+            this.iframeBody.find('.special.paste').show();
+        }
+
+        /**
+        *    Paste EditBarCopiedElement
+        */
+
+        private paste(): void {
+            var actions: string[] = ['replace with selected element', 'append inside selected element', 'append after selected element', 'append before selected element'];
+            var alert: Alert = new Alert({
+                title: 'Paste element',
+                body: 'Choose an action to paste your previously copied element (' + $(EditBarCopiedElement).get(0).tagName + ')',
+                icon: 'paste',
+                dropdown: actions,
+                onApprove: () => {
+                    switch (alert.getDropdownValue()) {
+                        
+                        case actions[0]:
+                            if (this.editingElement.tagName !== EditBarCopiedElement.get(0).tagName || !EditBarCopiedElement.hasClass(this.editingElement.className)) {
+                                new Alert({
+                                    title: 'Paste warning', 
+                                    body: 'Do care ! It seems that both element are not the same, are you sure about your action ?', 
+                                    onApprove: () => $(this.editingElement).replaceWith(EditBarCopiedElement),
+                                    onDeny: () => {}
+                                })
+                            } else {
+                                $(this.editingElement).replaceWith(EditBarCopiedElement)    
+                            }
+                            break
+
+                        case actions[1]:
+                            $(this.editingElement).append(EditBarCopiedElement)
+                            break
+
+                        case actions[2]:
+                            EditBarCopiedElement.insertAfter(this.editingElement)
+                            break
+
+                        case actions[3]:
+                            EditBarCopiedElement.insertBefore(this.editingElement)
+                            break
+
+                        default:
+                            return false
+                            break
+                    }
+                    EditBarCopiedElement = null;
+                    this.iframeBody.find('.special.paste').hide();
+                }, 
+                onDeny: () => {}
+            })
+        }
+
+        /**
         *    Handlebars handler for edit bar buttons
         */
 
@@ -398,6 +464,12 @@ module OctoBoot.controllers {
                     mouseover: () => this.borders.border(Borders.rect(this.editingElement.parentElement)),
                     mouseout: () => this.borders.border(Borders.rect(this.editingElement)),
                     click: () => this.show(this.editingElement.parentElement)
+                },
+                copy : {
+                    click: () => this.copy()
+                },
+                paste : {
+                    click: () => this.paste()
                 }
             }, (key: string, handlers: model.HTMLEvent) => handlers.context = context)
         }
