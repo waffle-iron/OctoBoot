@@ -131,7 +131,7 @@ module OctoBoot.controllers {
             this.rect = null;
 
             this.iframe.jDom.hide();
-            
+
             if (this.borders) {
                 this.borders.destroy();
             }
@@ -193,7 +193,7 @@ module OctoBoot.controllers {
                 } else {
                     this.borders = new Borders(element);
                 }
-                
+
                 this.rect = rect;
             }
         }
@@ -227,7 +227,7 @@ module OctoBoot.controllers {
             // Fill button with current tag name
             if (element && element.tagName) {
                 this.iframeBody.find('.button.tag .visible.content').html(element.tagName);
-                this.iframeBody.find('.button.tag').next().html('select parent > ' + element.parentElement.tagName.toLowerCase()); 
+                this.iframeBody.find('.button.tag').next().html('select parent > ' + element.parentElement.tagName.toLowerCase());
             }
         }
 
@@ -394,44 +394,47 @@ module OctoBoot.controllers {
         */
 
         private paste(): void {
-            var actions: string[] = ['replace with selected element', 'append inside selected element', 'append after selected element', 'append before selected element'];
+            var actions: string[] = [
+                'replace with selected element',
+                'append inside selected element',
+                'append after selected element',
+                'append before selected element'
+            ];
+            var copiedElement: JQuery = EditBarCopiedElement.clone();
             var alert: Alert = new Alert({
                 title: 'Paste element',
-                body: 'Choose an action to paste your previously copied element (' + $(EditBarCopiedElement).get(0).tagName + ')',
+                body: 'Choose an action to paste your previously copied element (' + copiedElement.get(0).tagName + ')',
                 icon: 'paste',
                 dropdown: actions,
                 onApprove: () => {
                     switch (alert.getDropdownValue()) {
-                        
+
                         case actions[0]:
-                            if (this.editingElement.tagName !== EditBarCopiedElement.get(0).tagName || !EditBarCopiedElement.hasClass(this.editingElement.className)) {
+                            if (this.editingElement.tagName !== copiedElement.get(0).tagName || !copiedElement.hasClass(this.editingElement.className)) {
                                 new Alert({
-                                    title: 'Paste warning', 
-                                    body: 'Do care ! It seems that both element are not the same, are you sure about your action ?', 
-                                    onApprove: () => $(this.editingElement).replaceWith(EditBarCopiedElement),
+                                    title: 'Paste warning',
+                                    body: 'Do care ! It seems that both element are not the same, are you sure about your action ?',
+                                    onApprove: () => $(this.editingElement).replaceWith(copiedElement),
                                     onDeny: () => {}
                                 })
                             } else {
-                                $(this.editingElement).replaceWith(EditBarCopiedElement)    
+                                $(this.editingElement).replaceWith(copiedElement)
                             }
                             break
 
                         case actions[1]:
-                            $(this.editingElement).append(EditBarCopiedElement)
+                            $(this.editingElement).append(copiedElement)
                             break
 
                         case actions[2]:
-                            EditBarCopiedElement.insertAfter(this.editingElement)
+                            copiedElement.insertAfter(this.editingElement)
                             break
 
                         case actions[3]:
-                            EditBarCopiedElement.insertBefore(this.editingElement)
+                            copiedElement.insertBefore(this.editingElement)
                             break
                     }
-                    
-                    EditBarCopiedElement = null;
-                    this.iframeBody.find('.special.paste').hide();
-                }, 
+                },
                 onDeny: () => {}
             })
         }
