@@ -56,6 +56,10 @@ module OctoBoot.controllers {
             if (options.dropdown) {
                 this.jDom.find('.dropdown').dropdown();
             }
+
+            if (options.dropdown && options.input) {
+                this.jDom.find('.input').css('margin-top', 15)
+            }
         }
 
         public getInputValue(): string {

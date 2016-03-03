@@ -25,7 +25,7 @@ module OctoBoot.controllers {
 
         // width and number of buttons on EditBar
         private buttonWidth: number = 35;
-        private buttonNum: number = 10;
+        private buttonNum: number = 11;
 
         // width / height and margin of global EditBar
         private width: number = (this.buttonWidth * this.buttonNum) + (this.buttonNum  * 2); // give some extra space for targeted tag (can be one letter like A but also SPAN etc..)
@@ -440,6 +440,53 @@ module OctoBoot.controllers {
         }
 
         /**
+         *    Create / Edit link
+         */
+
+        private link(): void {
+            var editLink = (url: string, target: string) => {
+                let link: HTMLAnchorElement = this.editingElement as HTMLAnchorElement
+
+                if ($(link).parents('a').length) {
+                    link = $(link).parents('a').get(0) as HTMLAnchorElement
+                } else if (link.tagName.toUpperCase() !== "A") {
+                    // create link
+                    link = document.createElement('a')
+                    $(link).insertBefore(this.editingElement)
+                    $(link).append(this.editingElement)
+                }
+
+                link.href = url
+                link.target = target
+
+                this.show(link)
+            }
+
+            let dirToInspect = this.stage.baseUrl.split('/').pop() + '/' + this.stage.url.split('/')[1];
+            core.Socket.getFilesListFiltered(dirToInspect, (data: string[]) => {
+                var alertUrl: Alert = new Alert({
+                    title: 'Create link',
+                    body: 'Please choose a local url (one from your website) OR type a external http url on the bottom input',
+                    icon: 'linkify',
+                    input: 'http://...',
+                    dropdown: data,
+                    onApprove: () => {
+                        var alertTarget: Alert = new Alert({
+                            title: 'Create link',
+                            body: 'Please choose a target, open the link on a new window (_blank) or in the current window (_self)',
+                            dropdown: ['_blank', '_self'],
+                            icon: 'linkify',
+                            onApprove: () => editLink(alertUrl.getDropdownValue() || alertUrl.getInputValue(), alertTarget.getDropdownValue()),
+                            onDeny: () => { }
+                        })
+                    },
+                    onDeny: () => {}
+                })
+            })
+
+        }
+
+        /**
         *    Handlebars handler for edit bar buttons
         */
 
@@ -470,6 +517,9 @@ module OctoBoot.controllers {
                 },
                 paste : {
                     click: () => this.paste()
+                },
+                link: {
+                    click: () => this.link()
                 }
             }, (key: string, handlers: model.HTMLEvent) => handlers.context = context)
         }

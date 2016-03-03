@@ -7,6 +7,14 @@ module OctoBoot.core {
         public static sid: number;
         public static io: SocketIOClient.Socket;
 
+        private static files_weight_order = {
+            html: 6,
+            png: 5,
+            jpg: 4,
+            css: 3,
+            js: 2
+        };
+
         public static init(): any {
             this.io = io('http://' + window.location.host);
             // try to retrieve previous sid on localstorage
@@ -43,6 +51,16 @@ module OctoBoot.core {
         public static reset(): void {
             localStorage.removeItem(model.ServerAPI.SOCKET_ID);
             location.reload();
+        }
+
+        public static getFilesListFiltered(dir: string, done: (filesList: string[]) => any): void {
+            this.emit(model.ServerAPI.SOCKET_LIST_FILES, { dir: dir }, (data: string[]) => {
+                done(data.sort((a: string, b: string) => {
+                    let aw: number = this.files_weight_order[a.split('.').pop()] || 1
+                    let bw: number = this.files_weight_order[b.split('.').pop()] || 1
+                    return bw - aw
+                }))
+            })
         }
     }
 }
