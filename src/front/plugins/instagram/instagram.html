@@ -14,7 +14,13 @@
         var previous_width, iframe_data = []
         var parse_instagram_response = function(resp) {
             $("#placeholder").html(resp.html)
-            resize()
+            var wait = setInterval(function() {
+                if ($("#placeholder").height() !== 0) {
+                    resize()
+                    clearInterval(wait)
+                }
+            }, 100)
+            
         }
 
         var resize = function() {
