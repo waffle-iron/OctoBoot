@@ -13,13 +13,14 @@
     </style>
 </head>
 <body>
+    <div id="fb_post_wrapper"></div>
     <script type="text/javascript">
         (window.OctoBoot_plugins = window.OctoBoot_plugins || {}).facebook_plugin = function(pid, nbr) {
             if (!pid) {
                 console.error('Facebook Plugin error - page id missing')
             }
 
-            container = document.body;
+            container = document.getElementById('fb_post_wrapper');
             var count = nbr = nbr || 1;
 
 
@@ -48,7 +49,7 @@
             var resize = function() {
                 var current_width = document.body.offsetWidth
                 if (previous_width !== current_width) {
-                    $(parent.document).find('iframe.' + pid + nbr).css('height', document.body.offsetHeight + 'px')
+                    $(parent.document).find('iframe.' + pid + nbr).css('height', container.offsetHeight + 'px')
                     previous_width = current_width
                 }
             }

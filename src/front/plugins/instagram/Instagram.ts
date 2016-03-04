@@ -22,7 +22,7 @@ module OctoBoot.plugins {
                 onApprove: () => {
                     let account_name: string = alert.getInputValue();
                     let html: string = new controllers.Handlebar('InstagramInline.hbs').getHtml({ 
-                        url: this.applyRelativeDepthOnUrl(this.libInstagram),
+                        url: this.stage.applyRelativeDepthOnUrl(this.libInstagram),
                         account_name: account_name, 
                         iframe_id: Date.now()
                     });

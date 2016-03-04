@@ -306,12 +306,7 @@ module OctoBoot.controllers {
             var depth: number = this.stage.url.split('/').length - 3; // remove project and file name
 
             if (url) {
-
-                for (var i: number = 0; i < depth; i++) {
-                    url = '../' + url
-                }
-
-                $(this.editingElement).attr('src', url);
+                $(this.editingElement).attr('src', this.stage.applyRelativeDepthOnUrl(url));
             }
 
             $(this.editingElement).attr('alt', alt)
@@ -476,7 +471,10 @@ module OctoBoot.controllers {
                             body: 'Please choose a target, open the link on a new window (_blank) or in the current window (_self)',
                             dropdown: ['_blank', '_self'],
                             icon: 'linkify',
-                            onApprove: () => editLink(alertUrl.getDropdownValue() || alertUrl.getInputValue(), alertTarget.getDropdownValue()),
+                            onApprove: () => editLink(
+                                this.stage.applyRelativeDepthOnUrl(alertUrl.getDropdownValue()) || alertUrl.getInputValue(),
+                                alertTarget.getDropdownValue()
+                            ),
                             onDeny: () => { }
                         })
                     },

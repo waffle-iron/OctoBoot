@@ -20,7 +20,7 @@
         var resize = function() {
             var current_width = document.body.offsetWidth
             if (previous_width !== current_width) {
-                $(window.parent.document).find('iframe.' + iframe_data[1]).css('height', (document.body.offsetHeight + 20) + 'px')
+                $(window.parent.document).find('iframe.' + iframe_data[1]).css('height', ($("#placeholder").height() + 20) + 'px')
                 previous_width = current_width
             }
         }

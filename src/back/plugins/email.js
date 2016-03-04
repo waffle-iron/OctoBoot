@@ -8,7 +8,6 @@ fs.readFile(__dirname + '/../../../mailgun.api.login.json', function(error, data
     if (error) {
         console.log('plugin mailgun error - mailgun.api.login.json missing')
     } else {
-        console.log(data.toString())
         transporter = nodemailer.createTransport({
              service: 'Mailgun', // no need to set host or port etc.
              auth: JSON.parse(data.toString())

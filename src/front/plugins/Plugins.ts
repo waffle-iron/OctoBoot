@@ -117,25 +117,11 @@ module OctoBoot {
             }
         }
 
-        // APPLY RELATIVE PATH DEPTH FOR URL
-        // USEFULL TO PUT A PLUGIN OR LIB ON PAGE
-        // IF WE HARE NOT IN DEPTH 1 (SUB-PAGE)
-        public applyRelativeDepthOnUrl(url: string): string {
-            var depth: number = this.stage.url.split('/').length - 3; // remove project and file name
-
-            for (var i: number = 0; i < depth; i++) {
-                url = '../' + url
-            }
-
-            return url
-        }
-
-
         // APPEND LIBRARY (CSS / JS) ON USER PAGE
         public appendLib(lib: string): void {
             let type: string = lib.split('.').pop(), sr: any;
 
-            lib = this.applyRelativeDepthOnUrl(lib);
+            lib = this.stage.applyRelativeDepthOnUrl(lib);
 
             switch (type) {
                 case 'js':

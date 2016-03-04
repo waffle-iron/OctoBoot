@@ -60,5 +60,18 @@ module OctoBoot.controllers {
                 this.jDom.find('.text').html(this.url);
             })
         }
+
+        // APPLY RELATIVE PATH DEPTH FOR A GIVEN ROOT'S RELATIVE PATH URL
+        // USEFULL TO PUT A PLUGIN OR LIB ON PAGE
+        // IF WE HARE NOT IN DEPTH 1 (SUB-PAGE)
+        public applyRelativeDepthOnUrl(url: string): string {
+            var depth: number = this.url.split('/').length - 3; // remove project and file name
+
+            for (var i: number = 0; i < depth; i++) {
+                url = '../' + url
+            }
+
+            return url
+        }
     }
 }

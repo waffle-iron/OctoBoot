@@ -29,7 +29,7 @@ module OctoBoot.plugins {
                         let html: string = new controllers.Handlebar('FacebookInline.hbs').getHtml({
                             pid: fid,
                             nbr: nbr || 1,
-                            url: this.applyRelativeDepthOnUrl('module/' + this.libFacebook)
+                            url: this.stage.applyRelativeDepthOnUrl('module/' + this.libFacebook)
                         });
                         cbk(html);
                     })
