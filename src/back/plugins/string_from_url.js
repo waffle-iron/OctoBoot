@@ -31,7 +31,7 @@ module.exports = function(req, res) {
 
         getres.on("end", function () {
             res.set('Access-Control-Allow-Origin', '*').send(data)
-            sumo.info('plugin-sfu', purl, Date.now() - start)
+            sumo.info('plugin-sfu', purl, req.get('Referer'), Date.now() - start)
         });
     })
 }
