@@ -24,6 +24,8 @@ module OctoBoot.model {
         public static SOCKET_FILL_TEMPLATE: string = 'fill';
         public static SOCKET_REMOVE_FILE: string = 'rm';
         public static SOCKET_REMOVE_DIR: string = 'rmdir';
+        public static SOCKET_SUMOLOGIC_INFO: string = 'sumoinfo';
+        public static SOCKET_SUMOLOGIC_ERROR: string = 'sumoerror';
 
         public static getProjectPath(sid: number, projectName: string): string {
 			return '/temp/' + sid + '/' + projectName + '/'

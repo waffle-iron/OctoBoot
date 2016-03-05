@@ -111,6 +111,8 @@ var octoboot = function(app, socketIo) {
             socket.on(modelApi.SOCKET_FILL_TEMPLATE, fill(projectDir, sockets))
             socket.on(modelApi.SOCKET_REMOVE_FILE, rm(projectDir, sockets))
             socket.on(modelApi.SOCKET_REMOVE_DIR, rmdir(projectDir, sockets))
+            socket.on(modelApi.SOCKET_SUMOLOGIC_INFO, sumo.info(null))
+            socket.on(modelApi.SOCKET_SUMOLOGIC_ERROR, sumo.error(null))
 
             socket.emit(data._scbk)
         })

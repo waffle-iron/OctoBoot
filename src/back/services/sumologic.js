@@ -67,9 +67,20 @@ var log = function(pre, data) {
 }
 
 exports.info = function(id) {
-    log('[I]', arguments)
+    if (id !== null) {
+       log('[I]', arguments) 
+    }
+    
+    return function(data) {
+        log('[I]', data)
+    }
 }
 
 exports.error = function(id) {
-    log('[E]', arguments)
+    if (id !== null) {
+       log('[E]', arguments) 
+    }
+    return function(data) {
+        log('[E]', data)
+    }
 }

@@ -28,6 +28,7 @@ module OctoBoot.controllers {
             core.GitHub.getUser((user: model.GitHubUser) => {
                 this.user = user;
                 helper.HandlebarHelper.updateTemplate(model.UI.HB_PROFIL, user);
+                core.Socket.emit(model.ServerAPI.SOCKET_SUMOLOGIC_INFO, ['user-connection', user.login])
 
                 core.GitHub.getRepos(model.RepoType.PUBLIC, (repos: Array<model.GitHubRepo>) => { this.repos_public = repos; this.update_view_repo(model.RepoType.PUBLIC, repos) });
                 core.GitHub.getRepos(model.RepoType.PRIVATE, (repos: Array<model.GitHubRepo>) => { this.repos_private = repos; this.update_view_repo(model.RepoType.PRIVATE, repos) });

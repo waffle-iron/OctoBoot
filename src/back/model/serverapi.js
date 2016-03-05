@@ -31,6 +31,8 @@ var OctoBoot;
             ServerAPI.SOCKET_FILL_TEMPLATE = 'fill';
             ServerAPI.SOCKET_REMOVE_FILE = 'rm';
             ServerAPI.SOCKET_REMOVE_DIR = 'rmdir';
+            ServerAPI.SOCKET_SUMOLOGIC_INFO = 'sumoinfo';
+            ServerAPI.SOCKET_SUMOLOGIC_ERROR = 'sumoerror';
             return ServerAPI;
         })();
         model.ServerAPI = ServerAPI;
