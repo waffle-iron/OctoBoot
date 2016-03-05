@@ -18,11 +18,13 @@ scrapp = require("./modules/scrapp.js"),
 fill = require("./modules/fill.js"),
 rm = require("./modules/rm.js"),
 rmdir = require("./modules/rmdir.js"),
-sfu = require("./modules/string_from_url.js"),
 upload = require("./modules/upload.js"),
-facebook = require("./modules/facebook.js"),
 // Plugins
 email = require("./plugins/email.js"),
+facebook = require("./plugins/facebook.js"),
+sfu = require("./plugins/string_from_url.js"),
+// Services
+sumo = require("./services/sumologic.js"),
 // Model API share with front
 modelApi = require("./model/serverapi.js"),
 // GitHub conf
@@ -86,7 +88,7 @@ var octoboot = function(app, socketIo) {
     ghapi.init(ghc.client_id, ghc.client_secret, ghc.authorization_callback_url)
 
     socketIo.on("connection", function(socket) {
-
+        sumo.info(0, 'socket connection')
         socket.on(modelApi.SOCKET_BIND, function(data) {
 
             socket.on(modelApi.SOCKET_ID, function(data) {

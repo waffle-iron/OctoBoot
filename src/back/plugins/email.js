@@ -1,8 +1,9 @@
-var nodemailer = require('nodemailer');
-var bodyParser = require('body-parser');
-var fs = require('fs');
+var nodemailer = require('nodemailer')
+var bodyParser = require('body-parser')
+var sumo = require("../services/sumologic.js")
+var fs = require('fs')
 
-var transporter;
+var transporter
 
 fs.readFile(__dirname + '/../../../mailgun.api.login.json', function(error, data) {
     if (error) {
@@ -11,7 +12,7 @@ fs.readFile(__dirname + '/../../../mailgun.api.login.json', function(error, data
         transporter = nodemailer.createTransport({
              service: 'Mailgun', // no need to set host or port etc.
              auth: JSON.parse(data.toString())
-        });
+        })
     }
 })
 
@@ -23,6 +24,9 @@ module.exports = function(app) {
         var mailOptions, body = '';
     
         if (req.params.from && req.params.to) {
+            
+            sumo.info('plugin-email', req.params.from, req.params.to)
+
             for (var param in req.body) {
                 body += param + ': ' + req.body[param] + '\n'
             }
@@ -36,6 +40,7 @@ module.exports = function(app) {
                 
             transporter.sendMail(mailOptions, function(error, info){
                 if(error){
+                    sumo.error('plugin-email', req.params.from, req.params.to, error)
                     return res.status(404).send('Error !')
                 }
                 res.send('Email sended !')
@@ -43,6 +48,7 @@ module.exports = function(app) {
             
         } else {
             res.status(404).send('Error !')
+            sumo.error('plugin-email', req.params.from, req.params.to, error)
         }
     }
     

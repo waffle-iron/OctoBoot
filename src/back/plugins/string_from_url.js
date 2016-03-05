@@ -1,11 +1,13 @@
-var http = require("http"),
-https = require("https"),
-url = require("url");
+var http = require("http")
+var https = require("https")
+var url = require("url")
+var sumo = require("../services/sumologic.js")
 
 
 module.exports = function(req, res) {
     var getter = req.params.url.indexOf('https') === 0 ? https : http
     var purl = url.parse(req.params.url)
+    var start = Date.now()
     var options = {
       hostname: purl.hostname,
       path: purl.path,
@@ -22,12 +24,14 @@ module.exports = function(req, res) {
             data += chunk;
         });
 
-        getres.on("error", function() {
+        getres.on("error", function(error) {
             res.status(404).send();
+            sumo.error('plugin-sfu', error, purl)
         })
 
         getres.on("end", function () {
             res.set('Access-Control-Allow-Origin', '*').send(data)
+            sumo.info('plugin-sfu', purl, Date.now() - start)
         });
     })
 }

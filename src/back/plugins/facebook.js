@@ -1,5 +1,6 @@
 var FB = require("fb")
 var fs = require("fs")
+var sumo = require("../services/sumologic.js")
 
 var appId, appSecret, token
 var appLogin = (done, error) => {
@@ -31,7 +32,7 @@ var appToken = (done, error) => {
                 grant_type: 'client_credentials'
             }, (res) => {
                 if(!res || res.error) {
-                    console.log(!res ? 'facebook plugin - error occurred' : res.error);
+                    sumo.error('plugin-facebook', !res ? 'error occurred' : res.error, req.get('Referer'));
                     error()
                     return;
                 }
@@ -50,14 +51,17 @@ exports.feed = (req, res) => {
             FB.api(req.params.pageid + '/feed', {access_token: token}, (fb_res) => {
                 if(!fb_res || fb_res.error) {
                     console.log(!fb_res ? 'error occurred' : fb_res.error);
+                    sumo.error('plugin-facebook', !res ? 'error occurred' : res.error, req.get('Referer'));
                     error()
                     return;
                 }
                 var ids = fb_res.data.map((post) => { return post.id })
                 res.set('Access-Control-Allow-Origin', '*').send(ids)
+                sumo.info('plugin-facebook', req.params.pageid, req.get('Referer'));
             })
         }, error)
     } else {
         error()
+        sumo.error('plugin-facebook', 'no page id', req.get('Referer'));
     }
 }

@@ -1,3 +1,4 @@
+var sumo = require("../services/sumologic.js")
 var s,c
 
 exports.init = function(socket, scbk) {
@@ -9,6 +10,7 @@ exports.cbk = function(done) {
     return function(error, stdo, stde) {
         if (error) {
             s.emit(c, stde || stdo || error)
+            sumo.error(scbk, stde || stdo || error)
         } else if (done) {
             done()
         }
