@@ -15,6 +15,9 @@
 <body>
     <div id="fb_post_wrapper"></div>
     <script type="text/javascript">
+        /**
+         * Octoboot - Facebook Plugin
+         */
         (window.OctoBoot_plugins = window.OctoBoot_plugins || {}).facebook_plugin = function(pid, nbr) {
             if (!pid) {
                 console.error('Facebook Plugin error - page id missing')
@@ -22,7 +25,6 @@
 
             container = document.getElementById('fb_post_wrapper');
             var count = nbr = nbr || 1;
-
 
             /**
              * APPEND POST
@@ -45,18 +47,40 @@
             /**
              * RESIZE
              */
-            var previous_width;
+            var previous_height;
             var resize = function() {
-                var current_width = document.body.offsetWidth
-                if (previous_width !== current_width) {
+                var current_height = container.offsetHeight
+                if (previous_height !== current_height) {
                     $(parent.document).find('iframe.' + pid + nbr).css('height', container.offsetHeight + 'px')
-                    previous_width = current_width
+                    previous_height = current_height
                 }
             }
             window.addEventListener('resize', resize)
 
             /**
-             * GET FEEDS / START
+             * Facebook SDK async callback
+             */
+            var postReady,fbReady;
+            var fbInit = function() {
+                FB.init({
+                    xfbml      : true,
+                    version    : 'v2.5'
+                })
+                var inter = setInterval(function() {
+                    if ($('.fb-post').length === $('[fb-xfbml-state="rendered"]').length) {
+                        resize(); 
+                    }
+                }, 500);
+            }
+            window.fbAsyncInit = function() {
+                fbReady = true
+                if (postReady) {
+                    fbInit()
+                }
+            }
+
+            /**
+             * START - GET FEEDS
              */
             $.get('http://octoboot.soizen.ovh/facebook/' + pid + '/feed', function(feeds) {
                 feeds.forEach(function(post_id) {
@@ -67,27 +91,22 @@
                         count--
                     }
                 })
-                if (FB) {
-                    FB.XFBML.parse()
-                    var inter = setInterval(function() {
-                        if ($('.fb-post').length === $('[fb-xfbml-state="rendered"]').length) {
-                            clearInterval(inter);
-                            resize(); 
-                        }
-                    }, 500);
+                postReady = true
+                if (fbReady) {
+                    fbInit()
                 }
-            });
+            })
         }
 
         /**
-         * Facebook SDK async callback
+         * Search for data in location and start process
          */
-        window.fbAsyncInit = function() {
-          FB.init({
-            xfbml      : true,
-            version    : 'v2.5'
-          });
-        };
+        if (location.search) {
+            iframe_data = location.search.replace('?', '').split('|')
+            OctoBoot_plugins.facebook_plugin(iframe_data[0], parseInt(iframe_data[1]))
+        } else {
+            console.error('facebook module error: facebook id missing on location')
+        }
 
         /**
          * Facebook SDK Tag
@@ -99,16 +118,6 @@
             js.src = "//connect.facebook.net/en_US/sdk.js";
             fjs.parentNode.insertBefore(js, fjs);
         }(document, 'script', 'facebook-jssdk'));
-
-        /**
-         * Search for data in location and start process
-         */
-        if (location.search) {
-            iframe_data = location.search.replace('?', '').split('|')
-            OctoBoot_plugins.facebook_plugin(iframe_data[0], parseInt(iframe_data[1]))
-        } else {
-            console.error('facebook module error: facebook id missing on location')
-        }
     </script>
 
 </body>
