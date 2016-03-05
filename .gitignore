@@ -8,3 +8,4 @@ temp/*
 githubconf.json
 facebook.app.login.json
 mailgun.api.login.json
+sumologic.collector.conf

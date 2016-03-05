@@ -45,6 +45,7 @@ var appToken = (done, error) => {
 
 exports.feed = (req, res) => {
     var error = (err) => {res.status(410).send()}
+    var start = Date.now()
     
     if (req.params.pageid) {
         appToken((token) => {
@@ -57,7 +58,7 @@ exports.feed = (req, res) => {
                 }
                 var ids = fb_res.data.map((post) => { return post.id })
                 res.set('Access-Control-Allow-Origin', '*').send(ids)
-                sumo.info('plugin-facebook', req.params.pageid, req.get('Referer'));
+                sumo.info('plugin-facebook', req.params.pageid, req.get('Referer'), Date.now() - start);
             })
         }, error)
     } else {
