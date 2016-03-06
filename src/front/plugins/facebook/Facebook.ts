@@ -110,7 +110,7 @@ module OctoBoot.plugins {
 
         private appendLibs(done: () => any): void {
             this.checkForLib({
-                name: 'jQuery library',
+                name: 'jQuery',
                 propToCheck: !!this.stage.iframe.contentWindow.$,
                 libToAppend: this.libJQuery,
                 done: () => this.copyFileInProject('facebook/' + this.libFacebook, done),

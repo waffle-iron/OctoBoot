@@ -76,7 +76,8 @@ module OctoBoot {
             }, (error: string) => {
                 if (error) {
                     new controllers.Alert({title: 'Error on plugin creation', body: error, onApprove: () => {}})
-                } else {
+                    this.placeholder.remove()
+                } else if (done) {
                     done()
                 }
             })
