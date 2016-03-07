@@ -1,7 +1,10 @@
 (window.OctoBoot_plugins = window.OctoBoot_plugins || {}).comments = function() {
-    var template = $(this).find('.comment')
+    var template = $(this).children('.comment')
+    var wrapper = $(this).children('.comments_wrapper')
     var form = $(this).find('form')
     var id = $(this).attr('id')
+
+    wrapper.html('')
 
     $.get('http://octoboot.soizen.ovh/comments/' + id, function(data) {
         if (data) {
@@ -31,7 +34,7 @@
                     })
                 }
 
-                com.insertBefore(template)
+                wrapper.append(com)
             })
         }
     })
