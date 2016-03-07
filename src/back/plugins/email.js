@@ -5,7 +5,7 @@ var fs = require('fs')
 
 var transporter
 
-fs.readFile(__dirname + '/../../../mailgun.api.login.json', function(error, data) {
+fs.readFile(__dirname + '/../../../mailgun.api.login.json', (error, data) => {
     if (error) {
         console.log('plugin mailgun error - mailgun.api.login.json missing')
     } else {
@@ -16,11 +16,11 @@ fs.readFile(__dirname + '/../../../mailgun.api.login.json', function(error, data
     }
 })
 
-module.exports = function(app) {
+module.exports = (app) => {
     
     app.use(bodyParser.urlencoded({ extended: true }))
 
-    return function(req, res) {
+    return (req, res) => {
         var mailOptions, body = '';
     
         if (req.params.from && req.params.to) {
@@ -38,7 +38,7 @@ module.exports = function(app) {
                 text: body
             }
                 
-            transporter.sendMail(mailOptions, function(error, info){
+            transporter.sendMail(mailOptions, (error, info) => {
                 if(error){
                     sumo.error('plugin-email', req.params.from, req.params.to, error)
                     return res.status(404).send('Error !')

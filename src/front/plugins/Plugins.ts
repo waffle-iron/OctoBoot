@@ -36,6 +36,7 @@ module OctoBoot {
         public dragOverAction: PluginDragOverAction = PluginDragOverAction.APPEND;
 
         public placeholder: JQuery;
+        public customPlaceholder: JQuery;
         public borders: controllers.Borders;
         public currentElement: HTMLElement;
         
@@ -47,7 +48,7 @@ module OctoBoot {
             this.container = container;
             this.stage = stage;
             this.projectName = projectName;
-            this.placeholder = new controllers.Handlebar('Placeholder.hbs').initWithContext(null);
+            this.placeholder = this.customPlaceholder || new controllers.Handlebar('Placeholder.hbs').initWithContext(null);
             this.placeholder.remove();
 
             return this.initWithContext(this, container)
@@ -147,8 +148,10 @@ module OctoBoot {
                 if (e.target === prev) {
                     return
                 }
+                
                 prev = e.target as HTMLElement
-                if (e.target !== this.placeholder.get(0)) {
+                
+                if (prev !== this.placeholder.get(0) && prev.parentElement !== this.placeholder.get(0)) {
                     switch (this.dragOverAction) {
                         case PluginDragOverAction.APPEND:
                             this.append(e)
@@ -171,7 +174,7 @@ module OctoBoot {
                 if (!parent) {
                     this.placeholder.appendTo(el)
                 } else {
-                    this.placeholder.insertBefore(el)
+                    this.placeholder.insertAfter(el)
                 }
             })
         }

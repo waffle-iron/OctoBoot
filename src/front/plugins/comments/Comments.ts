@@ -3,9 +3,9 @@
 
 module OctoBoot.plugins {
 
-    export class Filter extends Plugin {
+    export class Comments extends Plugin {
 
-        private libFilter: string = 'filter.js';
+        private libComments: string = 'comments.js';
         private libJQuery: string[] = ['https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js'];
         private libSemantic: string[] = [
             'https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.7/semantic.min.js',
@@ -13,40 +13,39 @@ module OctoBoot.plugins {
         ];
 
         constructor() {
-            super('FilterButton.hbs')
-            this.customPlaceholder = new controllers.Handlebar('FilterInline.hbs').initWithContext({ target: '' })
+            super('CommentsButton.hbs')
+            this.customPlaceholder = new controllers.Handlebar('CommentsInline.hbs').initWithContext({ target: '' })
         }
 
         public getInline(cbk: (plugin_html: string) => any): void {
-            var alert: controllers.Alert = new controllers.Alert({
-                title: 'Plugin Filter',
-                body: 'Choose a css selector to filter, default to "article"',
-                input: 'article',
-                icon: 'search',
+            new controllers.Alert({
+                title: 'Plugin Comments',
+                body: 'Add plugin comment ?',
+                icon: 'comments',
                 onApprove: () => {
-                    let selector: string = alert.getInputValue() || 'article'
-                    cbk(new controllers.Handlebar('FilterInline.hbs').getHtml({ target: selector }))
-                    this.appendLibs()
+                    this.appendLibs(() => {
+                        cbk(new controllers.Handlebar('CommentsInline.hbs').getHtml({id: Date.now()}))
+                    })
                 },
                 onDeny: () => this.placeholder.remove()
             })
         }
 
-        private appendLibs(): void {
+        private appendLibs(done: () => any): void {
             // copy filter.js lib to project
-            this.copyFileInProject('filter/' + this.libFilter, () => {
+            this.copyFileInProject('comments/' + this.libComments, () => {
                 // check if filter.js is on the window, if not, append it
                 this.checkForLib({
-                    name: 'Filter',
-                    propToCheck: 'filter',
-                    libToAppend: ['module/' + this.libFilter],
-                    done: () => { 
+                    name: 'Comments',
+                    propToCheck: 'comments',
+                    libToAppend: ['module/' + this.libComments],
+                    done: () => {
                         // check if semantic is here, if not, append it
                         this.checkForLib({
                             name: 'Semantic',
                             propToCheck: !!this.stage.iframe.contentWindow['$'](this.stage.iframe.contentDocument.body).accordion,
-                            libToAppend: this.libJQuery.concat(this.libSemantic),
-                            done: () => { },
+                            libToAppend: this.libJQuery.concat(this.libSemantic).concat('module/' + this.libComments),
+                            done: () => done(),
                             deny: () => this.placeholder.remove()
                         })
                     },

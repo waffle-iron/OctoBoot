@@ -1,0 +1,37 @@
+<div class="ui comments" id="{{id}}">
+  <h3 class="ui dividing header" style="display:none">Comments</h3>
+  <div class="comment" style="display:none">
+    <div class="content">
+      <div class="avatar"><i class="user big icon"></i></div>
+      <div class="author">Joe Henderson</div>
+      <div class="metadata">
+        <div class="date">1 day ago</div>
+        <div class="rating">
+          <i class="star icon"></i>
+          <span>5 Likes</span>
+        </div>
+      </div>
+      <div class="text">
+        <p>The hours, minutes and seconds stand as visible reminders that your effort put them all there. </p>
+        <p>Preserve until your next run, when the watch lets you see how Impermanent your efforts are.</p>
+      </div>
+      <div class="actions">
+        <div class="like" style="opacity:.5;cursor:pointer">Like</div>
+      </div>
+    </div>
+  </div>
+  <h3 class="ui dividing header">Leave a comment</h3>
+  <form class="ui reply form" action="http://octoboot.soizen.ovh/comments/{{id}}" method="post" target="_self">
+    <div class="field">
+      <label>Name</label>
+      <input type="text" name="name">
+    </div>
+    <div class="field">
+      <label>Message</label>
+      <textarea name="message"></textarea>
+    </div>
+    <div class="ui submit labeled icon button">
+      <i class="icon edit"></i> Add Comment
+    </div>
+  </form>
+</div>

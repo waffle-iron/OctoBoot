@@ -23,6 +23,7 @@ upload = require("./modules/upload.js"),
 email = require("./plugins/email.js"),
 facebook = require("./plugins/facebook.js"),
 sfu = require("./plugins/string_from_url.js"),
+comments = require("./plugins/comments.js"),
 // Services
 sumo = require("./services/sumologic.js"),
 // Model API share with front
@@ -81,6 +82,7 @@ var octoboot = function(app, socketIo) {
     app.get("/stringfromurl/:url", sfu)
     app.get("/facebook/:pageid/feed", facebook.feed)
     app.post("/email/:from/:to/:subject", email(app))
+    app.post("/comments/:id", comments(app))
 
     // 404
     app.use(r404)
