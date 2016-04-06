@@ -157,6 +157,7 @@ module OctoBoot.controllers {
             this.hide();
             this.iframe.jDom.remove();
             this.remove_iframe_overlay();
+            this.borders.clean();
         }
 
         /**

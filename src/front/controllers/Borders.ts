@@ -60,5 +60,12 @@ module OctoBoot.controllers {
             }
         }
 
+        public clean(): void {
+            var missing: JQuery = $(this.element.ownerDocument.body).find('.octoline')
+            if (missing.length) {
+                missing.remove()
+            }
+        }
+
     }
 }

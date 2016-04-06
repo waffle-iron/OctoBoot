@@ -6,6 +6,7 @@
   "scripts": {
     "test": "npm start",
     "start": "npm run build:ts && npm run build:model && npm run build:handlebars",
+    "run": "node server.js",
     "watch": "parallelshell 'npm run watch:ts' 'npm run watch:handlebars'",
     "build:ts": "tsc src/front/OctoBoot.ts --removeComments --sourceMap --out dist/octoboot.js && uglifyjs dist/octoboot.js -o dist/octoboot.js --mangle --compress",
     "build:model": "tsc src/front/model/ServerApi.ts --out src/back/model/serverapi.js && echo 'module.exports = OctoBoot.model.ServerAPI' >> src/back/model/serverapi.js",
