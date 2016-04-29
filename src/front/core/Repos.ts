@@ -21,14 +21,13 @@ module OctoBoot.core {
         public onCreate: (name: string, url: string) => void;
 
         private toolsbar: controllers.Toolsbar;
-        private alertConvert: controllers.Alert;
         private alertCreate: controllers.Alert;
 
         constructor (public name: string, public url: string, public type: string, public sidebar: JQuery, public sidebarButton?: HTMLElement) {
             if (!name) {
                 this.create(type);
             } else {
-                this.select();
+                this.clone();
             }
         }
 
@@ -39,33 +38,10 @@ module OctoBoot.core {
             }
         }
 
-        private select(): void {
-            this.setState(REPO_STATE.LOADING);
-            this.didConvertRepoToOctoBoot((convert: boolean) => {
-
-                if (convert) {
-                    this.alertConvert = new controllers.Alert({
-                        title: model.UI.REPO_ALERT_CONVERT_TITLE,
-                        body: model.UI.REPO_ALERT_CONVERT_BODY,
-                        onApprove: () => this.clone(convert),
-                        onDeny: () => true
-                    });
-                } else {
-                    this.clone(convert);
-                }
-
-            });
-        }
-
         private open(url: string): void {
             if (this.alertCreate) {
                 this.alertCreate.hide();
                 this.alertCreate = null;
-            }
-
-            if (this.alertConvert) {
-                this.alertConvert.hide();
-                this.alertConvert = null;
             }
 
             this.setState(REPO_STATE.SELECT);
@@ -73,23 +49,9 @@ module OctoBoot.core {
             this.toolsbar = new controllers.Toolsbar(this.name, this.stage, this.url, this.sidebar);
         }
 
-        private didConvertRepoToOctoBoot(done: (convert: boolean) => any): void {
-            var convert = true;
-            core.GitHub.getTree(this.name, (dataTree: model.GitHubTree) => {
-                dataTree.tree.forEach((value: model.GitHubTreeFile) => {
-                    if (value.path.indexOf('.octoboot') !== -1) {
-                        convert = false;
-                    }
-                });
+        private clone(convert: boolean = false): boolean {
+            this.setState(REPO_STATE.LOADING);
 
-                done(convert);
-            });
-        }
-
-        private clone(convert: boolean): boolean {
-            if (this.alertConvert) {
-                this.alertConvert.setWait()
-            }
             core.GitHub.cloneOnServer(this.name, this.url, (error: string) => {
                 if (!error) {
                     var projectUrl: string = model.ServerAPI.getProjectPath(Socket.sid, this.name) + "index.html";
@@ -112,11 +74,6 @@ module OctoBoot.core {
                 url: this.url
             }, (error: string) => {
                 if (!error) {
-
-                    if (this.alertConvert) {
-                        this.alertConvert.hide();
-                    }
-
                     done();
                 } else {
                     new controllers.Alert({ title: 'Error during project convertion', body: error , onApprove: () => {}})
