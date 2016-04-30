@@ -7,8 +7,12 @@ module OctoBoot.controllers {
         body?: string;
         onApprove?: any;
         onApproveText?: string;
+        onApproveClass?: string;
+        onApproveIcon?: string;
         onDeny?: any;
         onDenyText?: string;
+        onDenyClass?: string;
+        onDenyIcon?: string;
         icon?: string;
         image?: string;
         iframe?: string;
@@ -44,7 +48,12 @@ module OctoBoot.controllers {
             this.closable = typeof options.closable === "boolean" ? options.closable : false;
 
             this.options.onApproveText = options.onApproveText || 'OK'
+            this.options.onApproveClass = options.onApproveClass || 'ok green'
+            this.options.onApproveIcon = options.onApproveIcon || 'checkmark'
+            
             this.options.onDenyText = options.onDenyText || 'CANCEL'
+            this.options.onDenyClass = options.onDenyClass || 'deny red'
+            this.options.onDenyIcon = options.onDenyIcon || 'remove'
 
             this.initWithContext(this).modal({
                 closable: this.closable,

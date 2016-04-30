@@ -36,6 +36,8 @@ module OctoBoot.controllers {
                 icon: 'copy',
                 onApproveText: 'DUPLICATE',
                 onDenyText: 'TEMPLATE',
+                onDenyClass: 'deny green',
+                onDenyIcon: 'checkmark',
                 closable: true,
                 onApprove: () => this.duplicate(),
                 onDeny: () => this.jDom.modal('show')

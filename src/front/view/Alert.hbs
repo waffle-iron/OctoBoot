@@ -64,11 +64,11 @@
         <div class="{{buttonCount}} fluid ui inverted buttons">
 
             {{#if onDeny}}
-            <div class="ui red deny basic inverted button"><i class="remove icon"></i>{{options.onDenyText}}</div>
+            <div class="ui {{options.onDenyClass}} basic inverted button"><i class="{{options.onDenyIcon}} icon"></i>{{options.onDenyText}}</div>
             {{/if}}
 
             {{#if onApprove}}
-            <div class="ui green ok basic inverted button"><i class="checkmark icon"></i>{{options.onApproveText}}</div>
+            <div class="ui {{options.onApproveClass}} basic inverted button"><i class="{{options.onApproveIcon}} icon"></i>{{options.onApproveText}}</div>
             {{/if}}
 
         </div>

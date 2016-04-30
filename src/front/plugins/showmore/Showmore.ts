@@ -37,12 +37,9 @@ module OctoBoot.plugins {
             if ($(el).hasClass('showmore')) {
                 new controllers.Alert({
                     title: 'Plugin Show More - Already Exist!',
-                    body: 'Plugin Show More already exist on this element, click on OK to REMOVE it, or click on CANCEL to RESIZE it',
+                    body: 'Plugin Show More already exist on this element, you can REMOVE it or RESIZE it',
+                    onApproveText: 'RESIZE',
                     onApprove: () => {
-                        this.getPluginDom(this.setShowmoreParentAsCurrentElement(el));
-                        this.cancel();
-                    },
-                    onDeny: () => {
                         this.setShowmoreParentAsCurrentElement(el);
                         this.getPluginDom($(this.currentElement));
                         $(this.currentElement).css('transition', '');
@@ -50,6 +47,11 @@ module OctoBoot.plugins {
                         this.borders.element = this.currentElement;
                         this.borders.refresh();
                         cbk();
+                    },
+                    onDenyText: 'REMOVE',
+                    onDeny: () => {
+                        this.getPluginDom(this.setShowmoreParentAsCurrentElement(el));
+                        this.cancel();
                     }
                 })
             } else {
