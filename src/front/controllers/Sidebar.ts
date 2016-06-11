@@ -25,16 +25,30 @@ module OctoBoot.controllers {
         public update(): void {
             this.repo_template = null;
             this.jDom.sidebar('show');
+
+            // get user profile
             core.GitHub.getUser((user: model.GitHubUser) => {
                 this.user = user;
                 helper.HandlebarHelper.updateTemplate(model.UI.HB_PROFIL, user);
                 core.Socket.emit(model.ServerAPI.SOCKET_SUMOLOGIC_INFO, ['user-connection', user.login])
-
-                core.GitHub.getRepos(model.RepoType.PUBLIC, (repos: Array<model.GitHubRepo>) => { this.repos_public = repos; this.update_view_repo(model.RepoType.PUBLIC, repos) });
-                core.GitHub.getRepos(model.RepoType.PRIVATE, (repos: Array<model.GitHubRepo>) => { this.repos_private = repos; this.update_view_repo(model.RepoType.PRIVATE, repos) });
-
-                this.update_view_template()
             })
+
+            // get public repos
+            core.GitHub.getRepos(model.RepoType.PUBLIC, (repos: Array<model.GitHubRepo>) => {
+                this.repos_public = repos;
+                this.update_view_repo(model.RepoType.PUBLIC, repos) ;
+                this.update_view_template();
+            });
+
+            // get private repos
+            core.GitHub.getRepos(model.RepoType.PRIVATE, (repos: Array<model.GitHubRepo>) => {
+                if (repos.length) {
+                    this.repos_private = repos;
+                    this.update_view_repo(model.RepoType.PRIVATE, repos);
+                } else {
+                    $('.ReposPrivate').hide();
+                }
+            });
         }
 
         private update_view_repo(type: string, repos: Array<model.GitHubRepo>): void {
@@ -43,8 +57,8 @@ module OctoBoot.controllers {
                 titleHandlers: this.handlers_title(),
                 repoHandlers: this.handlers_repo(type),
                 newHandlers: this.handlers_new_repo(type),
-                repos: repos.filter((repo: model.GitHubRepo) => { return !!repo.owner.login.match(this.user.login) && !repo.name.match(model.ServerAPI.TEMPLATE_REPO_NAME) }), // filter by owner
-                title: formatedType
+                repos: repos.filter((repo: model.GitHubRepo) => { return !repo.name.match(model.ServerAPI.TEMPLATE_REPO_NAME) }), // filter template repo
+                title: type + ' website',
             }, 'Repos' + formatedType);
 
             this.check_for_template(repos);
@@ -56,7 +70,7 @@ module OctoBoot.controllers {
                 repoHandlers: this.handlers_template(),
                 newHandlers: this.handler_new_template(),
                 repos: dir ? dir.tree.map((sub: model.GitHubTreeFile) => { sub.name = sub.path; return sub }) : [],
-                title: 'Template'
+                title: 'template'
             }, 'ReposTemplates');
         }
 
@@ -195,12 +209,12 @@ module OctoBoot.controllers {
                         this.update();
 
                         // fill missing sidebarButton to change button state
-                        // ugly timeout .. 
+                        // ugly timeout ..
                         setTimeout(() => {
                             this.selected.sidebarButton = $('.Repos' + type.charAt(0).toUpperCase() + type.slice(1)).find('.repo' + name).get(0);
                         }, 3000)
                     }
-                }   
+                }
             }
         }
 

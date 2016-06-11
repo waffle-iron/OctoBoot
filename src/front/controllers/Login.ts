@@ -18,6 +18,7 @@ module OctoBoot.controllers {
                 title: model.UI.LOGIN_TITLE,
                 body: model.UI.LOGIN_BODY,
                 onApprove: () => this.connectGitHub(),
+                onApproveText: 'Connect me',
                 icon: 'github square'
             });
         }

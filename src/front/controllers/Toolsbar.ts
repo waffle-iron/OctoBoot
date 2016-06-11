@@ -12,56 +12,62 @@ module OctoBoot.controllers {
 
     export class Toolsbar extends Handlebar {
 
-        public templates: Templates;
-        public editing: boolean;
+        public templates: Templates
+        public editing: boolean
 
         public createHandlers: model.HTMLEvent = {
             click: () => this.create()
-        };
+        }
 
         public saveHandlers: model.HTMLEvent = {
             click: () => this.save()
-        };
+        }
 
         public publishHandlers: model.HTMLEvent = {
             click: () => this.publish()
-        };
+        }
 
         public editHandlers: model.HTMLEvent = {
             click: () => this.edit()
-        };
+        }
+
+        public duplicateHandlers: model.HTMLEvent = {
+            click: () => this.duplicate()
+        }
 
         public uploadHandlers: model.HTMLEvent = {
             click: () => this.upload()
-        };
+        }
 
         public removeHandlers: model.HTMLEvent = {
             click: () => this.remove()
-        };
+        }
 
         public pluginsHandlers: model.HTMLEvent = {
             click: () => this.plugins()
-        };
+        }
 
-        private editBarHover: EditBar;
-        private editBarClick: EditBar;
-        private inputUpload: HTMLInputElement;
-        private fileReader: FileReader;
+        private editBarHover: EditBar
+        private editBarClick: EditBar
+        private editDuplicables: Array<EditBar>
+        private inputUpload: HTMLInputElement
+        private fileReader: FileReader
+        private actionToCancel: Function
 
         constructor(public projectName: string, public stage: Stage, public repoUrl: string, public sidebar: JQuery) {
-            super(model.UI.HB_TOOLSBAR);
-            this.initWithContext(this, this.stage.jDom);
+            super(model.UI.HB_TOOLSBAR)
+            this.initWithContext(this, this.stage.jDom)
 
-            this.templates = new Templates(this.projectName, this.stage);
+            this.templates = new Templates(this.projectName, this.stage)
 
-            this.sidebar.sidebar('attach events', this.jDom.children('.settings'));
+            this.sidebar.sidebar('attach events', this.jDom.children('.settings'))
 
-            core.Socket.io.on('404', () => helper.Dom.setItemActive(this.jDom, 'New'));
-            core.Socket.io.on('save_available', () => helper.Dom.setItemActive(this.jDom, 'save'));
+            core.Socket.io.on('404', () => helper.Dom.setItemActive(this.jDom, 'New'))
+            core.Socket.io.on('save_available', () => helper.Dom.setItemActive(this.jDom, 'save'))
 
-            this.inputUpload = $('input#upload').get(0) as HTMLInputElement;
+            this.inputUpload = $('input#upload').get(0) as HTMLInputElement
 
-            this.initPlugins();
+            this.initPlugins()
         }
 
         private initPlugins(): void {
@@ -69,7 +75,7 @@ module OctoBoot.controllers {
             for (var name in OctoBoot.plugins) {
                 new OctoBoot.plugins[name]()
                 .init(container, this.stage, this.projectName)
-                .hide();
+                .hide()
             }
         }
 
@@ -78,18 +84,19 @@ module OctoBoot.controllers {
         }
 
         private create(): void {
-			this.templates.show();
+			this.templates.show()
         }
 
         private save(): void {
-            if (this.editing) {
-                this.edit();
+            // if action running, cancel it
+            if (this.actionToCancel) {
+                this.actionToCancel()
             }
 
-            helper.Dom.setIconLoading(this.jDom, ['save']);
+            helper.Dom.setIconLoading(this.jDom, ['save'])
 
-            var uri: string[] = this.stage.url.split('/');
-            var file: string = uri.pop();
+            var uri: string[] = this.stage.url.split('/')
+            var file: string = uri.pop()
 
             core.Socket.emit(model.ServerAPI.SOCKET_SAVE, {
                 name: uri.join('/'),
@@ -100,11 +107,11 @@ module OctoBoot.controllers {
                 if (error) {
                     new Alert({ title: 'Error on save', body: error, onApprove: () => {}})
                 } else {
-                    helper.Dom.setItemActive(this.jDom, 'publish');
-                    this.stage.reload();
+                    helper.Dom.setItemActive(this.jDom, 'publish')
+                    this.stage.reload()
                 }
-                helper.Dom.setIconLoading(this.jDom, ['save'], false);
-            });
+                helper.Dom.setIconLoading(this.jDom, ['save'], false)
+            })
         }
 
         private publish(): void {
@@ -113,12 +120,12 @@ module OctoBoot.controllers {
                 body: model.UI.PUBLISH_ALERT_BODY,
                 onApprove: () => {
 
-                    helper.Dom.setIconLoading(this.jDom, ['cloud', 'upload']);
+                    helper.Dom.setIconLoading(this.jDom, ['cloud', 'upload'])
 
                     core.Socket.emit(model.ServerAPI.SOCKET_PUBLISH, { name: this.projectName, url: this.repoUrl }, (error: string) => {
 
                         if (!error) {
-                            helper.Dom.setIconLoading(this.jDom, ['cloud', 'upload'], false);
+                            helper.Dom.setIconLoading(this.jDom, ['cloud', 'upload'], false)
 
                             core.GitHub.getUser((user: model.GitHubUser) => {
                                 new Alert({
@@ -126,63 +133,105 @@ module OctoBoot.controllers {
                                     icon: 'checkmark',
                                     link: 'http://' + user.login.toLowerCase() + '.github.io/' + this.projectName,
                                     onApprove: () => { }
-                                });
-                            });
+                                })
+                            })
                         } else {
                             new Alert({
                                 title: 'Publish error !',
                                 body: error,
                                 onApprove: () => { }
-                            });
+                            })
                         }
-                        
-                    });
+
+                    })
                 },
                 onDeny: () => {}
             })
         }
 
         private edit(): void {
-            var container: JQuery = $(this.stage.iframe.contentDocument.body);
+            var container: JQuery = $(this.stage.iframe.contentDocument.body)
             // if we want to edit a js / css file, start editing in basic mode
-            var basicEdit: boolean = container.children().length === 1 && container.children().get(0).tagName.toUpperCase() === 'PRE';
+            var basicEdit: boolean = container.children().length === 1 && container.children().get(0).tagName.toUpperCase() === 'PRE'
 
             // Bind events on window if not already done for editing
             if (!basicEdit) {
-                this.bindEditionEvents();
+                this.bindEditionEvents()
             }
 
             // Editing flag
-            this.editing = !this.editing;
+            this.editing = !this.editing
 
             if (this.editing) {
-                helper.Dom.setItemActive(this.jDom, 'edit');
+
+                // if action running, cancel it
+                if (this.actionToCancel) {
+                    this.actionToCancel()
+                }
+
+                this.actionToCancel = this.edit
+
+                helper.Dom.setItemActive(this.jDom, 'edit')
                 if (basicEdit) {
-                    container.children().get(0).contentEditable = "true";
+                    container.children().get(0).contentEditable = "true"
                 } else {
                     // most case, inline editing full mode
                     // create or reset EditBar on click and hover (need two different EditBar)
-                    this.editBarClick = new EditBar(container, this.stage);
-                    this.editBarHover = new EditBar(container, this.stage);
-                    this.editBarHover.init_iframes_overlay();
+                    this.editBarClick = new EditBar(container, this.stage)
+                    this.editBarHover = new EditBar(container, this.stage)
+                    this.editBarHover.init_iframes_overlay()
                 }
             } else {
                 // If not editing, destroy EditBar
-                helper.Dom.setItemActive(this.jDom, 'null');
+                this.actionToCancel = null
+                helper.Dom.setItemActive(this.jDom, 'null')
                 if (!basicEdit) {
-                    this.editBarClick.destroy();
-                    this.editBarHover.destroy();
+                    this.editBarClick.destroy()
+                    this.editBarHover.destroy()
                 } else {
-                    container.children().removeAttr('contentEditable');
+                    container.children().removeAttr('contentEditable')
                 }
             }
         }
 
+        private duplicate(): void {
+            if (!this.editDuplicables) {
+                helper.Dom.setItemActive(this.jDom, 'duplicate')
+                // if action running, cancel it
+                if (this.actionToCancel) {
+                    this.actionToCancel()
+                }
+
+                this.actionToCancel = this.duplicate
+
+                this.editDuplicables = []
+
+                var container: JQuery = $(this.stage.iframe.contentDocument.body)
+                var duplicables = container.find('*[ob-duplicable]')
+
+                var add_edit: (e: HTMLElement) => any = (e: HTMLElement) => {
+                    let edit: EditBar = new EditBar(container, this.stage)
+                    this.editDuplicables.push(edit)
+                    edit.show(e, true)
+                    edit.on_duplicate = add_edit
+                }
+
+                duplicables.each((i, e) => {
+                    add_edit(e as HTMLElement)
+                })
+            } else {
+                helper.Dom.setItemActive(this.jDom, 'null')
+                this.editDuplicables.forEach((edit: EditBar) => edit.destroy())
+                this.editDuplicables = null
+                this.actionToCancel = null
+            }
+        }
+
         private upload(): void {
-            $(this.inputUpload).click();
+            $(this.inputUpload).click()
             $(this.inputUpload).one('change', (e) => {
-                helper.Dom.setIconLoading(this.jDom, ['upload'], true);
-                this.fileReader = new FileReader();
+                helper.Dom.setIconLoading(this.jDom, ['upload'], true)
+                this.fileReader = new FileReader()
                 this.fileReader.readAsArrayBuffer(this.inputUpload.files[0])
                 this.fileReader.onloadend = (e: any) => {
                     var xhr: XMLHttpRequest = new XMLHttpRequest()
@@ -191,14 +240,14 @@ module OctoBoot.controllers {
                             .replace(/:project/, this.projectName)
                             .replace(/:filename/, this.inputUpload.files[0].name))
                     xhr.onloadend = () => {
-                        helper.Dom.setIconLoading(this.jDom, ['upload'], false);
-                        this.stage.refreshAndShowUrl();
+                        helper.Dom.setIconLoading(this.jDom, ['upload'], false)
+                        this.stage.refreshAndShowUrl()
 
                         if (xhr.status !== 200) {
                             new Alert({title: 'Upload error', onApprove: () => {}})
                         }
                     }
-                    xhr.setRequestHeader('Content-Type', this.inputUpload.files[0].type);
+                    xhr.setRequestHeader('Content-Type', this.inputUpload.files[0].type)
                     xhr.send(e.target.result)
                 }
             })
@@ -234,19 +283,19 @@ module OctoBoot.controllers {
             }
 
             this.stage.iframe.contentWindow.addEventListener('mousemove', (e: MouseEvent) => {
-                let element: HTMLElement = $(e.target).get(0);
+                let element: HTMLElement = $(e.target).get(0)
                 if (this.editing && !this.editBarClick.editingElement) {
                     // if we are in editing mode AND nothing currently editing
-                    this.editBarHover.show(element);
+                    this.editBarHover.show(element)
                 }
-            });
+            })
 
             var click = (e: JQueryEventObject) => {
-                let element: HTMLElement = $(e.target).get(0);
+                let element: HTMLElement = $(e.target).get(0)
                 if (this.editing && !this.editBarClick.editingElement) {
                     // if we are in editing mode, and nothing currently in edition, active edit bar
-                    this.editBarClick.show(element);
-                    this.editBarHover.hide();
+                    this.editBarClick.show(element)
+                    this.editBarHover.hide()
                 } else if (
                     // if we've not click on ckeditor
                     (!this.editBarClick.editor_dom || !helper.Dom.hasParent(element, this.editBarClick.editor_dom.get(0))) &&
@@ -255,21 +304,21 @@ module OctoBoot.controllers {
                     // and we click OUTSIDE our editing element
                     !helper.Dom.mouseIsOverElement(e.originalEvent as MouseEvent, this.editBarClick.editingElement)) {
                     // disable edit bar (so reactive on mousemove)
-                    this.editBarClick.hide();
+                    this.editBarClick.hide()
                 }
             }
 
             $(this.stage.iframe.contentWindow).click(click)
             // prevent stage link to redirect when editing
             $(this.stage.iframe.contentDocument).on('click', 'a', (e: JQueryEventObject) => {
-                e.preventDefault();
-                e.stopImmediatePropagation();
-                click(e);
-                return false;
-            });
+                e.preventDefault()
+                e.stopImmediatePropagation()
+                click(e)
+                return false
+            })
 
             // Editing flag for binded event
-            this.stage.iframe.contentWindow['editing'] = true;
+            this.stage.iframe.contentWindow['editing'] = true
         }
 
     }
