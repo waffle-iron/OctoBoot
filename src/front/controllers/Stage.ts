@@ -11,6 +11,7 @@ module OctoBoot.controllers {
         public showAdress: boolean;
         public iframe: HTMLIFrameElement;
         public baseUrl: string;
+        public path: string;
 
         constructor(public url: string = '/logo.html') {
             super(model.UI.HB_STAGE);
@@ -19,6 +20,7 @@ module OctoBoot.controllers {
 
             this.iframe = this.jDom.children('iframe').get()[0];
             this.baseUrl = url.match(/^\/temp\/\d+/) ? url.match(/^\/temp\/\d+/)[0] : '';
+            this.path = url.match(/^\/temp\/\d+\/\w+\//) ? url.match(/^\/temp\/\d+\/\w+\//)[0] : '';
             this.url = url.substr(this.baseUrl.length);
 
             this.load(this.url);

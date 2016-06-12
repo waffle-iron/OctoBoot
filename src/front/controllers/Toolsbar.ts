@@ -149,6 +149,16 @@ module OctoBoot.controllers {
             })
         }
 
+        private unload(e: BeforeUnloadEvent): string {
+            var e = e || window.event
+
+            if (e) {
+                e.returnValue = "Are you sure ? Your work is not saved..."
+            }
+
+            return "Are you sure ? Your work is not saved..."
+        }
+
         private edit(): void {
             var container: JQuery = $(this.stage.iframe.contentDocument.body)
             // if we want to edit a js / css file, start editing in basic mode
@@ -181,6 +191,9 @@ module OctoBoot.controllers {
                     this.editBarHover = new EditBar(container, this.stage)
                     this.editBarHover.init_iframes_overlay()
                 }
+
+                $(window).on('beforeunload', this.unload)
+                $(this.stage.iframe.contentWindow).on('beforeunload', this.unload)
             } else {
                 // If not editing, destroy EditBar
                 this.actionToCancel = null
@@ -191,6 +204,9 @@ module OctoBoot.controllers {
                 } else {
                     container.children().removeAttr('contentEditable')
                 }
+
+                $(window).off('beforeunload')
+                $(this.stage.iframe.contentWindow).off('beforeunload')
             }
         }
 
@@ -305,10 +321,14 @@ module OctoBoot.controllers {
                     !helper.Dom.mouseIsOverElement(e.originalEvent as MouseEvent, this.editBarClick.editingElement)) {
                     // disable edit bar (so reactive on mousemove)
                     this.editBarClick.hide()
+                } else if (e.type === 'dblclick' && this.editing && this.editBarClick.editingElement) {
+                    // if dblclick action, execute default action (text edit / image update / etc..)
+                    this.editBarClick.default(element)
                 }
             }
 
             $(this.stage.iframe.contentWindow).click(click)
+            $(this.stage.iframe.contentWindow).dblclick(click)
             // prevent stage link to redirect when editing
             $(this.stage.iframe.contentDocument).on('click', 'a', (e: JQueryEventObject) => {
                 e.preventDefault()

@@ -110,6 +110,10 @@ module OctoBoot.controllers {
             // if we are over iframe_overlay, get related iframe element, else keep it
             element = this.is_iframe_overlay(element)
 
+            if (element.tagName.toLowerCase().match(/^(b|i|u|em)$/)){
+                element = element.parentElement
+            }
+
             if (element.getBoundingClientRect) {
                 this.editingElement = element
 
@@ -125,6 +129,31 @@ module OctoBoot.controllers {
                 } else {
                     this.appendSpecialButton(element)
                 }
+            }
+        }
+
+        /**
+        *    Default action (on dlbclick usually)
+        */
+
+        public default(element: HTMLElement): void {
+            switch (element.tagName.toLowerCase()) {
+                case 'img':
+                    this.select_img()
+                    break
+
+                case 'a':
+                    this.link()
+                    break
+
+                case 'iframe':
+                    this.move()
+                    break
+
+                default:
+                    this.ckeditor()
+                    break
+
             }
         }
 
@@ -349,8 +378,6 @@ module OctoBoot.controllers {
         *    Image Edition
         */
         private update_img(url: string, alt: string): void {
-            var depth: number = this.stage.url.split('/').length - 3 // remove project and file name
-
             if (url) {
                 $(this.editingElement).attr('src', this.stage.applyRelativeDepthOnUrl(url))
             }
@@ -367,7 +394,11 @@ module OctoBoot.controllers {
                     body: model.UI.EDIT_IMG_BODY,
                     icon: 'file image outline',
                     input: $(this.editingElement).attr('alt') || 'alternate text',
-                    dropdown: data.filter((v: string) => { return !!v.match(/\.(JPG|JPEG|jpg|jpeg|png|gif)+$/) }),
+                    dropdown: data.filter((v: string) => {
+                        return !!v.match(/\.(JPG|JPEG|jpg|jpeg|png|gif)+$/)
+                    }).map((v: string) => {
+                        return this.stage.path + v
+                    }),
                     onApprove: () => this.update_img(alert.getDropdownValue(), alert.getInputValue()),
                     onDeny: () => {}
                 })

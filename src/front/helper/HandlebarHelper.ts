@@ -35,6 +35,18 @@ module OctoBoot.helper {
                     return 'hhb' + id
                 }
             });
+
+            Handlebars.registerHelper('AlertDrop_isImage', (uri: string): hbs.SafeString => {
+                return new Handlebars.SafeString(!!uri.match(/(jpg|JPG|jpeg|JPEG|gif|GIF|png|PNG)$/) ?
+                    '<img class="ui medium image" src="' + uri + '">' :
+                    '<i class="file icon"></i>')
+            });
+
+            Handlebars.registerHelper('AlertDrop_isImageUrl', (uri: string): hbs.SafeString => {
+                return !!uri.match(/(jpg|JPG|jpeg|JPEG|gif|GIF|png|PNG)$/) ?
+                    uri.split('/').slice(-2).join('/') :
+                    uri
+            });
         }
 
         private static bindEvent(id: number, context: JQuery): void {
