@@ -42,9 +42,9 @@ module OctoBoot.helper {
                     '<i class="file icon"></i>')
             });
 
-            Handlebars.registerHelper('AlertDrop_isImageUrl', (uri: string): hbs.SafeString => {
+            Handlebars.registerHelper('AlertDrop_isImageUrl', (uri: string, nb: number): hbs.SafeString => {
                 return !!uri.match(/(jpg|JPG|jpeg|JPEG|gif|GIF|png|PNG)$/) ?
-                    uri.split('/').slice(-2).join('/') :
+                    uri.split('/').slice(-(nb || 2)).join('/') :
                     uri
             });
         }
