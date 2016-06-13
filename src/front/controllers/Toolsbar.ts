@@ -171,6 +171,7 @@ module OctoBoot.controllers {
 
             // Editing flag
             this.editing = !this.editing
+            this.stage.iframe.contentWindow['editing'] = this.editing
 
             if (this.editing) {
 
@@ -294,7 +295,7 @@ module OctoBoot.controllers {
 
         // TODO SEE TO MOVE THIS ON EDIT BAR
         private bindEditionEvents(): void {
-            if (this.stage.iframe.contentWindow['editing']) {
+            if (this.stage.iframe.contentWindow['edit_event_binded']) {
                 return
             }
 
@@ -338,7 +339,7 @@ module OctoBoot.controllers {
             })
 
             // Editing flag for binded event
-            this.stage.iframe.contentWindow['editing'] = true
+            this.stage.iframe.contentWindow['edit_event_binded'] = true
         }
 
     }

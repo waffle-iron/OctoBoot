@@ -1,5 +1,8 @@
 (window.OctoBoot_plugins = window.OctoBoot_plugins || {}).imagezoom = function(elm, title, optional_src) {
-
+    if (window.editing) {
+        return
+    }
+    
     var load = function(done, src, optional_src) {
         var im = new Image()
         im.className = "ui fluid image"
@@ -44,4 +47,3 @@ $(document).ready(function() {
     $('.imagezoom_overlay').fadeOut(0)
     $('.imagezoom.modal').modal()
 })
-
