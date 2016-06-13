@@ -2,6 +2,10 @@
 /// <reference path="../../controllers/Alert.ts" />
 /// <reference path="../../helper/Dom.ts" />
 
+interface Window {
+    imagezoom: any;
+}
+
 module OctoBoot.plugins {
 
     export class Imagezoom extends Plugin {
@@ -32,7 +36,7 @@ module OctoBoot.plugins {
                         propToCheck: !!this.stage.iframe.contentWindow['$'](this.stage.iframe.contentDocument.body).accordion,
                         libToAppend: this.libSemantic,
                         done: () => {
-                            
+
                             let dirToInspect = this.stage.baseUrl.split('/').pop() + '/' + this.stage.url.split('/')[1];
                             core.Socket.emit(model.ServerAPI.SOCKET_LIST_FILES, { dir: dirToInspect }, (data: string[]) => {
                                 this.addPlugin(cbk, data)
@@ -52,19 +56,23 @@ module OctoBoot.plugins {
                 title: 'Plugin Image zoom',
                 body: 'Please select an larger image OR leave blank to use the same image',
                 input: 'Title',
-                dropdown: fileList.filter((v: string) => { return !!v.match(/\.(JPG|JPEG|jpg|jpeg|png|gif)+$/) }),
+                dropdown: fileList.filter((v: string) => {
+                    return !!v.match(/\.(JPG|JPEG|jpg|jpeg|png|gif)+$/)
+                }).map((v: string) => {
+                    return this.stage.path + v
+                }),
                 icon: 'zoom',
                 closable: false,
                 onApprove: () => {
 
                     let title: string = helper.Dom.encodeString(alert.getInputValue());
-                    let url: string = alert.getDropdownValue();
-                    console.log(this.stage.iframe.contentDocument, $(this.stage.iframe.contentDocument).find('.imagezoom_overlay'))
+                    let url: string = this.stage.applyRelativeDepthOnUrl(alert.getDropdownValue());
+
                     let html: string = $(this.stage.iframe.contentDocument).find('.imagezoom_overlay').length ? '' : new controllers.Handlebar('ImagezoomInline.hbs').getHtml({});
 
                     this.checkForLib({
                         name: 'Plugin Image Zoom',
-                        propToCheck: 'imagezoom',
+                        propToCheck: !!this.stage.iframe.contentWindow.imagezoom || 'imagezoom',
                         libToAppend: [this.libImageZoom],
                         done: () => {
 
@@ -82,15 +90,17 @@ module OctoBoot.plugins {
         }
 
         public filterElement(el: HTMLElement, cbk: () => any): void {
-            if ($(el).attr('onmouseover') && $(el).attr('onmouseover').indexOf('OctoBoot_plugins.imagezoom') === 0) {
+            if ($(el).attr('onmouseover') && $(el).attr('onmouseover').indexOf('imagezoom') !== -1) {
                 new controllers.Alert({
                     title: 'Plugin Image Zoom - Already Exist!',
-                    body: 'Plugin Image Zoom already exist on this element, click on OK to REMOVE it, or click on CANCEL to MODIFY it',
-                    onApprove: () => {
+                    body: 'Plugin Image Zoom already exist on this element, you can update it with a new zoomed image OR just remove it',
+                    onApprove: () => cbk(),
+                    onApproveText: 'UPDATE',
+                    onDeny: () => {
                         $(el).removeAttr('onmouseover');
                         this.placeholder.remove();
-                    }, 
-                    onDeny: () => cbk()
+                    },
+                    onDenyText: 'REMOVE'
                 })
             } else {
                 cbk()
