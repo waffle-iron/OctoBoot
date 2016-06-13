@@ -397,6 +397,7 @@ module OctoBoot.controllers {
                     dropdown: data.filter((v: string) => {
                         return !!v.match(/\.(JPG|JPEG|jpg|jpeg|png|gif)+$/)
                     }).map((v: string) => {
+                        console.log(this.stage.path)
                         return this.stage.path + v
                     }),
                     onApprove: () => this.update_img(alert.getDropdownValue(), alert.getInputValue()),

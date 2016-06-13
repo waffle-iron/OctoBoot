@@ -80,6 +80,9 @@ module OctoBoot.controllers {
         }
 
         private plugins(): void {
+            if (this.actionToCancel) {
+                this.actionToCancel()
+            }
             this.jDom.find('.menu.plugins .item').slideToggle()
         }
 
