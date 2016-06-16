@@ -26,15 +26,6 @@ module OctoBoot.controllers {
         // public callback
         public on_duplicate: (e: HTMLElement) => any
 
-        // width and number of buttons on EditBar
-        private buttonWidth: number = 35
-        private buttonNum: number = 12
-
-        // width / height and margin of global EditBar
-        private width: number = (this.buttonWidth * this.buttonNum) + (this.buttonNum  * 2) // give some extra space for targeted tag (can be one letter like A but also SPAN etc..)
-        private height: number = 80
-        private margin: number = 5
-
         // lines who border the editing element
         private borders: Borders
         // extended editable
@@ -43,43 +34,21 @@ module OctoBoot.controllers {
         private ignored_extended = { span: 0, strong: 0, b: 0, u: 0, i: 0 }
         // interval positioning
         private interval: number
-        // current position
-        private rect: ClientRect
+        // current top
+        private top: number
+        // current left
+        private left: number
         // iframe edition overlay
         private iframes_overlay: JQuery[]
 
         constructor(public container: JQuery, public stage: Stage) {
             super(model.UI.HB_EDITBAR)
 
-            this.iframe = new Handlebar(model.UI.HB_EDITBAR_FRAME)
-            this.iframe.initWithContext(this, container)
+            this.initWithContext(this.HBHandlers(), this.stage.jDom)
 
-            var onLoad: (e?: Event) => void = (e: Event) => {
-                var iframeDocument: JQuery = this.iframe.jDom.contents()
-                this.iframeBody = iframeDocument.find('body')
-
-                iframeDocument.find('head').append($.parseHTML(
-                    '<link rel=\"stylesheet\" type=\"text/css\" href=\"https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.7/semantic.min.css\">' +
-                    '<script src=\"https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.7/semantic.min.js\"></script>'
-                ))
-
-                this.initWithContext(this.HBHandlers(this.iframeBody), this.iframeBody)
-
-                // activate popup on edit button
-                this.iframeBody.find('.button.topleft').popup({ inline: true, position: 'top left' })
-                this.iframeBody.find('.button.topright').popup({ inline: true, position: 'top right' })
-
-                this.iframeBody.css('background', 'none') // semantic-ui put a *** background on body
-
-                this.iframe.jDom.hide()
-            }
-
-            // Fix #16 - Check if Firefox, and if it is, fill iframe on load
-            if (typeof window['InstallTrigger'] !== 'undefined') {
-                this.iframe.jDom.on('load', onLoad)
-            } else {
-                onLoad()
-            }
+            // activate popup on edit button
+            this.jDom.find('.button.topleft').popup({ inline: true, position: 'top left' })
+            this.jDom.find('.button.topright').popup({ inline: true, position: 'top right' })
 
             // extend ckeditor editable because we do the positioning manually )
             jQuery.extend(CKEDITOR.dtd.$editable, this.editable_extended)
@@ -116,19 +85,16 @@ module OctoBoot.controllers {
 
             if (element.getBoundingClientRect) {
                 this.editingElement = element
-
-                // clean interval if already existing on other element
-                // create interval and make manually the first call
                 clearInterval(this.interval)
-                this.interval = null
-                this.interval = setInterval(() => this.position(element, !duplicateOnly), 100)
-                this.position(element, !duplicateOnly)
+                this.interval = setInterval(() => this.position(element, !duplicateOnly), 50)
 
                 if (duplicateOnly) {
                     this.setDuplicableOnly()
                 } else {
                     this.appendSpecialButton(element)
                 }
+
+                this.position(element, !duplicateOnly, true)
             }
         }
 
@@ -164,9 +130,8 @@ module OctoBoot.controllers {
         public hide(): void {
             clearInterval(this.interval)
             this.interval = null
-            this.rect = null
 
-            this.iframe.jDom.hide()
+            this.jDom.hide()
 
             if (this.borders) {
                 this.borders.destroy()
@@ -191,7 +156,7 @@ module OctoBoot.controllers {
 
         public destroy(): void {
             this.hide()
-            this.iframe.jDom.remove()
+            this.jDom.remove()
             this.remove_iframe_overlay()
             if (this.borders) {
                 this.borders.clean()
@@ -203,11 +168,9 @@ module OctoBoot.controllers {
         */
 
         private setDuplicableOnly(): void {
-            this.iframeBody.find('.button').hide()
-            this.iframeBody.find('.duplicate, .remove').show()
-            this.iframeBody.find('.remove').popup({ inline: true, position: 'top right' })
-            this.width = this.buttonWidth * 3
-            this.iframe.jDom.css('width', this.width + 'px')
+            this.jDom.find('.button').hide()
+            this.jDom.find('.duplicate, .remove').show()
+            this.jDom.find('.remove').popup({ inline: true, position: 'top right' })
             this.position(this.editingElement, false, true)
         }
 
@@ -232,21 +195,29 @@ module OctoBoot.controllers {
         private position(element: HTMLElement, withBorder: boolean = true, force: boolean = false): void {
             var rect: ClientRect = Borders.rect(element)
 
-            if (JSON.stringify(this.rect) !== JSON.stringify(rect) || force) {
-                var down: boolean = rect.top - this.height < 0
+            var offset: number = $(this.stage.iframe).position().top  - this.stage.iframe.contentWindow.scrollY
+            var top: number = rect.top - this.jDom.height() + offset
+            var bottom: number = rect.bottom + offset
+            var left : number = rect.right + $(this.stage.iframe).position().left - this.jDom.width()
 
-                this.iframe.jDom.css({
-                    'top': down ? rect.bottom : rect.top - this.height,
-                    'left': rect.right - this.width
-                }).show()
+            top = top < $(this.stage.iframe).position().top ? bottom : top
 
-                if (this.borders && withBorder) {
-                    this.borders.border(rect)
-                } else if (withBorder) {
-                    this.borders = new Borders(element)
-                }
+            if (this.top === top && this.left === left) {
+                return
+            }
 
-                this.rect = rect
+            this.top = top
+            this.left = left
+
+            this.jDom.css({
+                'top': this.top,
+                'left': this.left
+            }).show()
+
+            if (this.borders && withBorder) {
+                this.borders.border(rect)
+            } else if (withBorder) {
+                this.borders = new Borders(element)
             }
         }
 
@@ -301,8 +272,8 @@ module OctoBoot.controllers {
         private fillTagButton(element: Element): void {
             // Fill button with current tag name
             if (element && element.tagName) {
-                this.iframeBody.find('.button.tag .visible.content').html(element.tagName)
-                this.iframeBody.find('.button.tag').next().html('select parent > ' + element.parentElement.tagName.toLowerCase())
+                this.jDom.find('.button.tag .visible.content').html(element.tagName)
+                this.jDom.find('.button.tag').next().html('select parent > ' + element.parentElement.tagName.toLowerCase())
             }
         }
 
@@ -311,27 +282,27 @@ module OctoBoot.controllers {
         */
 
         private appendSpecialButton(element: Element): void {
-            this.iframeBody.find('.button.special').hide()
+            this.jDom.find('.button.special').hide()
             let tag: string = element.tagName.toLowerCase()
 
             // if it's an CKEDITOR editable element (text/div/etc)
             if (CKEDITOR.dtd.$editable[tag]) {
-                this.iframeBody.find('.special.ckeditor').show()
+                this.jDom.find('.special.ckeditor').show()
             }
 
             // if the parent of current editing element as more than one child, show "move" button
             if ($(element).parent().children().length > 1) {
-                this.iframeBody.find('.special.move').show()
+                this.jDom.find('.special.move').show()
             }
 
             // if we have a copied element in storage, show paste button
             if (EditBarCopiedElement) {
-                this.iframeBody.find('.special.paste').show()
+                this.jDom.find('.special.paste').show()
             }
 
             switch (tag) {
                 case 'img':
-                    this.iframeBody.find('.special.img').show()
+                    this.jDom.find('.special.img').show()
                     break
             }
 
@@ -440,6 +411,7 @@ module OctoBoot.controllers {
             let events = $._data(this.stage.iframe.contentDocument as any, 'events')
             if (events && events.keydown) {
                 $(this.stage.iframe.contentDocument).off('keydown')
+                $(document).off('keydown')
             } else {
                 new controllers.Alert({
                     title: model.UI.EDIT_MOVE_TITLE,
@@ -447,6 +419,7 @@ module OctoBoot.controllers {
                     icon: 'keyboard',
                     onApprove: () => {
                         $(this.stage.iframe.contentDocument).keydown(do_move)
+                        $(document).keydown(do_move)
                     },
                     onDeny: () => { }
                 })
@@ -459,7 +432,7 @@ module OctoBoot.controllers {
 
         private copy(): void {
             EditBarCopiedElement = $(this.editingElement).clone()
-            this.iframeBody.find('.special.paste').show()
+            this.jDom.find('.special.paste').show()
         }
 
         /**
@@ -550,7 +523,7 @@ module OctoBoot.controllers {
                             dropdown: ['_blank', '_self'],
                             icon: 'linkify',
                             onApprove: () => editLink(
-                                this.stage.applyRelativeDepthOnUrl(alertUrl.getDropdownValue()) || alertUrl.getInputValue(),
+                                alertUrl.getDropdownValue() ? this.stage.applyRelativeDepthOnUrl(alertUrl.getDropdownValue()) : alertUrl.getInputValue(),
                                 alertTarget.getDropdownValue()
                             ),
                             onDeny: () => { }
@@ -566,8 +539,8 @@ module OctoBoot.controllers {
         *    Handlebars handler for edit bar buttons
         */
 
-        private HBHandlers(context: JQuery): any {
-            return $.each({
+        private HBHandlers(): any {
+            return {
                 duplicate : {
                     click: () => this.duplicate()
                 },
@@ -589,7 +562,7 @@ module OctoBoot.controllers {
                 parent: {
                     mouseover: () => this.borders.border(Borders.rect(this.editingElement.parentElement)),
                     mouseout: () => this.borders.border(Borders.rect(this.editingElement)),
-                    click: () => this.show(this.editingElement.parentElement)
+                    click: () => { this.show(this.editingElement.parentElement); this.jDom.find('.tag').blur() }
                 },
                 copy : {
                     click: () => this.copy()
@@ -600,7 +573,7 @@ module OctoBoot.controllers {
                 link: {
                     click: () => this.link()
                 }
-            }, (key: string, handlers: model.HTMLEvent) => handlers.context = context)
+            }
         }
     }
 }
