@@ -87,7 +87,11 @@ var octoboot = function(app, socketIo) {
     // 404
     app.use(r404)
 
-    ghapi.init(ghc.client_id, ghc.client_secret, ghc.authorization_callback_url)
+    for (var domain in ghc) {
+        if (ghc.hasOwnProperty(domain)) {
+            ghapi.init(domain, ghc[domain].client_id, ghc[domain].client_secret, ghc[domain].authorization_callback_url)
+        }
+    }
 
     socketIo.on("connection", function(socket) {
         sumo.info(0, 'socket connection')

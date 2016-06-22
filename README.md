@@ -35,12 +35,15 @@ Go to your GitHub account `settings / application / Devellopers Application` => 
 Then, you need to create and fill `githubconf.json` file at `./` with your credentials like this:
 
     {
-        "client_id": "[CLIENT-ID]",
-        "client_secret": "[CLIENT-SECRET]",
-        "authorization_callback_url": "http://localhost:8080"
+        "localhost": {
+            "client_id": "[CLIENT-ID]",
+            "client_secret": "[CLIENT-SECRET]",
+            "authorization_callback_url": "http://localhost:8080"
+        }
     }
 
-When all is done, you can start OctoBot ! 
+
+When all is done, you can start OctoBot !
 
     > node server.js
 
