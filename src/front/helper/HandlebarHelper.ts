@@ -37,15 +37,23 @@ module OctoBoot.helper {
             });
 
             Handlebars.registerHelper('AlertDrop_isImage', (uri: string): hbs.SafeString => {
-                return new Handlebars.SafeString(!!uri.match(/(jpg|JPG|jpeg|JPEG|gif|GIF|png|PNG)$/) ?
+                if (!uri.match) {
+                    return new Handlebars.SafeString('<i class="file icon"></i>')
+                } else {
+                    return new Handlebars.SafeString(!!uri.match(/(jpg|JPG|jpeg|JPEG|gif|GIF|png|PNG)$/) ?
                     '<img class="ui medium image" src="' + uri + '">' :
                     '<i class="file icon"></i>')
+                }
             });
 
             Handlebars.registerHelper('AlertDrop_isImageUrl', (uri: string, nb: number): hbs.SafeString => {
-                return !!uri.match(/(jpg|JPG|jpeg|JPEG|gif|GIF|png|PNG)$/) ?
-                    uri.split('/').slice(-(nb || 2)).join('/') :
-                    uri
+                if (!uri.match) {
+                    return uri
+                } else {
+                    return !!uri.match(/(jpg|JPG|jpeg|JPEG|gif|GIF|png|PNG)$/) ?
+                        uri.split('/').slice(-(nb || 2)).join('/') :
+                        uri
+                }
             });
         }
 
