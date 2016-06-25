@@ -35,6 +35,10 @@ module OctoBoot.controllers {
             click: () => this.duplicate()
         }
 
+        public backgroundHandlers: model.HTMLEvent = {
+            click: () => this.background()
+        }
+
         public uploadHandlers: model.HTMLEvent = {
             click: () => this.upload()
         }
@@ -49,7 +53,7 @@ module OctoBoot.controllers {
 
         private editBarHover: EditBar
         private editBarClick: EditBar
-        private editDuplicables: Array<EditBar>
+        private edits: Array<EditBar>
         private inputUpload: HTMLInputElement
         private fileReader: FileReader
         private actionToCancel: Function
@@ -215,7 +219,7 @@ module OctoBoot.controllers {
         }
 
         private duplicate(): void {
-            if (!this.editDuplicables) {
+            if (!this.edits) {
                 helper.Dom.setItemActive(this.jDom, 'duplicate')
                 // if action running, cancel it
                 if (this.actionToCancel) {
@@ -224,15 +228,15 @@ module OctoBoot.controllers {
 
                 this.actionToCancel = this.duplicate
 
-                this.editDuplicables = []
+                this.edits = []
 
                 var container: JQuery = $(this.stage.iframe.contentDocument.body)
                 var duplicables = container.find('*[ob-duplicable]')
 
                 var add_edit: (e: HTMLElement) => any = (e: HTMLElement) => {
                     let edit: EditBar = new EditBar(container, this.stage)
-                    this.editDuplicables.push(edit)
-                    edit.show(e, true)
+                    this.edits.push(edit)
+                    edit.show(e, '.duplicate, .remove')
                     edit.on_duplicate = add_edit
                 }
 
@@ -241,8 +245,43 @@ module OctoBoot.controllers {
                 })
             } else {
                 helper.Dom.setItemActive(this.jDom, 'null')
-                this.editDuplicables.forEach((edit: EditBar) => edit.destroy())
-                this.editDuplicables = null
+                this.edits.forEach((edit: EditBar) => edit.destroy())
+                this.edits = null
+                this.actionToCancel = null
+            }
+        }
+
+        private background(): void {
+            if (!this.edits) {
+                helper.Dom.setItemActive(this.jDom, 'background')
+                // if action running, cancel it
+                if (this.actionToCancel) {
+                    this.actionToCancel()
+                }
+
+                this.actionToCancel = this.background
+
+                this.edits = []
+
+                var container: JQuery = $(this.stage.iframe.contentDocument.body)
+                var editables = container.find('*').filter((i, e) => {
+                    var cs: CSSStyleDeclaration = getComputedStyle(e)
+                    return !!(cs.backgroundImage && cs.backgroundImage !== 'none') || e.tagName.toLowerCase() === 'img'
+                })
+
+                var add_edit: (e: HTMLElement) => any = (e: HTMLElement) => {
+                    let edit: EditBar = new EditBar(container, this.stage)
+                    this.edits.push(edit)
+                    edit.show(e, '.img')
+                }
+
+                editables.each((i, e) => {
+                    setTimeout(() => add_edit(e as HTMLElement), 100)
+                })
+            } else {
+                helper.Dom.setItemActive(this.jDom, 'null')
+                this.edits.forEach((edit: EditBar) => setTimeout(() => edit.destroy(), 100))
+                this.edits = null
                 this.actionToCancel = null
             }
         }

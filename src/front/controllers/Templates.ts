@@ -14,19 +14,16 @@ module OctoBoot.controllers {
         min?: string;
         iframe?: string;
         name: string;
-        event: model.HTMLEvent;
+        personal: boolean;
     }
 
-    export class Templates extends Handlebar {
+    export class Templates {
 
-        public data: Array<Template>;   
+        public data: Array<Template>;
 
         constructor(public projectName: string, public stage: Stage) {
-            super(model.UI.HB_TEMPLATES);
-
-            this.get_octoboot_template(() => {
-                this.get_personal_template(() => this.initWithContext(this))
-            });
+            this.get_octoboot_template();
+            this.get_personal_template();
         }
 
         public show(): void {
@@ -40,7 +37,7 @@ module OctoBoot.controllers {
                 onDenyIcon: 'checkmark',
                 closable: true,
                 onApprove: () => this.duplicate(),
-                onDeny: () => this.jDom.modal('show')
+                onDeny: () => this.create_from_template()
             })
         }
 
@@ -53,10 +50,10 @@ module OctoBoot.controllers {
             this.enterFileName((name: string) => {
                 var urls: string[] = this.stage.url.split('/')
                 var file: string = urls.pop()
-                
+
                 if (currentDepth) {
                     var burl: string = this.stage.baseUrl.substr(1)
-                    
+
                     if (file.indexOf('.html') === -1) {
                         urls.push(file)
                     }
@@ -86,31 +83,50 @@ module OctoBoot.controllers {
             }, () => { }, null, this.stage.baseUrl + this.stage.url)
         }
 
-        private get_octoboot_template(done: () => any): void {
+        private create_from_template(): void {
+            var dropdown: Array<string> = this.data.map((template) => { return template.name})
+            var get_template: Function = (name: string): Template => {return this.data.filter((t: Template) => { return t.name === name })[0]}
+            var alert: Alert = this.enterFileName((name: string) => {
+                var tname: string = alert.getDropdownValue()
+                this.createFileFromTemplate(name, tname, get_template(tname).personal)
+            }, () => this.show(), null, this.data[0].iframe, dropdown)
+
+            alert.jDom.find('.dropdown').dropdown({
+                onChange: (value: string) => {
+                    alert.jDom.find('iframe').attr('src', get_template(value).iframe)
+                }
+            })
+        }
+
+        private get_octoboot_template(done: () => any = () => {}): void {
             core.Socket.emit(model.ServerAPI.SOCKET_LIST_TEMPLATE, null, (templateList: Array<string>) => {
                 this.data = templateList.filter((name: string) => {
                     return !(name.indexOf('.') === 0)
                 }).map((name: string) => {
-                    return { path: model.ServerAPI.getTemplatePath(name), min: 'min.jpg', name: name, event: this.event(name, model.ServerAPI.getTemplatePath(name) + 'min.jpg') }
+                    return {
+                        path: model.ServerAPI.getTemplatePath(name),
+                        iframe: model.ServerAPI.getTemplatePath(name) + '/index.html',
+                        name: name,
+                        personal: false
+                    }
                 });
                 done();
             });
         }
 
-        private get_personal_template(done: () => any): void {
+        private get_personal_template(done: () => any = () => {}): void {
             core.Socket.emit(model.ServerAPI.SOCKET_LIST_DIR, { dir: core.Socket.sid + '/' + model.ServerAPI.TEMPLATE_REPO_NAME}, (templateList: Array<string>) => {
-                console.log(templateList);
                 if (templateList) {
                     var url: string;
                     var sup: Array<Template> = templateList.filter((name: string) => {
                         return !(name.indexOf('.') === 0)
                     }).map((name: string) => {
                         url = model.ServerAPI.getProjectPath(core.Socket.sid, model.ServerAPI.TEMPLATE_REPO_NAME) + name + '/index.html'
-                        return { 
-                            path: model.ServerAPI.getProjectPath(core.Socket.sid, model.ServerAPI.TEMPLATE_REPO_NAME), 
-                            //iframe: name + '/index.html', 
-                            name: name, 
-                            event: this.event('../../temp/' + core.Socket.sid + '/' + model.ServerAPI.TEMPLATE_REPO_NAME + '/' + name, null, url) 
+                        return {
+                            path: model.ServerAPI.getProjectPath(core.Socket.sid, model.ServerAPI.TEMPLATE_REPO_NAME),
+                            iframe: url,
+                            name: name,
+                            personal: true
                         }
                     });
 
@@ -120,25 +136,21 @@ module OctoBoot.controllers {
             });
         }
 
-        private event(templateName: string, img? :string, iframe?: string): model.HTMLEvent {
-            return {
-                click: () => this.enterFileName((name: string) => this.createFileFromTemplate(name, templateName), () => this.show(), img, iframe)
-            }
-        }
-
-        private enterFileName(done: (name: string) => any, deny: () => any, img?: string, iframe?: string): void {
+        private enterFileName(done: (name: string) => any, deny: () => any, img?: string, iframe?: string, dropdown?: Array<string>): controllers.Alert {
             var alert: controllers.Alert = new Alert({
-                title: 'Enter a name for your file',
+                title: dropdown ? 'Select a template and fill the name for your new page' : 'Fill the name for your new page',
                 onApprove: () => done(alert.getInputValue().replace('.html', '')),
                 onDeny: deny,
                 image: img || null,
                 iframe: iframe || null,
+                dropdown: dropdown || null,
                 input: this.stage.url.split('/').pop().replace(/\.html/ig, '')
             })
+            return alert
         }
 
-        private createFileFromTemplate(fileName: string, templateName: string): void {
-            core.Socket.emit(model.ServerAPI.SOCKET_COPY_TEMPLATE, { file: fileName, template: templateName, project: this.projectName }, () => {
+        private createFileFromTemplate(fileName: string, templateName: string, personal: boolean): void {
+            core.Socket.emit(model.ServerAPI.SOCKET_COPY_TEMPLATE, { file: fileName, template: templateName, project: this.projectName, personal: personal }, () => {
                 this.stage.load('/' + this.projectName + (fileName === 'index' ? '' : '/' + fileName ) + '/index.html');
             });
         }

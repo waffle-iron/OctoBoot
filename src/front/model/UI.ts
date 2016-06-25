@@ -10,7 +10,6 @@ module OctoBoot.model {
         public static HB_TOOLSBAR: string = 'Toolsbar.hbs'
         public static HB_STAGE: string = 'Stage.hbs'
         public static HB_ALERT: string = 'Alert.hbs'
-        public static HB_TEMPLATES: string = 'Templates.hbs'
         public static HB_EDITBAR: string = 'EditBar.hbs'
         public static HB_EDITBAR_FRAME: string = 'EditBarFrame.hbs'
         public static HB_EDITBAR_IFRAME_OVERLAY: string = 'EditIframeOverlay.hbs'

@@ -585,6 +585,7 @@ declare module CKEDITOR {
         skin?: string;
         width?: string | number;
         removeFormatTags?: string;
+        autoParagraph?:boolean;
     }
 
 

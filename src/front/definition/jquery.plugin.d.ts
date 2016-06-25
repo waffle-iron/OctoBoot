@@ -14,7 +14,7 @@ interface JQuery {
     /**
      * Semantic dropdown http://semantic-ui.com/modules/dropdown.html
      */
-    dropdown(options?: any): JQuery;
+    dropdown(options?: any, behaviorOptions?:any): JQuery;
     /**
      * Semantic accordion http://semantic-ui.com/modules/accordion.html
      */

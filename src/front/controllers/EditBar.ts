@@ -34,12 +34,14 @@ module OctoBoot.controllers {
         private ignored_extended = { span: 0, strong: 0, b: 0, u: 0, i: 0 }
         // interval positioning
         private interval: number
+        private timer_show: number
         // current top
         private top: number
         // current left
         private left: number
         // iframe edition overlay
         private iframes_overlay: JQuery[]
+        private position_infos: any
 
         constructor(public container: JQuery, public stage: Stage) {
             super(model.UI.HB_EDITBAR)
@@ -54,6 +56,9 @@ module OctoBoot.controllers {
             jQuery.extend(CKEDITOR.dtd.$editable, this.editable_extended)
             jQuery.extend(CKEDITOR.dtd.$removeEmpty, this.ignored_extended)
             CKEDITOR.config.allowedContent = true
+            CKEDITOR.config.autoParagraph = false
+
+            $(this.stage.iframe.contentWindow).scroll(() => this.show_with_delay())
         }
 
         // we can't handle mouseover and click on iframe, and subframe etc..
@@ -75,26 +80,38 @@ module OctoBoot.controllers {
         *    Show EditBar
         */
 
-        public show(element: HTMLElement, duplicateOnly: boolean = false): void {
+        public show(element: HTMLElement, onlyButtons?: string /*css selector*/): void {
             // if we are over iframe_overlay, get related iframe element, else keep it
+
             element = this.is_iframe_overlay(element)
 
             if (element.tagName.toLowerCase().match(/^(b|i|u|em)$/)){
                 element = element.parentElement
             }
 
-            if (element.getBoundingClientRect) {
+            if (element.getBoundingClientRect && element !== this.editingElement) {
                 this.editingElement = element
                 clearInterval(this.interval)
-                this.interval = setInterval(() => this.position(element, !duplicateOnly), 50)
+                this.interval = setInterval(() => this.position(element, true), 100)
 
-                if (duplicateOnly) {
-                    this.setDuplicableOnly()
+                if (onlyButtons) {
+                    this.setOnly(onlyButtons)
                 } else {
                     this.appendSpecialButton(element)
                 }
 
-                this.position(element, !duplicateOnly, true)
+                this.jDom.show()
+
+                this.position_infos = {
+                    content_height: $(this.stage.iframe.contentDocument).height(),
+                    iframe_position: $(this.stage.iframe).position(),
+                    iframe_height: $(this.stage.iframe).height(),
+                    iframe_width: $(this.stage.iframe).width(),
+                    width: this.jDom.width(),
+                    height: this.jDom.height(),
+                }
+
+                this.position(element, true)
             }
         }
 
@@ -139,10 +156,14 @@ module OctoBoot.controllers {
 
             if (this.editingElement) {
                 this.editingElement.removeAttribute('contentEditable')
-                $(this.stage.iframe.contentDocument).off('keydown')
             }
 
+            $(this.stage.iframe.contentDocument).off('keydown')
+            $(document).off('keydown')
+
             this.editingElement = null
+            this.top = null
+            this.left = null
 
             if (this.editor) {
                 this.editor.destroy()
@@ -164,14 +185,22 @@ module OctoBoot.controllers {
         }
 
         /**
-        *    Activate Duplicable mode - Just duplicate and remove button
+        *    Check if element have background
         */
 
-        private setDuplicableOnly(): void {
+
+        public haveBackground(e: Element): boolean {
+            var cs: CSSStyleDeclaration = getComputedStyle(e)
+            return cs.backgroundImage && cs.backgroundImage !== 'none'
+        }
+
+        /**
+        *    Activate only some button
+        */
+
+        private setOnly(on: string): void {
             this.jDom.find('.button').hide()
-            this.jDom.find('.duplicate, .remove').show()
-            this.jDom.find('.remove').popup({ inline: true, position: 'top right' })
-            this.position(this.editingElement, false, true)
+            this.jDom.find(on).show()
         }
 
         /**
@@ -193,16 +222,30 @@ module OctoBoot.controllers {
         */
 
         private position(element: HTMLElement, withBorder: boolean = true, force: boolean = false): void {
+
+            if (element.tagName.toLowerCase() === 'a' && element.children.length) {
+                element = element.firstChild as HTMLElement
+            }
+
             var rect: ClientRect = Borders.rect(element)
 
-            var offset: number = $(this.stage.iframe).position().top  - this.stage.iframe.contentWindow.scrollY
-            var top: number = rect.top - this.jDom.height() + offset
+            var offset: number = this.position_infos.iframe_position.top - this.stage.iframe.contentWindow.scrollY
+            var top: number = rect.top - this.position_infos.height + offset
             var bottom: number = rect.bottom + offset
-            var left : number = rect.right + $(this.stage.iframe).position().left - this.jDom.width()
+            var left : number = rect.right + this.position_infos.iframe_position.left - this.position_infos.width
 
-            top = top < $(this.stage.iframe).position().top ? bottom : top
+            // rectif max top
+            top = top < this.position_infos.iframe_position.top || top < 0 ?
+                bottom < this.position_infos.iframe_height ? bottom : top : top
+            top = top > -5 ? Math.max(top, this.position_infos.iframe_position.top) : top
+            // rectif max bottom
+            top = Math.min(top, this.position_infos.content_height - (this.position_infos.height * 2) + offset)
+            // rectif max right
+            left = Math.min(left, this.position_infos.iframe_width + this.position_infos.iframe_position.left - (this.position_infos.height * 2))
+            // rectif max left
+            left = Math.max(left, this.position_infos.iframe_position.left)
 
-            if (this.top === top && this.left === left) {
+            if (this.top === top && this.left === left && !force) {
                 return
             }
 
@@ -212,12 +255,24 @@ module OctoBoot.controllers {
             this.jDom.css({
                 'top': this.top,
                 'left': this.left
-            }).show()
+            })
 
             if (this.borders && withBorder) {
                 this.borders.border(rect)
             } else if (withBorder) {
                 this.borders = new Borders(element)
+            }
+        }
+
+        private show_with_delay(delay: number = 250) {
+            if (this.editingElement) {
+                clearTimeout(this.timer_show)
+
+                if (!this.timer_show) {
+                    this.jDom.hide()
+                }
+
+                this.timer_show = setTimeout(() => {this.jDom.fadeIn(); this.timer_show = null}, delay)
             }
         }
 
@@ -300,6 +355,11 @@ module OctoBoot.controllers {
                 this.jDom.find('.special.paste').show()
             }
 
+            // if element got background image property, allow to edit it
+            if (this.haveBackground(element)) {
+                this.jDom.find('.special.img').show()
+            }
+
             switch (tag) {
                 case 'img':
                     this.jDom.find('.special.img').show()
@@ -349,12 +409,19 @@ module OctoBoot.controllers {
         *    Image Edition
         */
         private update_img(url: string, alt: string): void {
-            if (url) {
-                $(this.editingElement).attr('src', this.stage.applyRelativeDepthOnUrl(url))
+            if (this.haveBackground(this.editingElement) && url) {
+                // background
+                $(this.editingElement).css('background-image', 'url(' + this.stage.applyRelativeDepthOnUrl(url) + ')')
+            } else {
+                // img node
+                if (url) {
+                    $(this.editingElement).attr('src', this.stage.applyRelativeDepthOnUrl(url))
+                }
+
+                $(this.editingElement).attr('alt', alt)
+                $(this.editingElement).attr('title', alt)
             }
 
-            $(this.editingElement).attr('alt', alt)
-            $(this.editingElement).attr('title', alt)
         }
 
         private select_img(): void {
@@ -364,11 +431,10 @@ module OctoBoot.controllers {
                     title: model.UI.EDIT_IMG_TITLE,
                     body: model.UI.EDIT_IMG_BODY,
                     icon: 'file image outline',
-                    input: $(this.editingElement).attr('alt') || 'alternate text',
+                    input: this.haveBackground(this.editingElement) ? '' : $(this.editingElement).attr('alt') || 'alternate text',
                     dropdown: data.filter((v: string) => {
                         return !!v.match(/\.(JPG|JPEG|jpg|jpeg|png|gif)+$/)
                     }).map((v: string) => {
-                        console.log(this.stage.path)
                         return this.stage.path + v
                     }),
                     onApprove: () => this.update_img(alert.getDropdownValue(), alert.getInputValue()),
@@ -386,7 +452,9 @@ module OctoBoot.controllers {
                 e.originalEvent.preventDefault()
 
                 if (!this.editingElement) {
-                    return $(this.stage.iframe.contentDocument).off('keydown')
+                    $(this.stage.iframe.contentDocument).off('keydown')
+                    $(document).off('keydown')
+                    return
                 }
 
                 switch (e.keyCode) {
@@ -408,10 +476,11 @@ module OctoBoot.controllers {
                 this.position(this.editingElement)
             }
 
-            let events = $._data(this.stage.iframe.contentDocument as any, 'events')
+            let events = $._data(document as any, 'events')
             if (events && events.keydown) {
                 $(this.stage.iframe.contentDocument).off('keydown')
                 $(document).off('keydown')
+                this.jDom.find('.move').blur()
             } else {
                 new controllers.Alert({
                     title: model.UI.EDIT_MOVE_TITLE,
@@ -561,7 +630,7 @@ module OctoBoot.controllers {
                 },
                 parent: {
                     mouseover: () => this.borders.border(Borders.rect(this.editingElement.parentElement)),
-                    mouseout: () => this.borders.border(Borders.rect(this.editingElement)),
+                    mouseout: () => this.position(this.editingElement, true, true),
                     click: () => { this.show(this.editingElement.parentElement); this.jDom.find('.tag').blur() }
                 },
                 copy : {
