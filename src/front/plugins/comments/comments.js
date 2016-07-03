@@ -11,7 +11,7 @@
             template.parent().find('.header').show()
 
             data = JSON.parse(data)
-            data.forEach(function(comment) {
+            data.comments.forEach(function(comment) {
                 var com = template.clone()
                 com.find('.author').html(comment.name)
                 com.find('.date').html(new Date(comment.time).toLocaleString())
