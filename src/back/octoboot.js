@@ -81,7 +81,7 @@ var octoboot = function(app, socketIo) {
     // custom module utilities (instagram / etc..)
     app.get("/stringfromurl/:url", sfu)
     app.get("/facebook/:pageid/feed", facebook.feed)
-    app.post("/email/:from/:to/:subject", email(app))
+    app.post("/email/:from/:to/:subject", email.form(app))
     app.post("/comments/:id", comments(app))
 
     // 404
