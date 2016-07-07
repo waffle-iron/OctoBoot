@@ -20,9 +20,9 @@ module.exports = (app) => {
       fs.readFile(dir + req.params.id, (err, data) => {
           if (!err && data) {
             data = JSON.parse(data)
-            data.forEach((comment, i) => {
+            data.comments.forEach((comment, i) => {
               if (comment.time === parseInt(req.params.cid)) {
-                data[i].like++
+                data.comments[i].like++
                 res.send()
               }
             })
@@ -35,9 +35,9 @@ module.exports = (app) => {
       fs.readFile(dir + req.params.id, (err, data) => {
           if (!err && data) {
             data = JSON.parse(data)
-            data.forEach((comment, i) => {
+            data.comments.forEach((comment, i) => {
               if (comment.time === parseInt(req.params.cid)) {
-                data.splice(i, 1)
+                data.comments.splice(i, 1)
                 res.send()
               }
             })
