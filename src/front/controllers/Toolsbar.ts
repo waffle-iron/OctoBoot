@@ -276,11 +276,11 @@ module OctoBoot.controllers {
                 }
 
                 editables.each((i, e) => {
-                    setTimeout(() => add_edit(e as HTMLElement), 100)
+                    setTimeout(() => add_edit(e as HTMLElement), 1)
                 })
             } else {
                 helper.Dom.setItemActive(this.jDom, 'null')
-                this.edits.forEach((edit: EditBar) => setTimeout(() => edit.destroy(), 100))
+                this.edits.forEach((edit: EditBar) => setTimeout(() => edit.destroy(), 1))
                 this.edits = null
                 this.actionToCancel = null
             }

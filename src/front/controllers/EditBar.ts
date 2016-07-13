@@ -82,7 +82,6 @@ module OctoBoot.controllers {
 
         public show(element: HTMLElement, onlyButtons?: string /*css selector*/): void {
             // if we are over iframe_overlay, get related iframe element, else keep it
-
             element = this.is_iframe_overlay(element)
 
             if (element.tagName.toLowerCase().match(/^(b|i|u|em)$/)){
@@ -148,7 +147,9 @@ module OctoBoot.controllers {
             clearInterval(this.interval)
             this.interval = null
 
-            this.jDom.hide()
+            if (this.jDom) {
+                this.jDom.hide()
+            }
 
             if (this.borders) {
                 this.borders.destroy()
@@ -176,12 +177,15 @@ module OctoBoot.controllers {
         */
 
         public destroy(): void {
-            this.hide()
-            this.jDom.remove()
-            this.remove_iframe_overlay()
             if (this.borders) {
                 this.borders.clean()
+                this.borders = null
             }
+
+            $('.editbar').remove()
+            this.jDom = null
+            this.hide()
+            this.remove_iframe_overlay()
         }
 
         /**
@@ -223,6 +227,7 @@ module OctoBoot.controllers {
 
         private position(element: HTMLElement, withBorder: boolean = true, force: boolean = false): void {
 
+            if (this.jDom.css('display') === 'none') return
             if (element.tagName.toLowerCase() === 'a' && element.children.length) {
                 element = element.firstChild as HTMLElement
             }
@@ -258,7 +263,8 @@ module OctoBoot.controllers {
             })
 
             if (this.borders && withBorder) {
-                this.borders.border(rect)
+                this.borders.element = element
+                this.borders.refresh()
             } else if (withBorder) {
                 this.borders = new Borders(element)
             }
