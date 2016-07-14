@@ -48,6 +48,7 @@ module.exports = (app) => {
 
     app.get("/comments/:id/:email/:name/init", (req, res) => {
       fs.writeFileSync(dir + req.params.id, JSON.stringify({name: req.params.name, email: req.params.email, comments: []}))
+      res.send()
     })
 
     return (req, res) => {

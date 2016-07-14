@@ -23,9 +23,41 @@ module OctoBoot.plugins {
                 body: 'Add plugin comment ?',
                 icon: 'comments',
                 onApprove: () => {
-                    this.appendLibs(() => {
-                        cbk(new controllers.Handlebar('CommentsInline.hbs').getHtml({id: Date.now()}))
+                    this.getValue('name', (name: string) => {
+                        this.getValue('email', (email: string) => {
+                            let id: string = Date.now().toString()
+                            let url: string = '/comments/:id/:email/:name/init'
+                                                .replace(/\:id/, id)
+                                                .replace(/\:email/, email)
+                                                .replace(/\:name/, name)
+                            $.get(url).done(() => {
+                                this.appendLibs(() => {
+                                    cbk(new controllers.Handlebar('CommentsInline.hbs').getHtml({id: id}))
+                                })
+                            }).fail(() => {
+                                new controllers.Alert({
+                                    title: 'Plugin Comments',
+                                    body: 'Error on plugin creation',
+                                    onDeny: () => this.placeholder.remove()
+                                })
+                            })
+                        })
                     })
+
+                },
+                onDeny: () => this.placeholder.remove()
+            })
+        }
+
+        private getValue(name: string, done: (value: string) => any): void {
+            let alert: controllers.Alert = new controllers.Alert({
+                title: 'Plugin Comments',
+                body: 'Fill a ' + name + ' for this plugin (use for email alert)',
+                input: name,
+                icon: 'comments',
+                onApprove: () => {
+                    if (!alert.getInputValue()) return false
+                    done(alert.getInputValue())
                 },
                 onDeny: () => this.placeholder.remove()
             })

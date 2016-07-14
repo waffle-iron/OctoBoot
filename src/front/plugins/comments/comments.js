@@ -7,7 +7,7 @@
     wrapper.html('')
 
     $.get('http://octoboot.soizen.ovh/comments/' + id, function(data) {
-        if (data) {
+        if (data && data.comments && data.comments.length) {
             template.parent().find('.header').show()
 
             data = JSON.parse(data)
