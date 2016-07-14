@@ -635,7 +635,7 @@ module OctoBoot.controllers {
                     click: () => this.move()
                 },
                 parent: {
-                    mouseover: () => this.borders.border(Borders.rect(this.editingElement.parentElement)),
+                    mouseover: () => { this.borders.element = this.editingElement.parentElement; this.borders.refresh() },
                     mouseout: () => this.position(this.editingElement, true, true),
                     click: () => { this.show(this.editingElement.parentElement); this.jDom.find('.tag').blur() }
                 },
