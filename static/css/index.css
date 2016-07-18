@@ -33,3 +33,7 @@ input#upload {
 .ui.menu {
 	overflow-y: auto;
 }
+
+.toolbar {
+    overflow-x: hidden;
+}
