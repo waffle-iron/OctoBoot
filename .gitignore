@@ -1,11 +1,10 @@
 dist/
 node_modules/
 bower_components/
-temp/*
 .DS_Store
 .cache_string
 .comments
-!temp/.gitkeep
+temp
 
 githubconf.json
 facebook.app.login.json
