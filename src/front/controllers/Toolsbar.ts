@@ -8,6 +8,10 @@
 /// <reference path="../helper/Dom.ts" />
 /// <reference path="../plugins/Ref.ts" />
 
+interface Window {
+    octoboot_before_save?: Function;
+}
+
 module OctoBoot.controllers {
 
     export class Toolsbar extends Handlebar {
@@ -100,25 +104,35 @@ module OctoBoot.controllers {
                 this.actionToCancel()
             }
 
-            helper.Dom.setIconLoading(this.jDom, ['save'])
+            let do_save: Function = () => {
+                helper.Dom.setIconLoading(this.jDom, ['save'])
 
-            var uri: string[] = this.stage.url.split('/')
-            var file: string = uri.pop()
+                var uri: string[] = this.stage.url.split('/')
+                var file: string = uri.pop()
 
-            core.Socket.emit(model.ServerAPI.SOCKET_SAVE, {
-                name: uri.join('/'),
-                url: this.repoUrl,
-                content: helper.Dom.formatDocumentToString(this.stage.iframe.contentDocument),
-                file: file
-            }, (error: string) => {
-                if (error) {
-                    new Alert({ title: 'Error on save', body: error, onApprove: () => {}})
-                } else {
-                    helper.Dom.setItemActive(this.jDom, 'publish')
-                    this.stage.reload()
-                }
-                helper.Dom.setIconLoading(this.jDom, ['save'], false)
-            })
+                core.Socket.emit(model.ServerAPI.SOCKET_SAVE, {
+                    name: uri.join('/'),
+                    url: this.repoUrl,
+                    content: helper.Dom.formatDocumentToString(this.stage.iframe.contentDocument),
+                    file: file
+                }, (error: string) => {
+                    if (error) {
+                        new Alert({ title: 'Error on save', body: error, onApprove: () => {}})
+                    } else {
+                        helper.Dom.setItemActive(this.jDom, 'publish')
+                        this.stage.reload()
+                    }
+                    helper.Dom.setIconLoading(this.jDom, ['save'], false)
+                })
+            }
+
+            // if we find a custom action to do on the edited project, execut it
+            if (this.stage.iframe.contentWindow.octoboot_before_save) {
+                this.stage.iframe.contentWindow.octoboot_before_save(do_save)
+            } else {
+                do_save()
+            }
+
         }
 
         private publish(): void {
