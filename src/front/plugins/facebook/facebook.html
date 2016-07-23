@@ -7,6 +7,9 @@
             margin: -10px 0;
             overflow: hidden;
         }
+        #fb_post_wrapper {
+            text-align: center;
+        }
         .fb-post {
             margin: 10px auto;
         }
@@ -36,12 +39,12 @@
                 dom.className = 'fb-post';
                 dom.setAttribute('data-href', url);
                 dom.setAttribute('data-width', width)
-                
+
                 if (width > 750) {
                     $(parent.document).find('iframe.' + pid + nbr).css('width', width);
                 }
-                
-                container.appendChild(dom); 
+
+                container.appendChild(dom);
             };
 
             /**
@@ -68,7 +71,7 @@
                 })
                 var inter = setInterval(function() {
                     if ($('.fb-post').length === $('[fb-xfbml-state="rendered"]').length) {
-                        resize(); 
+                        resize();
                     }
                 }, 500);
             }
