@@ -5,7 +5,7 @@ var fs = require('fs')
 
 exports.transporter = {}
 
-fs.readFile(__dirname + '/../../../mailgun.api.login.json', (error, data) => {
+fs.readFile(__dirname + '/../../../config/mailgun.api.login.json', (error, data) => {
     if (error) {
         console.log('plugin mailgun error - mailgun.api.login.json missing')
     } else {

@@ -10,7 +10,7 @@ var appLogin = (done, error) => {
         return
     }
 
-    fs.readFile(__dirname + '/../../../facebook.app.login.json', (err, data) => {
+    fs.readFile(__dirname + '/../../../config/facebook.app.login.json', (err, data) => {
       if (err) {
         console.log('facebook plugin error, facebook.app.login.json missing')
         error()
@@ -19,7 +19,7 @@ var appLogin = (done, error) => {
         appId = data.appId
         appSecret = data.appSecret
         done(appId, appSecret)
-      } 
+      }
     })
 }
 var appToken = (done, error) => {
@@ -46,11 +46,11 @@ var appToken = (done, error) => {
 
 exports.feed = (req, res) => {
     var error = (err) => {res.status(410).send()}
-    
+
     if (req.params.pageid) {
         cache(req.params.pageid, (done) => {
            var start = Date.now()
-           
+
            appToken((token) => {
                 FB.api(req.params.pageid + '/feed', {access_token: token}, (fb_res) => {
                     if(!fb_res || fb_res.error) {
@@ -63,11 +63,11 @@ exports.feed = (req, res) => {
                     done(JSON.stringify(ids))
                     sumo.info('plugin-facebook', req.params.pageid, req.get('Referer'), Date.now() - start);
                 })
-            }, error) 
+            }, error)
         }, (data) => {
             res.set('Access-Control-Allow-Origin', '*').send(JSON.parse(data))
         })
-        
+
     } else {
         error()
         sumo.error('plugin-facebook', 'no page id', req.get('Referer'));

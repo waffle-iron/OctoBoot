@@ -29,7 +29,7 @@ sumo = require("./services/sumologic.js"),
 // Model API share with front
 modelApi = require("./model/serverapi.js"),
 // GitHub conf
-ghc = require("../../githubconf.json")
+ghc = require("../../config/githubconf.json")
 
 // TEMP
 ghcli.debug = true

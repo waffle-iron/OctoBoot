@@ -1,12 +1,8 @@
 dist/
 node_modules/
 bower_components/
+config/
 .DS_Store
 .cache_string
 .comments
 temp
-
-githubconf.json
-facebook.app.login.json
-mailgun.api.login.json
-sumologic.collector.conf

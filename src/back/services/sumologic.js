@@ -3,7 +3,7 @@ var fs = require('fs')
 
 var sumologic_collector;
 
-fs.readFile(__dirname + '/../../../sumologic.collector.conf', function(error, data) {
+fs.readFile(__dirname + '/../../../config/sumologic.collector.conf', function(error, data) {
     if (error) {
         console.log('service sumologic error - sumologic.collector.conf missing')
     } else {
@@ -68,9 +68,9 @@ var log = function(pre, data) {
 
 exports.info = function(id) {
     if (id !== null) {
-       log('[I]', arguments) 
+       log('[I]', arguments)
     }
-    
+
     return function(data) {
         log('[I]', data)
     }
@@ -78,7 +78,7 @@ exports.info = function(id) {
 
 exports.error = function(id) {
     if (id !== null) {
-       log('[E]', arguments) 
+       log('[E]', arguments)
     }
     return function(data) {
         log('[E]', data)
