@@ -79,12 +79,18 @@ module OctoBoot.controllers {
         }
 
         private initPlugins(): void {
-            let container: JQuery = this.jDom.find('.menu.plugins')
-            for (var name in OctoBoot.plugins) {
-                new OctoBoot.plugins[name]()
-                .init(container, this.stage, this.projectName)
-                .hide()
-            }
+            this.jDom.find('.item.plugins').hide()
+            // check if user is in the whitelist for plugin
+            core.GitHub.getUser((user: model.GitHubUser) => {
+                $.get(model.ServerAPI.WHITELIST.replace(':for', 'plugin').replace(':from', user.login), () => {
+                    this.jDom.find('.item.plugins').show()
+                    for (var name in OctoBoot.plugins) {
+                        new OctoBoot.plugins[name]()
+                        .init(this.jDom.find('.menu.plugins'), this.stage, this.projectName)
+                        .hide()
+                    }
+                })
+            })
         }
 
         private plugins(): void {

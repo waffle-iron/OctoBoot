@@ -18,7 +18,7 @@ var update_cache = (cache_object, done) => {
         })
     } else {
         sumo.error('cache-string', 'update error - params missing', cache_object)
-    } 
+    }
 }
 
 var inter = setInterval(() => {
@@ -32,12 +32,12 @@ var inter = setInterval(() => {
 
 module.exports = (uid, req, done) => {
     var time = Date.now()
-    
+
     var ndone = (data) => {
         done(data)
         sumo.info('cache-string', 'done in', Date.now() - time)
     }
-    
+
     if (!cache[uid]) {
         cache[uid] = {
             req: req,

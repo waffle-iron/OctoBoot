@@ -19,6 +19,7 @@ fill = require("./modules/fill.js"),
 rm = require("./modules/rm.js"),
 rmdir = require("./modules/rmdir.js"),
 upload = require("./modules/upload.js"),
+whitelist = require("./modules/whitelist.js"),
 // Plugins
 email = require("./plugins/email.js"),
 facebook = require("./plugins/facebook.js"),
@@ -77,6 +78,8 @@ var octoboot = function(app, socketIo) {
 
     app.get(modelApi.IS_LOGGED, isLogged)
     app.get(modelApi.GITHUB_LOGIN, ghapi.oauth(oauth, 'repo,delete_repo'))
+
+    app.get(modelApi.WHITELIST, whitelist)
 
     // custom module utilities (instagram / etc..)
     app.get("/stringfromurl/:url", sfu)
