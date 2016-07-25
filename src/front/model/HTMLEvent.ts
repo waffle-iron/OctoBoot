@@ -9,6 +9,7 @@ module OctoBoot.model {
         mouseout?: (e: MouseEvent) => any;
         dragstart?: (e: DragEvent) => any;
         dragend?: (e: DragEvent) => any;
+        change?: (e: Event) => any;
         // TODO ADD MORE :)
     }
 }

@@ -1,0 +1,28 @@
+<div class="editcss" style="position:fixed;top:0;left:0;width:{{width}}px;height:100%;background:#1b1c1d">
+    <h3 style="color:white"><i class="big inverted write icon"></i>CSS</h3>
+    {{#each styles}}
+        <div class="field" style="text-align:left; margin: 10px 0;">
+          <label style="color:white;text-transform: uppercase;"><i class="inverted ellipsis vertical icon"></i>{{key}}</label>
+          {{#if unit}}
+            <div class="ui small fluid right labeled input">
+                <input type="text" placeholder="{{key}}" value="{{value}}" style="padding: .3em .5em;" class="{{bind event_input}}">
+                <div class="ui basic label" style="padding: .3em .5em;">
+                    {{unit}}
+                </div>
+            </div>
+            <div class="ui mini fluid basic inverted icon buttons">
+              <button class="ui button plus {{bind event_bt}}">
+                <i class="plus icon"></i>
+              </button>
+              <button class="ui button minus {{bind event_bt}}">
+                <i class="minus icon"></i>
+              </button>
+            </div>
+          {{else}}
+            <div class="ui fluid input">
+                <input type="text" name="{{key}}" placeholder="{{key}}" value="{{value}}" style="padding: .3em .5em;" class="{{bind event_input}}">
+            </div>
+          {{/if}}
+        </div>
+    {{/each}}
+</div>

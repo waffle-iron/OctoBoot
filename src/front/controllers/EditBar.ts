@@ -44,6 +44,7 @@ module OctoBoot.controllers {
         private iframes_overlay: JQuery[]
         private position_infos: any
         private lock: boolean
+        private css_editor: Handlebar
 
         constructor(public container: JQuery, public stage: Stage) {
             super(model.UI.HB_EDITBAR)
@@ -171,6 +172,11 @@ module OctoBoot.controllers {
             if (this.editor) {
                 this.editor.destroy()
                 this.editor = null
+            }
+
+            if (this.css_editor) {
+                this.css_editor.jDom.remove()
+                this.css_editor = null
             }
         }
 
@@ -382,6 +388,10 @@ module OctoBoot.controllers {
             // if element got background image property, allow to edit it
             if (this.haveBackground(element)) {
                 this.jDom.find('.special.img').show()
+            }
+
+            if (this.editingElement.style.length) {
+                this.jDom.find('.special.css').show()
             }
 
             switch (tag) {
@@ -629,6 +639,53 @@ module OctoBoot.controllers {
         }
 
         /**
+         *    Create / Edit CSS
+         */
+
+        private css() : void {
+            if (!this.css_editor) {
+                this.css_editor = new Handlebar(model.UI.HB_EDIT_CSS)
+                var toolsbar: JQuery = $('.ui.menu.toolbar')
+                var data_style: Array<{key: string, value: string, unit?: string, event_input: model.HTMLEvent, event_bt: model.HTMLEvent}> = []
+                var prop: string, val: string, unit: string
+
+                while (data_style.length !== this.editingElement.style.length) {
+                    prop = this.editingElement.style[data_style.length]
+                    val = this.editingElement.style[prop]
+                    unit = val.match(/px|%|em/) ? val.match(/px|%|em/)[0] : ''
+                    data_style.push({
+                        key: prop,
+                        value: val.replace(/px|%|em/, ''),
+                        unit: unit,
+                        event_input: {
+                            keyup: (e) => {
+                                this.editingElement.style[$(e.target).attr('placeholder')] = $(e.target).val() + unit
+                            }
+                        },
+                        event_bt: {
+                            click: (e) => {
+                                let input: JQuery = $(e.target).parents('.field').find('input'), newval: number = parseInt(input.val())
+                                if ($(e.target).hasClass('plus')) {
+                                    newval++
+                                    this.editingElement.style[input.attr('placeholder')] = newval + unit
+                                } else if ($(e.target).hasClass('minus')) {
+                                    newval--
+                                    this.editingElement.style[input.attr('placeholder')] = newval + unit
+                                }
+                                input.attr('value', newval)
+                            }
+                        }
+                    })
+                }
+                this.css_editor.initWithContext({width: toolsbar.width() - 2, styles: data_style}, toolsbar)
+            } else {
+                this.css_editor.jDom.remove()
+                this.css_editor = null
+            }
+        }
+
+
+        /**
         *    Handlebars handler for edit bar buttons
         */
 
@@ -665,6 +722,9 @@ module OctoBoot.controllers {
                 },
                 link: {
                     click: () => this.link()
+                },
+                css: {
+                    click: () => this.css()
                 }
             }
         }
