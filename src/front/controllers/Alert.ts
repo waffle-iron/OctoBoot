@@ -20,6 +20,7 @@ module OctoBoot.controllers {
         dropdown?: string[] | number[];
         link?: string;
         closable?: boolean;
+        onVisible?: Function;
     }
 
     export class Alert extends Handlebar {
@@ -50,7 +51,7 @@ module OctoBoot.controllers {
             this.options.onApproveText = options.onApproveText || 'OK'
             this.options.onApproveClass = options.onApproveClass || 'ok green'
             this.options.onApproveIcon = options.onApproveIcon || 'checkmark'
-            
+
             this.options.onDenyText = options.onDenyText || 'CANCEL'
             this.options.onDenyClass = options.onDenyClass || 'deny red'
             this.options.onDenyIcon = options.onDenyIcon || 'remove'
@@ -58,7 +59,8 @@ module OctoBoot.controllers {
             this.initWithContext(this).modal({
                 closable: this.closable,
                 onApprove: options.onApprove,
-                onDeny: options.onDeny
+                onDeny: options.onDeny,
+                onVisible: options.onVisible
             })
             .modal('show');
 

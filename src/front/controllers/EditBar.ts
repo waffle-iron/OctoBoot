@@ -25,6 +25,7 @@ module OctoBoot.controllers {
 
         // public callback
         public on_duplicate: (e: HTMLElement) => any
+        public on_remove: (e: HTMLElement) => any
 
         // lines who border the editing element
         private borders: Borders
@@ -42,6 +43,7 @@ module OctoBoot.controllers {
         // iframe edition overlay
         private iframes_overlay: JQuery[]
         private position_infos: any
+        private lock: boolean
 
         constructor(public container: JQuery, public stage: Stage) {
             super(model.UI.HB_EDITBAR)
@@ -227,12 +229,24 @@ module OctoBoot.controllers {
 
         private position(element: HTMLElement, withBorder: boolean = true, force: boolean = false): void {
 
-            if (this.jDom.css('display') === 'none') return
+            if (this.lock) return
             if (element.tagName.toLowerCase() === 'a' && element.children.length) {
                 element = element.firstChild as HTMLElement
             }
 
             var rect: ClientRect = Borders.rect(element)
+
+            // if element are out of iframe border (left / right) don't do anything
+            if (rect.right < 0 || rect.left > this.position_infos.iframe_width || rect.width === 0 || rect.height === 0) {
+                if (this.jDom) {
+                    this.jDom.hide()
+                }
+
+                if (this.borders) {
+                    this.borders.destroy()
+                }
+                return
+            }
 
             var offset: number = this.position_infos.iframe_position.top - this.stage.iframe.contentWindow.scrollY
             var top: number = rect.top - this.position_infos.height + offset
@@ -260,7 +274,7 @@ module OctoBoot.controllers {
             this.jDom.css({
                 'top': this.top,
                 'left': this.left
-            })
+            }).show()
 
             if (this.borders && withBorder) {
                 this.borders.element = element
@@ -276,9 +290,10 @@ module OctoBoot.controllers {
 
                 if (!this.timer_show) {
                     this.jDom.hide()
+                    this.lock = true
                 }
 
-                this.timer_show = setTimeout(() => {this.jDom.fadeIn(); this.timer_show = null}, delay)
+                this.timer_show = setTimeout(() => {this.jDom.fadeIn(); this.timer_show = this.lock = null;}, delay)
             }
         }
 
@@ -321,6 +336,9 @@ module OctoBoot.controllers {
         */
 
         private remove(): void {
+            if (this.on_remove) {
+                this.on_remove(this.editingElement)
+            }
             $(this.editingElement).remove()
             this.editingElement = null
             this.hide()

@@ -247,16 +247,37 @@ module OctoBoot.controllers {
                 var container: JQuery = $(this.stage.iframe.contentDocument.body)
                 var duplicables = container.find('*[ob-duplicable]')
 
-                var add_edit: (e: HTMLElement) => any = (e: HTMLElement) => {
+                var add_edit: (e: HTMLElement, exec_cbk?: boolean) => any = (e: HTMLElement, exec_cbk: boolean = true) => {
+                    let duplicable_cbk: string = $(e).attr('ob-duplicable')
                     let edit: EditBar = new EditBar(container, this.stage)
                     this.edits.push(edit)
                     edit.show(e, '.duplicate, .remove')
                     edit.on_duplicate = add_edit
+                    if (duplicable_cbk && typeof this.stage.iframe.contentWindow[duplicable_cbk] === 'function') {
+                        edit.on_remove = (e: HTMLElement) => { this.stage.iframe.contentWindow[duplicable_cbk](e, false) }
+                        if (exec_cbk) {
+                            this.stage.iframe.contentWindow[duplicable_cbk](e, true)
+                        }
+                    }
                 }
 
-                duplicables.each((i, e) => {
-                    add_edit(e as HTMLElement)
+                var alert: Alert = new Alert({
+                    title: 'Duplicate - Please wait',
+                    body: 'This can take one minute if you have many duplicable element',
+                    icon: 'notched circle loading',
+                    onVisible: () => {
+                        duplicables.each((i, e) => {
+                            if ($(e).css('display') !== 'none') {
+                                setTimeout(() => add_edit(e as HTMLElement, false), 1)
+                            }
+                        })
+
+                        setTimeout(() => {
+                            alert.hide()
+                        }, 100)
+                    }
                 })
+
             } else {
                 helper.Dom.setItemActive(this.jDom, 'null')
                 this.edits.forEach((edit: EditBar) => edit.destroy())
@@ -289,9 +310,21 @@ module OctoBoot.controllers {
                     edit.show(e, '.img')
                 }
 
-                editables.each((i, e) => {
-                    setTimeout(() => add_edit(e as HTMLElement), 1)
+                var alert: Alert = new Alert({
+                    title: 'Image edition - Please wait',
+                    body: 'This can take one minute if you have many images',
+                    icon: 'notched circle loading',
+                    onVisible: () => {
+                        editables.each((i, e) => {
+                            setTimeout(() => add_edit(e as HTMLElement), 1)
+                        })
+
+                        setTimeout(() => {
+                            alert.hide()
+                        }, 100)
+                    }
                 })
+
             } else {
                 helper.Dom.setItemActive(this.jDom, 'null')
                 this.edits.forEach((edit: EditBar) => setTimeout(() => edit.destroy(), 1))
