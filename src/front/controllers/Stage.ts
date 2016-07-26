@@ -12,6 +12,7 @@ module OctoBoot.controllers {
         public iframe: HTMLIFrameElement
         public baseUrl: string
         public path: string
+        public on_load: (url: string) => any
 
         constructor(public url: string = '/logo.html') {
             super(model.UI.HB_STAGE)
@@ -48,10 +49,18 @@ module OctoBoot.controllers {
             if (this.showAdress) {
                 this.refreshAndShowUrl()
             }
+
+            if (this.on_load) {
+                this.on_load(this.url)
+            }
         }
 
         public reload(): void {
             this.iframe.contentWindow.location.reload()
+
+            if (this.on_load) {
+                this.on_load(this.url)
+            }
         }
 
         public refreshAndShowUrl(): void {

@@ -76,6 +76,13 @@ module OctoBoot.controllers {
             this.inputUpload = $('input#upload').get(0) as HTMLInputElement
 
             this.initPlugins()
+
+            // if stage is reload, cancel action like edit / duplicate / etc...
+            this.stage.on_load = (url: string) => {
+                if (this.actionToCancel) {
+                    this.actionToCancel()
+                }
+            }
         }
 
         private initPlugins(): void {
