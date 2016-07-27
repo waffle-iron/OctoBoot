@@ -10,7 +10,7 @@ interface JQuery {
 	/**
 	 * Semantic popup http://semantic-ui.com/modules/popup.html
      */
-	popup(options: any): JQuery;
+	popup(options?: any): JQuery;
     /**
      * Semantic dropdown http://semantic-ui.com/modules/dropdown.html
      */

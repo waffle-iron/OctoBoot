@@ -234,6 +234,7 @@ module OctoBoot.controllers {
                 this.actionToCancel = null
                 helper.Dom.setItemActive(this.jDom, 'null')
                 if (!basicEdit) {
+                    this.editBarHover.jDom.popup('hide all')
                     this.editBarClick.destroy()
                     this.editBarHover.destroy()
                 } else {
@@ -397,6 +398,8 @@ module OctoBoot.controllers {
 
         // TODO SEE TO MOVE THIS ON EDIT BAR
         private bindEditionEvents(): void {
+            var timeout_popup: number
+
             if (this.stage.iframe.contentWindow['edit_event_binded']) {
                 return
             }
@@ -406,10 +409,16 @@ module OctoBoot.controllers {
                 if (this.editing && !this.editBarClick.editingElement) {
                     // if we are in editing mode AND nothing currently editing
                     this.editBarHover.show(element)
+                    clearTimeout(timeout_popup)
+                    this.editBarHover.jDom.popup('hide')
+                    timeout_popup = setTimeout(() => this.editBarHover.jDom.popup('show'), 2000)
                 }
             })
 
             var click = (e: JQueryEventObject) => {
+                clearTimeout(timeout_popup)
+                this.editBarHover.jDom.popup('hide all')
+
                 let element: HTMLElement = $(e.target).get(0)
                 if (this.editing && !this.editBarClick.editingElement) {
                     // if we are in editing mode, and nothing currently in edition, active edit bar
@@ -424,9 +433,20 @@ module OctoBoot.controllers {
                     !helper.Dom.mouseIsOverElement(e.originalEvent as MouseEvent, this.editBarClick.editingElement)) {
                     // disable edit bar (so reactive on mousemove)
                     this.editBarClick.hide()
-                } else if (e.type === 'dblclick' && this.editing && this.editBarClick.editingElement) {
+                }
+
+                if (e.type.match(/dblclick|keydown/) && this.editing && this.editBarClick.editingElement) {
                     // if dblclick action, execute default action (text edit / image update / etc..)
                     this.editBarClick.default(element)
+                }
+            }
+
+            var keydown = (e: JQueryEventObject) => {
+                // if spacebar pressed
+                if (e.keyCode === 32 && this.editBarHover.editingElement) {
+                    e.preventDefault()
+                    e.target = this.editBarHover.editingElement
+                    click(e)
                 }
             }
 
@@ -439,6 +459,9 @@ module OctoBoot.controllers {
                 click(e)
                 return false
             })
+
+            $(window).on('keydown', keydown)
+            $(this.stage.iframe.contentWindow).on('keydown', keydown)
 
             // Editing flag for binded event
             this.stage.iframe.contentWindow['edit_event_binded'] = true
