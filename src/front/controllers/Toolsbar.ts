@@ -261,18 +261,11 @@ module OctoBoot.controllers {
                 var container: JQuery = $(this.stage.iframe.contentDocument.body)
                 var duplicables = container.find('*[ob-duplicable]')
 
-                var add_edit: (e: HTMLElement, exec_cbk?: boolean) => any = (e: HTMLElement, exec_cbk: boolean = true) => {
-                    let duplicable_cbk: string = $(e).attr('ob-duplicable')
+                var add_edit: (e: HTMLElement, exec_cbk?: boolean) => any = (e: HTMLElement) => {
                     let edit: EditBar = new EditBar(container, this.stage)
                     this.edits.push(edit)
                     edit.show(e, '.duplicate, .remove')
                     edit.on_duplicate = add_edit
-                    if (duplicable_cbk && typeof this.stage.iframe.contentWindow[duplicable_cbk] === 'function') {
-                        edit.on_remove = (e: HTMLElement) => { this.stage.iframe.contentWindow[duplicable_cbk](e, false) }
-                        if (exec_cbk) {
-                            this.stage.iframe.contentWindow[duplicable_cbk](e, true)
-                        }
-                    }
                 }
 
                 var alert: Alert = new Alert({
@@ -282,7 +275,7 @@ module OctoBoot.controllers {
                     onVisible: () => {
                         duplicables.each((i, e) => {
                             if ($(e).css('display') !== 'none') {
-                                setTimeout(() => add_edit(e as HTMLElement, false), 1)
+                                setTimeout(() => add_edit(e as HTMLElement), 1)
                             }
                         })
 

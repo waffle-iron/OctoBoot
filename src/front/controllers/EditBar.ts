@@ -344,6 +344,12 @@ module OctoBoot.controllers {
             if (this.on_remove) {
                 this.on_remove(this.editingElement)
             }
+
+            let duplicable_cbk: string = $(this.editingElement).attr('ob-duplicable')
+            if (duplicable_cbk && typeof this.stage.iframe.contentWindow[duplicable_cbk] === 'function') {
+                this.stage.iframe.contentWindow[duplicable_cbk](this.editingElement, false)
+            }
+
             $(this.editingElement).remove()
             this.editingElement = null
             this.hide()
