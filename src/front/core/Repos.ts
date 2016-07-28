@@ -51,6 +51,10 @@ module OctoBoot.core {
 
         private clone(convert: boolean = false): boolean {
             this.setState(REPO_STATE.LOADING);
+            var timeout: number = setTimeout(() => $(this.sidebarButton).popup({
+                title:'Please wait',
+                content: 'We are currently copying your project, this operation can be long the first time, please be patient'})
+                .popup('show'), 5000)
 
             core.GitHub.cloneOnServer(this.name, this.url, (error: string) => {
                 if (!error) {
@@ -60,6 +64,8 @@ module OctoBoot.core {
                     } else {
                         this.open(projectUrl);
                     }
+                    clearTimeout(timeout)
+                    $(this.sidebarButton).popup('destroy')
                 } else {
                     new controllers.Alert({ title: 'Error during project creation / refresh', body: error, onApprove: Socket.reset})
                 }
