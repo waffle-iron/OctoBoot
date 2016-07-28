@@ -586,6 +586,7 @@ declare module CKEDITOR {
         width?: string | number;
         removeFormatTags?: string;
         autoParagraph?:boolean;
+        fillEmptyBlocks?:boolean;
     }
 
 

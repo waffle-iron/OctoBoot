@@ -55,12 +55,6 @@ module OctoBoot.controllers {
             this.jDom.find('.button.topleft').popup({ inline: true, position: 'top left' })
             this.jDom.find('.button.topright').popup({ inline: true, position: 'top right' })
 
-            // extend ckeditor editable because we do the positioning manually )
-            jQuery.extend(CKEDITOR.dtd.$editable, this.editable_extended)
-            jQuery.extend(CKEDITOR.dtd.$removeEmpty, this.ignored_extended)
-            CKEDITOR.config.allowedContent = true
-            CKEDITOR.config.autoParagraph = false
-
             $(this.stage.iframe.contentWindow).scroll(() => this.show_with_delay())
         }
 
@@ -113,7 +107,7 @@ module OctoBoot.controllers {
                     height: this.jDom.height(),
                 }
 
-                this.position(element, true)
+                this.position(element, true, true)
             }
         }
 
@@ -170,8 +164,7 @@ module OctoBoot.controllers {
             this.left = null
 
             if (this.editor) {
-                this.editor.destroy()
-                this.editor = null
+                this.ckeditor()
             }
 
             if (this.css_editor) {
@@ -311,10 +304,16 @@ module OctoBoot.controllers {
             var duplicable_parents: JQuery = $(this.editingElement).parents('li')
             var toDuplicate: JQuery = duplicable_parents.length ? duplicable_parents : $(this.editingElement)
             var duplicateElement: JQuery = toDuplicate.clone()
+            let duplicable_cbk: string = toDuplicate.attr('ob-duplicable')
+
             duplicateElement.insertAfter(duplicable_parents.length ? duplicable_parents : this.editingElement)
 
             if (this.on_duplicate) {
                 this.on_duplicate(duplicateElement.get(0))
+            }
+
+            if (duplicable_cbk && typeof this.stage.iframe.contentWindow[duplicable_cbk] === 'function') {
+                this.stage.iframe.contentWindow[duplicable_cbk](duplicateElement.get(0), true)
             }
         }
 
@@ -412,8 +411,18 @@ module OctoBoot.controllers {
             if (this.editor) {
                 this.editor.destroy()
                 this.editor = null
-                this.editingElement.removeAttribute('contentEditable')
+                $(this.stage.iframe.contentDocument).find('*[contenteditable]').removeAttr('contenteditable')
+                $(this.stage.iframe.contentDocument)
+                    .find('.cke_editable, .cke_editable_inline, .cke_contents_ltr, .cke_show_borders')
+                    .removeClass('cke_editable cke_editable_inline cke_contents_ltr cke_show_borders')
             } else {
+                // extend ckeditor editable because we do the positioning manually )
+                jQuery.extend(CKEDITOR.dtd.$editable, this.editable_extended)
+                jQuery.extend(CKEDITOR.dtd.$removeEmpty, this.ignored_extended)
+                CKEDITOR.config.allowedContent = true
+                CKEDITOR.config.autoParagraph = false
+                CKEDITOR.config.fillEmptyBlocks = false
+
                 this.editingElement.contentEditable = 'true'
                 this.editor = CKEDITOR.inline(this.editingElement)
                 this.editingElement.focus()
