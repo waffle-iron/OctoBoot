@@ -7,10 +7,12 @@
     wrapper.html('')
 
     $.get('http://octoboot.soizen.ovh/comments/' + id, function(data) {
+
+        try { data = JSON.parse(data) } catch(e) {}
+
         if (data && data.comments && data.comments.length) {
             template.parent().find('.header').show()
 
-            data = JSON.parse(data)
             data.comments.reverse().forEach(function(comment) {
                 var com = template.clone()
                 com.find('.author').html(comment.name)
