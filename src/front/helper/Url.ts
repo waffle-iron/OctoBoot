@@ -14,16 +14,20 @@ module OctoBoot.helper {
             var load: Function = (_last_modified?: string) => {
                 xhr = $.get(url, (data: string) => {
                     if (_last_modified && _last_modified !== xhr.getResponseHeader('Last-Modified')) {
+                        clearTimeout(timeout)
                         done()
                     } else if (!stop) {
                         setTimeout(() => load(_last_modified || xhr.getResponseHeader('Last-Modified')), 500)
                     }
                 })
-                xhr.fail(() => done())
+                xhr.fail(() => {
+                    clearTimeout(timeout)
+                    done()
+                })
             }
 
             load()
-            
+
             return () => {
                 clearTimeout(timeout)
                 do_stop()
