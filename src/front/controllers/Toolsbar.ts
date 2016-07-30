@@ -149,11 +149,12 @@ module OctoBoot.controllers {
         }
 
         private publish(): void {
-            new Alert({
+            var alert: Alert = new Alert({
                 title: model.UI.PUBLISH_ALERT_TITLE,
                 body: model.UI.PUBLISH_ALERT_BODY,
                 onApprove: () => {
 
+                    alert.setWait()
                     helper.Dom.setIconLoading(this.jDom, ['cloud', 'upload'])
 
                     core.Socket.emit(model.ServerAPI.SOCKET_PUBLISH, { name: this.projectName, url: this.repoUrl }, (error: string) => {
@@ -161,13 +162,11 @@ module OctoBoot.controllers {
                         if (!error) {
                             helper.Dom.setIconLoading(this.jDom, ['cloud', 'upload'], false)
 
-                            core.GitHub.getUser((user: model.GitHubUser) => {
-                                new Alert({
-                                    title: 'Publish success !',
-                                    icon: 'checkmark',
-                                    link: 'http://' + user.login.toLowerCase() + '.github.io/' + this.projectName,
-                                    onApprove: () => { }
-                                })
+                            new Alert({
+                                title: 'Publish success !',
+                                icon: 'checkmark',
+                                link: 'http://' + this.repoUrl.match(/github\.com\/(.+)\/.+\.git/)[1].toLowerCase() + '.github.io/' + this.projectName,
+                                onApprove: () => { }
                             })
                         } else {
                             new Alert({
@@ -178,6 +177,8 @@ module OctoBoot.controllers {
                         }
 
                     })
+
+                    return false
                 },
                 onDeny: () => {}
             })

@@ -128,7 +128,7 @@ module OctoBoot.core {
          * Parse the Github Link HTTP header used for pageination
          * http://developer.github.com/v3/#pagination
          */
-        private static parse_link_header(header): model.GitHubLinkHeader {
+        private static parse_link_header(header: string): model.GitHubLinkHeader {
             if (header.length == 0) {
                 throw new Error("input must not be of zero length");
             }
