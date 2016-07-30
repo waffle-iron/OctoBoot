@@ -32,7 +32,7 @@
             {{/if}}
 
             {{#if options.link}}
-            <a href="{{options.link}}" target="_blank">{{options.link}}</a>
+            <a href="{{options.link}}{{#if options.timestamp}}?{{options.timestamp}}{{/if}}" target="_blank">{{options.link}}</a>
             {{/if}}
 
             {{#if options.dropdown}}

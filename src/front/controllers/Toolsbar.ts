@@ -6,6 +6,7 @@
 /// <reference path="../model/UI.ts" />
 /// <reference path="../core/Socket.ts" />
 /// <reference path="../helper/Dom.ts" />
+/// <reference path="../helper/Url.ts" />
 /// <reference path="../plugins/Ref.ts" />
 
 interface Window {
@@ -149,38 +150,50 @@ module OctoBoot.controllers {
         }
 
         private publish(): void {
-            var alert: Alert = new Alert({
+            var unlisten: Function
+            new Alert({
                 title: model.UI.PUBLISH_ALERT_TITLE,
                 body: model.UI.PUBLISH_ALERT_BODY,
                 onApprove: () => {
+                    helper.Dom.setItemActive(this.jDom, 'null')
 
-                    alert.setWait()
-                    helper.Dom.setIconLoading(this.jDom, ['cloud', 'upload'])
+                    new Alert({
+                        title: 'Publishing',
+                        body: 'Please wait, publication is ongoing',
+                        icon: 'notched circle loading'
+                    })
+
+                    var owner: string = this.repoUrl.match(/github\.com\/(.+)\/.+\.git/)[1].toLowerCase()
+                    var url: string = 'http://' + owner + '.github.io/' + this.projectName + '/'
+
+                    // start to check Last-Modified property on url
+                    unlisten  = helper.Url.on_modified(url, () => {
+                        new Alert({
+                            title: 'Publish success !',
+                            icon: 'checkmark',
+                            link: url,
+                            timestamp: Date.now(),
+                            onApprove: () => { }
+                        })
+                    })
 
                     core.Socket.emit(model.ServerAPI.SOCKET_PUBLISH, { name: this.projectName, url: this.repoUrl }, (error: string) => {
-
-                        if (!error) {
-                            helper.Dom.setIconLoading(this.jDom, ['cloud', 'upload'], false)
-
-                            new Alert({
-                                title: 'Publish success !',
-                                icon: 'checkmark',
-                                link: 'http://' + this.repoUrl.match(/github\.com\/(.+)\/.+\.git/)[1].toLowerCase() + '.github.io/' + this.projectName,
-                                onApprove: () => { }
-                            })
-                        } else {
+                        if (error) {
+                            unlisten() // stop to check Last-Modified on url because of publish error
                             new Alert({
                                 title: 'Publish error !',
                                 body: error,
                                 onApprove: () => { }
                             })
                         }
-
                     })
 
-                    return false
                 },
-                onDeny: () => {}
+                onDeny: () => {
+                    if (unlisten) {
+                        unlisten()
+                    }
+                }
             })
         }
 
@@ -188,7 +201,7 @@ module OctoBoot.controllers {
             var e = e || window.event
 
             if (e) {
-                e.returnValue = "Are you sure ? Your work is not saved..."
+                e.returnValue = 'Are you sure ? Your work is not saved...'
             }
 
             return "Are you sure ? Your work is not saved..."

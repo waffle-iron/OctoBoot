@@ -19,6 +19,7 @@ module OctoBoot.controllers {
         input?: string;
         dropdown?: string[] | number[];
         link?: string;
+        timestamp?: number;
         closable?: boolean;
         onVisible?: Function;
     }
