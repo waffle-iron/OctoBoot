@@ -66,7 +66,7 @@ module OctoBoot.controllers {
             .modal('show');
 
             if (options.dropdown) {
-                this.jDom.find('.dropdown').dropdown();
+                this.jDom.find('.dropdown').dropdown({fullTextSearch: true, match: 'text'});
             }
 
             if (options.dropdown && options.input) {

@@ -94,7 +94,9 @@ module OctoBoot.controllers {
             alert.jDom.find('.dropdown').dropdown({
                 onChange: (value: string) => {
                     alert.jDom.find('iframe').attr('src', get_template(value).iframe)
-                }
+                },
+                fullTextSearch: true,
+                match: 'text'
             })
         }
 
