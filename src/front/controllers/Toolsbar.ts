@@ -423,9 +423,10 @@ module OctoBoot.controllers {
             }
 
             var click = (e: JQueryEventObject) => {
+                clearTimeout(timeout_popup)
+
                 // if editing and editbarHover exist, hide potential info popup
                 if (this.editing && this.editBarHover.jDom) {
-                    clearTimeout(timeout_popup)
                     this.editBarHover.jDom.popup('hide all')
                 }
 
