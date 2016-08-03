@@ -411,7 +411,7 @@ module OctoBoot.controllers {
                 return
             }
 
-            this.stage.iframe.contentWindow.addEventListener('mousemove', (e: MouseEvent) => {
+            var mousemove = (e: JQueryEventObject) => {
                 let element: HTMLElement = $(e.target).get(0)
                 if (this.editing && !this.editBarClick.editingElement) {
                     // if we are in editing mode AND nothing currently editing
@@ -420,11 +420,14 @@ module OctoBoot.controllers {
                     this.editBarHover.jDom.popup('hide')
                     timeout_popup = setTimeout(() => this.editBarHover.jDom.popup('show'), 2000)
                 }
-            })
+            }
 
             var click = (e: JQueryEventObject) => {
-                clearTimeout(timeout_popup)
-                this.editBarHover.jDom.popup('hide all')
+                // if editing and editbarHover exist, hide potential info popup
+                if (this.editing && this.editBarHover.jDom) {
+                    clearTimeout(timeout_popup)
+                    this.editBarHover.jDom.popup('hide all')
+                }
 
                 let element: HTMLElement = $(e.target).get(0)
                 if (this.editing && !this.editBarClick.editingElement) {
@@ -459,6 +462,11 @@ module OctoBoot.controllers {
 
             $(this.stage.iframe.contentWindow).click(click)
             $(this.stage.iframe.contentWindow).dblclick(click)
+            $(this.stage.iframe.contentWindow).mousemove(mousemove)
+            $(this.stage.iframe.contentWindow).keydown(keydown)
+
+            $(window).keydown(keydown)
+
             // prevent stage link to redirect when editing
             $(this.stage.iframe.contentDocument).on('click', 'a', (e: JQueryEventObject) => {
                 e.preventDefault()
@@ -466,9 +474,6 @@ module OctoBoot.controllers {
                 click(e)
                 return false
             })
-
-            $(window).on('keydown', keydown)
-            $(this.stage.iframe.contentWindow).on('keydown', keydown)
 
             // Editing flag for binded event
             this.stage.iframe.contentWindow['edit_event_binded'] = true
