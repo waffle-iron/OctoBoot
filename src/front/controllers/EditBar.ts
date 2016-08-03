@@ -130,7 +130,9 @@ module OctoBoot.controllers {
                     break
 
                 default:
-                    this.ckeditor()
+                    if (!this.editor) {
+                        this.ckeditor()
+                    }
                     break
 
             }
