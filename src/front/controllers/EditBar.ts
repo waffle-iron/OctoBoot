@@ -662,7 +662,14 @@ module OctoBoot.controllers {
                 this.css_editor = new Handlebar(model.UI.HB_EDIT_CSS)
                 var toolsbar: JQuery = $('.ui.menu.toolbar')
                 var data_style: Array<{key: string, value: string, unit?: string, event_input: model.HTMLEvent, event_bt: model.HTMLEvent}> = []
-                var prop: string, val: string, unit: string
+                var prop: string, val: string, unit: string, timeout: number
+
+                var update_input: Function = (input: JQuery, inc: boolean) => {
+                    let newval: number = parseInt(input.val())
+                    newval = inc ? ++newval : --newval
+                    this.editingElement.style[input.attr('placeholder')] = newval + unit
+                    input.val(newval.toString())
+                }
 
                 while (data_style.length !== this.editingElement.style.length) {
                     prop = this.editingElement.style[data_style.length]
@@ -679,17 +686,20 @@ module OctoBoot.controllers {
                         },
                         event_bt: {
                             click: (e) => {
-                                let input: JQuery = $(e.target).parents('.field').find('input'), newval: number = parseInt(input.val())
-                                
-                                if ($(e.target).hasClass('plus')) {
-                                    newval++
-                                    this.editingElement.style[input.attr('placeholder')] = newval + unit
-                                } else if ($(e.target).hasClass('minus')) {
-                                    newval--
-                                    this.editingElement.style[input.attr('placeholder')] = newval + unit
-                                }
-
-                                input.val(newval.toString())
+                                clearTimeout(timeout)
+                                clearInterval(timeout)
+                                update_input($(e.target).parents('.field').find('input'), $(e.target).hasClass('plus'))
+                            },
+                            mousedown: (e) => {
+                                timeout = setTimeout(() => {
+                                    timeout = setInterval(() => {
+                                        update_input($(e.target).parents('.field').find('input'), $(e.target).hasClass('plus'))
+                                    }, 50)
+                                }, 500)
+                            },
+                            mouseup: (e) => {
+                                clearTimeout(timeout)
+                                clearInterval(timeout)
                             }
                         }
                     })
