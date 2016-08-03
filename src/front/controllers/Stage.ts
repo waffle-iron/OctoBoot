@@ -74,7 +74,7 @@ module OctoBoot.controllers {
                     this.jDom.find('.dropdown .menu').append('<div class="item">/' + this.url.split('/')[1] + '/' + dir + '</div>')
                 })
                 // active dropdown
-                this.jDom.find('.dropdown').dropdown({ onChange: (value: string, text: string) => this.load(text) })
+                this.jDom.find('.dropdown').dropdown({ onChange: (value: string, text: string) => this.load(text), fullTextSearch: true, match: 'text' })
                 this.jDom.find('.text').html(this.url)
             })
         }
@@ -89,7 +89,7 @@ module OctoBoot.controllers {
                 url = '../' + url
             }
 
-            return url
+            return encodeURI(url)
         }
     }
 }
