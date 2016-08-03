@@ -680,6 +680,7 @@ module OctoBoot.controllers {
                         event_bt: {
                             click: (e) => {
                                 let input: JQuery = $(e.target).parents('.field').find('input'), newval: number = parseInt(input.val())
+                                
                                 if ($(e.target).hasClass('plus')) {
                                     newval++
                                     this.editingElement.style[input.attr('placeholder')] = newval + unit
@@ -687,7 +688,8 @@ module OctoBoot.controllers {
                                     newval--
                                     this.editingElement.style[input.attr('placeholder')] = newval + unit
                                 }
-                                input.attr('value', newval)
+
+                                input.val(newval.toString())
                             }
                         }
                     })
