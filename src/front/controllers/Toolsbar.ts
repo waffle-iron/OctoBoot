@@ -309,7 +309,6 @@ module OctoBoot.controllers {
 
         private background(): void {
             if (!this.edits) {
-                helper.Dom.setItemActive(this.jDom, 'background')
                 // if action running, cancel it
                 if (this.actionToCancel) {
                     this.actionToCancel()
@@ -342,6 +341,7 @@ module OctoBoot.controllers {
 
                         setTimeout(() => {
                             alert.hide()
+                            helper.Dom.setItemActive(this.jDom, 'background')
                         }, 100)
                     }
                 })
