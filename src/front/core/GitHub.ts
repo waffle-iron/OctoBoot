@@ -36,7 +36,8 @@ module OctoBoot.core {
 
         public static createRepo(name: string, done: (repo: model.GitHubRepo) => any): void {
             this.postJSON(this.ghapi + '/user/repos', {
-                name: name
+                name: name,
+                auto_init: true
             })
             .done(done)
             .fail(this.throwError);

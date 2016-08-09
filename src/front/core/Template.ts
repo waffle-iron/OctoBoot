@@ -39,7 +39,7 @@ module OctoBoot.core {
 
                 case REPO_STATE.SELECT:
                     if (this.sidebarButton) this.sidebarButton.innerHTML = this.name + ' <i class="checkmark icon" > </i>';
-                    $(helper.HandlebarHelper.formatId(model.UI.HB_SIDEBAR, '.')).sidebar('toggle');
+                    this.sidebar.sidebar('toggle');
                     break;
 
                 case REPO_STATE.UNSELECT:
