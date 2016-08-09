@@ -1,0 +1,37 @@
+{{!-- data context -> controllers.toolsbar.Publish --}}
+
+<div class="ui basic small modal" style="max-width: 400px; margin: -290px 0 0 -200px">
+
+  <i class="close icon"></i>
+
+    <div class="header">
+        Publish you website online !
+    </div>
+
+    <div class="content">
+        <div class="ui one cards">
+        {{#each methods}}
+            <div class="ui fluid card">
+              <div class="content">
+                <i class="right floated {{icon}} icon"></i>
+                <div class="header">{{title}}</div>
+                <div class="description">
+                  {{desc}}
+                </div>
+              </div>
+              <div class="ui bottom green attached button {{bind button_event}}">
+                <i class="{{button_icon}} icon"></i>
+                {{button_txt}}
+              </div>
+            </div>
+        {{/each}}
+        </div>
+    </div>
+
+    <div class="actions">
+        <div class="one fluid ui inverted buttons">
+            <div class="ui deny red basic inverted button"><i class="remove icon"></i>CANCEL</div>
+        </div>
+    </div>
+
+</div>

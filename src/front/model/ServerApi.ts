@@ -19,6 +19,7 @@ module OctoBoot.model {
         public static SOCKET_LIST_FILES: string = 'ls';
         public static SOCKET_SAVE: string = 'save';
         public static SOCKET_PUBLISH: string = 'publish';
+        public static SOCKET_PUBLISH_FTP: string = 'publishftp';
         public static SOCKET_CLONE: string = 'clone';
         public static SOCKET_CONVERT: string = 'convert';
         public static SOCKET_SCRAPP: string = 'scrapp';

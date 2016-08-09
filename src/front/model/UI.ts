@@ -16,6 +16,8 @@ module OctoBoot.model {
         public static HB_VERTICAL_LINE: string = 'VerticalLine.hbs'
         public static HB_HORIZONTAL_LINE: string = 'HorizontalLine.hbs'
         public static HB_EDIT_CSS: string = 'EditCss.hbs'
+        public static HB_PUBLISH: string = 'Publish.hbs'
+        public static HB_PUBLISH_FTP: string = 'PublishFtp.hbs'
 
         public static SIDEBAR_LAUNCH_BT: string = '.Toolsbar .sidebar'
 

@@ -1,13 +1,14 @@
-/// <reference path="Handlebar.ts" />
-/// <reference path="Templates.ts" />
-/// <reference path="Alert.ts" />
-/// <reference path="Stage.ts" />
-/// <reference path="EditBar.ts" />
-/// <reference path="../model/UI.ts" />
-/// <reference path="../core/Socket.ts" />
-/// <reference path="../helper/Dom.ts" />
-/// <reference path="../helper/Url.ts" />
-/// <reference path="../plugins/Ref.ts" />
+/// <reference path="../Handlebar.ts" />
+/// <reference path="../Templates.ts" />
+/// <reference path="../Alert.ts" />
+/// <reference path="../Stage.ts" />
+/// <reference path="../EditBar.ts" />
+/// <reference path="../../model/UI.ts" />
+/// <reference path="../../core/Socket.ts" />
+/// <reference path="../../helper/Dom.ts" />
+/// <reference path="../../helper/Url.ts" />
+/// <reference path="../../plugins/Ref.ts" />
+/// <reference path="Publish.ts" />
 
 interface Window {
     octoboot_before_save?: Function;
@@ -29,7 +30,7 @@ module OctoBoot.controllers {
         }
 
         public publishHandlers: model.HTMLEvent = {
-            click: () => this.publish()
+            click: () => this.ctrl_publish.show()
         }
 
         public editHandlers: model.HTMLEvent = {
@@ -63,11 +64,14 @@ module OctoBoot.controllers {
         private fileReader: FileReader
         private actionToCancel: Function
 
+        private ctrl_publish: toolsbar.Publish
+
         constructor(public projectName: string, public stage: Stage, public repoUrl: string, public sidebar: JQuery) {
             super(model.UI.HB_TOOLSBAR)
             this.initWithContext(this, this.stage.jDom)
 
             this.templates = new Templates(this.projectName, this.stage)
+            this.ctrl_publish = new toolsbar.Publish(repoUrl)
 
             this.sidebar.sidebar('attach events', this.jDom.children('.settings'))
 
@@ -147,54 +151,6 @@ module OctoBoot.controllers {
                 do_save()
             }
 
-        }
-
-        private publish(): void {
-            var unlisten: Function
-            new Alert({
-                title: model.UI.PUBLISH_ALERT_TITLE,
-                body: model.UI.PUBLISH_ALERT_BODY,
-                onApprove: () => {
-                    helper.Dom.setItemActive(this.jDom, 'null')
-
-                    new Alert({
-                        title: 'Publishing',
-                        body: 'Please wait, publication is ongoing',
-                        icon: 'notched circle loading'
-                    })
-
-                    var owner: string = this.repoUrl.match(/github\.com\/(.+)\/.+\.git/)[1].toLowerCase()
-                    var url: string = 'http://' + owner + '.github.io/' + this.projectName + '/'
-
-                    // start to check Last-Modified property on url
-                    unlisten  = helper.Url.on_modified(url, () => {
-                        new Alert({
-                            title: 'Publish success !',
-                            icon: 'checkmark',
-                            link: url,
-                            timestamp: Date.now(),
-                            onApprove: () => { }
-                        })
-                    })
-
-                    core.Socket.emit(model.ServerAPI.SOCKET_PUBLISH, { name: this.projectName, url: this.repoUrl }, (error: string) => {
-                        if (error) {
-                            unlisten() // stop to check Last-Modified on url because of publish error
-                            new Alert({
-                                title: 'Publish error !',
-                                body: error,
-                                onApprove: () => { }
-                            })
-                        }
-                    })
-
-                },
-                onDeny: () => {
-                    if (unlisten) {
-                        unlisten()
-                    }
-                }
-            })
         }
 
         private unload(e: BeforeUnloadEvent): string {

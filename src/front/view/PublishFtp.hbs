@@ -1,0 +1,52 @@
+{{!-- data context -> controllers.toolsbar.Publish --}}
+
+<div class="ui basic small modal">
+
+  <i class="close icon"></i>
+
+    <div class="header">
+        Please fill your FTP config
+    </div>
+
+    <div class="content">
+        <form class="ui inverted form">
+            <div class="fields">
+                <div class="twelve wide field">
+                  <label>Host*</label>
+                  <input type="text" name="host" placeholder="hostname/address of the remote ftp server">
+                </div>
+                <div class="four wide field">
+                  <label>Port</label>
+                  <input type="text" name="port" placeholder="port of the remote ftp server" value="21">
+                </div>
+                <div class="twelve wide field">
+                  <label>Remote path</label>
+                  <input type="text" name="rpath" placeholder="the root path of the remote server">
+                </div>
+                <div class="four wide field">
+                  <label>Connections</label>
+                  <input type="text" name="conn" placeholder="the max number of concurrent ftp connections" value="1">
+                </div>
+            </div>
+
+            <div class="fields">
+                <div class="twelve wide field">
+                  <label>User*</label>
+                  <input type="text" name="user" placeholder="ftp username">
+                </div>
+                <div class="four wide field">
+                  <label>Pass*</label>
+                  <input type="text" name="pass" placeholder="ftp password">
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="actions">
+        <div class="two fluid ui inverted buttons">
+            <div class="ui deny red basic inverted button"><i class="remove icon"></i>CANCEL</div>
+            <div class="ui ok green basic inverted button"><i class="checkmark icon"></i>OK</div>
+        </div>
+    </div>
+
+</div>

@@ -19,4 +19,8 @@ interface JQuery {
      * Semantic accordion http://semantic-ui.com/modules/accordion.html
      */
     accordion(options?: any): JQuery;
+    /**
+     * Semantic progress http://semantic-ui.com/modules/progress.html
+     */
+    progress(options?: any): JQuery;
 }

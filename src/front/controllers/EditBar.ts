@@ -88,6 +88,7 @@ module OctoBoot.controllers {
             if (element.getBoundingClientRect && element !== this.editingElement) {
                 this.editingElement = element
                 clearInterval(this.interval)
+                // TODO IMPROVE POSITIONNING
                 this.interval = setInterval(() => this.position(element, true), 100)
 
                 if (onlyButtons) {

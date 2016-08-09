@@ -18,6 +18,7 @@ module OctoBoot.controllers {
         iframe?: string;
         input?: string;
         dropdown?: string[] | number[];
+        progress?: boolean;
         link?: string;
         timestamp?: number;
         closable?: boolean;

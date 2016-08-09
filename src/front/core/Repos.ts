@@ -1,6 +1,6 @@
 /// <reference path="../controllers/Alert.ts" />
 /// <reference path="../controllers/Stage.ts" />
-/// <reference path="../controllers/Toolsbar.ts" />
+/// <reference path="../controllers/toolsbar/Toolsbar.ts" />
 /// <reference path="../definition/jquery.plugin.d.ts" />
 /// <reference path="../model/UI.ts" />
 /// <reference path="../model/ServerApi.ts" />

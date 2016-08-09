@@ -34,12 +34,16 @@ module OctoBoot.core {
             }
         }
 
-        public static emit(event: string, data: any, done?: (data?: any) => any): void {
+        public static emit(event: string, data: any, done?: (data?: any) => any, once: boolean = true): void {
             var cbk: string = event + 'all';
 
             if (done) {
                 cbk = event + (Date.now() * Math.random()); // set a cbk event to call to execute done method on side front
-                this.io.once(cbk, done);
+                if (once) {
+                    this.io.once(cbk, done);
+                } else {
+                    this.io.on(cbk, done);
+                }
             }
 
             data = data || {};

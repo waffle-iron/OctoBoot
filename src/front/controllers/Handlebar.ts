@@ -22,10 +22,10 @@ module OctoBoot.controllers {
             }
         }
 
-        public initWithContext(context: any, customContainer?: JQuery): JQuery {
+        public initWithContext(context?: any, customContainer?: JQuery): JQuery {
             // If main container are not ready yet, append on body, sidebar pusher will take everything in body and put in on pusher
             var container: JQuery = customContainer ? customContainer : $(model.UI.MAIN_CONTAINER).length ? $(model.UI.MAIN_CONTAINER) : $(document.body)
-            container.append(this.getHtml(context));
+            container.append(this.getHtml(context || {}));
 
             this.jDom = container.children().last()
 

@@ -14,6 +14,7 @@ copy_template = require("./modules/copy_template.js"),
 copy_plugin = require("./modules/copy_plugin.js"),
 save = require("./modules/save.js"),
 publish = require("./modules/publish.js"),
+publish_ftp = require("./modules/publish_ftp.js"),
 scrapp = require("./modules/scrapp.js"),
 fill = require("./modules/fill.js"),
 rm = require("./modules/rm.js"),
@@ -112,6 +113,7 @@ var octoboot = function(app, socketIo) {
             socket.on(modelApi.SOCKET_COPY, copy(rootDir, sockets))
             socket.on(modelApi.SOCKET_CLONE, clone(projectDir, sockets))
             socket.on(modelApi.SOCKET_PUBLISH, publish(projectDir, sockets))
+            socket.on(modelApi.SOCKET_PUBLISH_FTP, publish_ftp(projectDir, sockets))
             socket.on(modelApi.SOCKET_CONVERT, convert(projectDir, sockets))
             socket.on(modelApi.SOCKET_LIST_DIR, list(projectDir, sockets))
             socket.on(modelApi.SOCKET_LIST_FILES, ls(projectDir, sockets))

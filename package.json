@@ -38,6 +38,7 @@
     "cookie-session": "^1.1.0",
     "express": "^4.12.3",
     "fb": "^1.0.2",
+    "ftp": "^0.3.10",
     "github-api": "git+https://github.com/RonanDrouglazet/github-api.git",
     "github-cli": "git+https://github.com/RonanDrouglazet/github-cli.git",
     "handlebars": "^3.0.3",
