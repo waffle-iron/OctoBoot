@@ -17,6 +17,11 @@ module OctoBoot.core {
 
         public static init(): any {
             this.io = io('http://' + window.location.host);
+            this.io.on('reconnect',
+                () => this.emit(model.ServerAPI.SOCKET_BIND, {},
+                    () => this.emit(model.ServerAPI.SOCKET_ID, {})
+                )
+            )
             // try to retrieve previous sid on localstorage
             // allow us to keep original user folder with repo and not re clone everything, just pull / reset
             this.sid = localStorage.getItem(model.ServerAPI.SOCKET_ID);
