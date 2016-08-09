@@ -17,7 +17,7 @@ module.exports = function(dir, sockets) {
             // clone / clean and reset cachable repo
             ghcli.clone(cache_dir, gitUrl + " " + cache_name, function(err, stdout, stderr) {
                 ghcli.clean(cache_dir + "/" + cache_name, function(perr, pstdout, pstderr) {
-                    ghcli.reset(baseUri + "/" + cache_name, 'master', function(perr, pstdout, pstderr) {
+                    ghcli.reset(cache_dir + "/" + cache_name, 'master', function(perr, pstdout, pstderr) {
                         data.src = '.cache/' + cache_name
                         data.dest = data._sid
                         data.file = '/' + data.name
