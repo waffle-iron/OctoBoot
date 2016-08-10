@@ -54,7 +54,7 @@ module OctoBoot.controllers.toolsbar {
             let match: RegExpMatchArray = url.match(/github\.com\/(.+)\/(.+)\.git/)
             this.owner = match[1].toLowerCase()
             this.pname =  match[2]
-            this.ghpage = 'http://' + this.owner + '.github.io/' + this.pname + '/'
+            this.ghpage = 'https://' + this.owner + '.github.io/' + this.pname + '/'
 
             this.methods[0].desc = this.ghpage
 
@@ -86,7 +86,7 @@ module OctoBoot.controllers.toolsbar {
                     })
 
                     // start to check Last-Modified property on url
-                    unlisten  = helper.Url.on_modified(this.ghpage, () => {
+                    unlisten  = helper.Url.on_modified(this.ghpage + 'index.html', () => {
                         new Alert({
                             title: 'Publish success !',
                             icon: 'checkmark',
