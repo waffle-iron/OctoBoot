@@ -4,7 +4,7 @@
   "description": "OctoBoot is a fast, powerful, and user friendly tools to create your own website in a few clic, all free !! (with help of some free/custom template and gh-pages)",
   "main": "server.js",
   "scripts": {
-    "test": "npm start",
+    "test": "nightwatch -c config/nightwatch.json --env prod,firefox --retries",
     "start": "npm run build:ts && npm run build:model && npm run build:handlebars",
     "run": "node server.js",
     "watch": "parallelshell 'npm run watch:ts' 'npm run watch:handlebars'",
@@ -43,6 +43,7 @@
     "github-cli": "git+https://github.com/RonanDrouglazet/github-cli.git",
     "handlebars": "^3.0.3",
     "jsontree-js": "0.0.4",
+    "nightwatch": "^0.9.6",
     "nodemailer": "^2.2.1",
     "parallelshell": "latest",
     "rimraf": "^2.5.1",
