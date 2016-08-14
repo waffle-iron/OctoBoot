@@ -54,7 +54,7 @@ module OctoBoot.controllers.toolsbar {
             let match: RegExpMatchArray = url.match(/github\.com\/(.+)\/(.+)\.git/)
             this.owner = match[1].toLowerCase()
             this.pname =  match[2]
-            this.ghpage = 'https://' + this.owner + '.github.io/' + this.pname + '/'
+            this.ghpage = 'http://' + this.owner + '.github.io/' + this.pname + '/'
 
             this.methods[0].desc = this.ghpage
 
@@ -73,11 +73,22 @@ module OctoBoot.controllers.toolsbar {
         }
 
         private github(): void {
+            var alert_ongoing: Alert
             var unlisten: Function
+            var error_fct: Function = (error: string) => {
+                unlisten() // stop to check Last-Modified on url because of publish error
+                new Alert({
+                    title: 'Publish error !',
+                    body: error,
+                    onApprove: () => { }
+                })
+            }
+
             new Alert({
                 title: model.UI.PUBLISH_ALERT_TITLE,
                 body: model.UI.PUBLISH_ALERT_BODY,
                 onApprove: () => {
+                    var now: number = Date.now()
 
                     new Alert({
                         title: 'Publishing',
@@ -86,27 +97,32 @@ module OctoBoot.controllers.toolsbar {
                     })
 
                     // start to check Last-Modified property on url
-                    unlisten  = helper.Url.on_modified(this.ghpage + 'index.html', () => {
+                    unlisten  = helper.Url.on_modified('/stringfromurl/' + encodeURIComponent(this.ghpage) + 'octoboot_publish', now.toString(),  () => {
                         new Alert({
                             title: 'Publish success !',
                             icon: 'checkmark',
                             link: this.ghpage,
-                            timestamp: Date.now(),
+                            timestamp: now,
                             onApprove: () => { }
                         })
                     })
 
-                    core.Socket.emit(model.ServerAPI.SOCKET_PUBLISH, { name: this.pname, url: this.url }, (error: string) => {
-                        if (error) {
-                            unlisten() // stop to check Last-Modified on url because of publish error
-                            new Alert({
-                                title: 'Publish error !',
-                                body: error,
-                                onApprove: () => { }
+                    core.Socket.emit(model.ServerAPI.SOCKET_SAVE, {
+                        name: this.pname,
+                        url: this.url,
+                        content: now,
+                        file: 'octoboot_publish'
+                    }, (err: string) => {
+                        if (err) {
+                            error_fct(err)
+                        } else {
+                            core.Socket.emit(model.ServerAPI.SOCKET_PUBLISH, { name: this.pname, url: this.url }, (error: string) => {
+                                if (error) {
+                                    error_fct(error)
+                                }
                             })
                         }
                     })
-
                 },
                 onDeny: () => {
                     if (unlisten) {

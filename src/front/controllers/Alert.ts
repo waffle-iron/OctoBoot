@@ -35,8 +35,6 @@ module OctoBoot.controllers {
         constructor(public options: AlertOptions) {
             super(model.UI.HB_ALERT);
 
-            $('.Alert').remove();
-
             if (!options.icon && !options.image && !options.iframe) {
                 this.options.icon = 'warning sign'; //default
             }
