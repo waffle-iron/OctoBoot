@@ -153,7 +153,7 @@ module OctoBoot.controllers {
 
         private createFileFromTemplate(fileName: string, templateName: string, personal: boolean): void {
             core.Socket.emit(model.ServerAPI.SOCKET_COPY_TEMPLATE, { file: fileName, template: templateName, project: this.projectName, personal: personal }, () => {
-                this.stage.load('/' + this.projectName + (fileName === 'index' ? '' : '/' + fileName ) + '/index.html');
+                this.stage.load('/' + this.projectName + (fileName === 'index' ? '' : '/' + fileName ) + 'index.html');
             });
         }
 

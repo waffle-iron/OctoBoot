@@ -129,6 +129,7 @@ module.exports = {
             .click(module.exports.ui.modal_ok)
             .waitForElementNotVisible(module.exports.ui.modals, 20000)
 
+        // expect modal to not be here
         client
             .expect.element(module.exports.ui.modal)
             .to.not.be.present

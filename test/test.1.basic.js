@@ -1,5 +1,6 @@
 var login = require('./actions/login.js')
 var project = require('./actions/project.js')
+var request = require('request')
 var logged = false
 var project_name
 
@@ -8,15 +9,26 @@ module.exports = {
         project_name = client.globals.project
     },
 
-    after: (client) => {
-        client.end()
+    after: (client, done) => {
+        client
+            .getAttribute('iframe:nth-child(2)', 'src', (r) => {
+                client.assert.equal(typeof r, 'object', 'iframe src should exist')
+                request(r.value, (err, resp, body1) => {
+                    client.assert.ifError(err)
+                    request(r.value.replace('tata', 'toto'), (err, resp, body2) => {
+                        client.assert.ifError(err)
+                        client.assert.equal(body1, body2, 'iframe src and template should be equal')
+                        done()
+                    })
+                })
+            })
+            .end()
     },
 
     'Check if project to delete': (client) => {
         login(client)
             .waitForElementNotPresent('.menu .repo' + project_name, 1000, false, (r) => {
-                console.log(r.status)
-                if (r.status !== 0) {
+                if (r.value.length) {
                     // click on "public project" title (and wait for animation)
                     client
                         .click(project.ui.repos_public_title)
@@ -24,6 +36,7 @@ module.exports = {
                     // delete project and close the client session
                     project
                         .delete(client, project_name)
+                        .pause(5000)
                         .end()
                 } else {
                     logged = true
@@ -36,11 +49,6 @@ module.exports = {
         if (!logged) {
             login(client)
         }
-
-        client
-            .expect.element(project.ui.repos_public_label)
-            .text.to.be.equal('0')
-            .before(2000)
 
         // button "new +" should not be visible before click on public project header
         client
@@ -66,11 +74,10 @@ module.exports = {
             })
     },
 
-    'Toolsbar - New Page should work': (client) => {
+    'Toolsbar - New Page from template should work': (client) => {
         client
             .click('.toolbar .item.new')
 
-        // then, after click, it should be visible
         client
             .expect.element(project.ui.modals)
             .to.be.visible
@@ -112,31 +119,72 @@ module.exports = {
             .text.to.be.equal('Select a template and fill the name for your new page')
             .before(1000)
 
-        client.end()
-    },
-
-    'Delete project (with falsy value first)': (client) => {
-        // log in, and expect to have 1 project on this test account (created on previous test)
-        login(client)
-            .expect.element(project.ui.repos_public_label)
-            .text.to.not.be.equal('0')
-
-        // click on "public project" title (and wait for animation)
+        // the input search should search correctly
         client
-            .click(project.ui.repos_public_title)
+            .setValue(project.ui.modal_input + '.search', 'blog')
+            .expect.element(project.ui.modal + ' .dropdown .item.selected')
+            .to.have.attribute('data-value')
+            .equals('[bootstrap] - blog')
 
-        // delete project and close the client session
-        project
-            .delete(client, project_name)
-            .end()
+        // on click on ok, the modals should disappear
+        client
+            .click(project.ui.modal + ' .dropdown .item.selected')
+            .click(project.ui.modal_ok)
+            .waitForElementNotPresent(project.ui.modal, 100)
+            .waitForElementNotVisible(project.ui.modals, 1000)
     },
 
-    'Delete project check': (client) => {
-        // expect modal to be invisible and project repos label to 0
-        login(client)
-            .click(project.ui.repos_public_title)
-            .pause(100)
-            .expect.element('.menu .repo' + project_name)
-            .to.not.be.present
+    'Toolsbar - New Page duplicate should work': (client) => {
+        client
+            .click('.toolbar .item.new')
+
+        client
+            .expect.element(project.ui.modals)
+            .to.be.visible
+            .before(100)
+
+        client
+            .expect.element(project.ui.modal_title)
+            .to.be.visible
+            .before(1000)
+
+        client
+            .click(project.ui.modal_ok)
+            .expect.element(project.ui.modal_title)
+            .to.be.visible
+            .and
+            .text.to.be.equal('Fill the name for your new page')
+            .before(1000)
+
+        client
+            .setValue(project.ui.modal_input, 'toto')
+            .click(project.ui.modal_ok)
+            .waitForElementNotPresent(project.ui.modal, 100)
+            .waitForElementNotVisible(project.ui.modals, 1000)
+            .expect.element('iframe:nth-child(2)')
+            .to.have.attribute('src')
+            .which.contains(project_name + '/toto/index.html')
+            .before(100)
+
+        client
+            .click('.toolbar .item.new')
+
+        client
+            .expect.element(project.ui.modal_title)
+            .to.be.visible
+            .before(1000)
+
+        client
+            .click(project.ui.modal_ok)
+            .waitForElementPresent(project.ui.modal_input, 1000)
+            .setValue(project.ui.modal_input, 'tata')
+            .click(project.ui.modal_ok)
+            .waitForElementNotPresent(project.ui.modal, 100)
+            .waitForElementNotVisible(project.ui.modals, 1000)
+            .expect.element('iframe:nth-child(2)')
+            .to.have.attribute('src')
+            .which.contains(project_name + '/tata/index.html')
+            .before(100)
+
     }
 };
