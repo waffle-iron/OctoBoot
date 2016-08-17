@@ -19,7 +19,10 @@ module OctoBoot.core {
             this.io = io('http://' + window.location.host);
             this.io.on('reconnect',
                 () => this.emit(model.ServerAPI.SOCKET_BIND, {},
-                    () => this.emit(model.ServerAPI.SOCKET_ID, {})
+                    () => this.emit(model.ServerAPI.SOCKET_ID, {}, () => {
+                        let login: controllers.Login = new controllers.Login()
+                        login.isLogged().fail(() => login.show())
+                    })
                 )
             )
             // try to retrieve previous sid on localstorage

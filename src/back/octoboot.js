@@ -103,7 +103,8 @@ var octoboot = function(app, socketIo) {
 
             socket.on(modelApi.SOCKET_ID, function(data) {
                 var sid = data._sid || Date.now()
-                sockets[sid] = {s: socket}
+                sockets[sid] = sockets[sid] || {}
+                sockets[sid].s = socket
                 socket.emit(data._scbk, sid)
             })
 
