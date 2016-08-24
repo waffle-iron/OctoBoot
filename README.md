@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/RonanDrouglazet/OctoBoot.png?label=ready&title=Ready)](https://waffle.io/RonanDrouglazet/OctoBoot)
 # OctoBoot (WIP !!)
 ![screen1](http://ronandrouglazet.github.io/OctoBoot/screen1.png)
 ![screen2](http://ronandrouglazet.github.io/OctoBoot/screen2.png)
